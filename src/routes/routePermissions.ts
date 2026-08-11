@@ -38,6 +38,7 @@ export const routePermissions: Record<string, RoutePermission> = {
   // Creating is its own action — a view-only user who types the URL should not
   // land on the form just because the list is open to them.
   "/inventory/products/create": { module: "Products", action: "Create" },
+  "/inventory/products/edit/:id": { module: "Products", action: "Update" },
   "/inventory/products/expired": { module: "Expired Products", action: "View" },
   "/inventory/products/low-stock": { module: "Low Stocks", action: "View" },
   "/inventory/categories": { module: "Categories", action: "View" },

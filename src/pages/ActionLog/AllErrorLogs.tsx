@@ -1,4 +1,4 @@
-ï»¿import { SearchOutlined } from "@ant-design/icons";
+import { SearchOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -158,14 +158,14 @@ const AllErrorLogs = () => {
       // A 5xx is ours to fix; a 4xx is usually the caller's.
       isLow: (l: any) => Number(l.statusCode) >= 500,
       cells: (l: any) => [
-        l.timestamp ? dayjs(l.timestamp).format("DD MMM YYYY, h:mm A") : "â€”",
-        l.statusCode ?? "â€”",
-        l.errorName || "â€”",
-        l.message || "â€”",
-        l.method || "â€”",
-        l.route || "â€”",
+        l.timestamp ? dayjs(l.timestamp).format("DD MMM YYYY, h:mm A") : "—",
+        l.statusCode ?? "—",
+        l.errorName || "—",
+        l.message || "—",
+        l.method || "—",
+        l.route || "—",
         l.email || "guest",
-        l.leadDetails?.ipAddress || "â€”",
+        l.leadDetails?.ipAddress || "—",
       ],
     });
   };
@@ -246,7 +246,7 @@ const AllErrorLogs = () => {
           <div className="flex items-center gap-2">
             {methodBadge(record.method)}
             <span className="text-xs font-mono text-secondary-700 truncate">
-              {record.route || "â€”"}
+              {record.route || "—"}
             </span>
           </div>
           {record.errorName && (
@@ -283,7 +283,7 @@ const AllErrorLogs = () => {
           <div className="flex items-center gap-1 text-secondary-600">
             <Globe className="w-3 h-3" />
             <span className="font-mono">
-              {record.leadDetails?.ipAddress || "â€”"}
+              {record.leadDetails?.ipAddress || "—"}
             </span>
           </div>
           <div className="text-secondary-500 truncate max-w-[150px]">
@@ -308,7 +308,7 @@ const AllErrorLogs = () => {
           <PermissionGate module="Error Logs" action="Delete">
             <Tooltip title="Delete">
               <Button
-                icon={<Trash2 className="w-4 h-4" />}
+                danger icon={<Trash2 className="w-4 h-4" />}
                 onClick={() => handleDelete(record._id)}
               />
             </Tooltip>
@@ -338,13 +338,13 @@ const AllErrorLogs = () => {
         ]}
         extra={
           <div className="flex flex-wrap items-center gap-2">
-            {/* Worth having before Clear All is pressed â€” the file is the only
+            {/* Worth having before Clear All is pressed — the file is the only
                 copy left afterwards. */}
             <ExportMenu sheet={buildSheet} disabled={logs.length === 0} />
             <PermissionGate module="Error Logs" action="Delete">
               <Button
                 loading={isClearing}
-                icon={<Trash2 className="w-4 h-4" />}
+                danger icon={<Trash2 className="w-4 h-4" />}
                 onClick={handleClearAll}
               >
                 Clear All
@@ -401,7 +401,7 @@ const AllErrorLogs = () => {
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
           <div className="flex flex-col sm:flex-row gap-3 flex-1">
             <Input
-              placeholder="Search by message, route or emailâ€¦"
+              placeholder="Search by message, route or email…"
               prefix={<SearchOutlined />}
               value={searchText}
               onChange={(e) => {
@@ -556,7 +556,7 @@ const AllErrorLogs = () => {
                 <div className="text-sm mt-1">
                   {selected.timestamp
                     ? new Date(selected.timestamp).toLocaleString()
-                    : "â€”"}
+                    : "—"}
                 </div>
               </div>
             </div>
@@ -569,15 +569,15 @@ const AllErrorLogs = () => {
                 <div className="text-xs font-mono bg-secondary-50 px-3 py-2 rounded mt-1 space-y-1 break-all">
                   <div>
                     <span className="text-secondary-500">IP:</span>{" "}
-                    {selected.leadDetails.ipAddress || "â€”"}
+                    {selected.leadDetails.ipAddress || "—"}
                   </div>
                   <div>
                     <span className="text-secondary-500">URL:</span>{" "}
-                    {selected.leadDetails.browserUrl || "â€”"}
+                    {selected.leadDetails.browserUrl || "—"}
                   </div>
                   <div>
                     <span className="text-secondary-500">UA:</span>{" "}
-                    {selected.leadDetails.userAgent || "â€”"}
+                    {selected.leadDetails.userAgent || "—"}
                   </div>
                 </div>
               </div>
@@ -589,7 +589,7 @@ const AllErrorLogs = () => {
                   Stack trace
                 </Text>
                 {/* Scrolls on its own, so it opts out of the page's smooth
-                    scrolling â€” otherwise the wheel over a long stack trace
+                    scrolling — otherwise the wheel over a long stack trace
                     moves the page behind it instead of the trace. */}
                 <pre
                   data-lenis-prevent

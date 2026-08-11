@@ -156,6 +156,14 @@ export const baseApi = createApi({
     "notifications",
     "countries",
     "error-logs",
+    // Inventory
+    "categories",
+    "sub-categories",
+    "brands",
+    "units",
+    "variant-attributes",
+    "warranties",
+    "products",
   ],
   endpoints: () => ({}),
 });

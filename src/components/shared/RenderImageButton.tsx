@@ -1,4 +1,4 @@
-﻿import { Button } from "antd";
+import { Button } from "antd";
 import { RiDeleteBinLine } from "react-icons/ri";
 import AntImage from "./AntImage";
 
@@ -39,7 +39,7 @@ const RenderImageButton = ({
             type="default"
             size="small"
             onClick={handleDelete}
-            icon={<RiDeleteBinLine size={15} />}
+            danger icon={<RiDeleteBinLine size={15} />}
           />
         </div>
       ) : (

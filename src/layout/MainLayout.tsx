@@ -17,7 +17,7 @@ const MainLayout = () => {
 
   return (
     <div className="w-full h-screen bg-[#fbfdfd]">
-      <div className="flex h-full max-w-9xl mx-auto bg-gray-200 overflow-hidden shadow-sm">
+      <div className="flex h-full max-w-9xl mx-auto bg-[#f4f7f7] overflow-hidden shadow-sm">
         {/* Sits above every page: an account still on its issued password gets
             no further until it has been replaced. */}
         <ForcePasswordChangeModal />

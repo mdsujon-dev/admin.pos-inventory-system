@@ -1,4 +1,4 @@
-ï»¿import {
+import {
   Badge,
   Button,
   Empty,
@@ -167,7 +167,7 @@ const NotificationCard: FC<CardProps> = ({
                 <span className="text-[11px] text-secondary-400 font-medium">
                   {meta.label}
                 </span>
-                <span className="text-secondary-300">â€¢</span>
+                <span className="text-secondary-300">•</span>
                 <Tooltip title={createdAtAbsolute}>
                   <span className="text-[11px] text-secondary-400">
                     {createdAtRelative}
@@ -227,7 +227,7 @@ const NotificationCard: FC<CardProps> = ({
                 <span>
                   <span className="text-secondary-400">Source:</span>{" "}
                   <span className="text-secondary-700 font-medium">
-                    {item.source?.module ?? "â€”"}
+                    {item.source?.module ?? "—"}
                   </span>
                 </span>
                 <span>
@@ -252,7 +252,7 @@ const NotificationCard: FC<CardProps> = ({
                 <PermissionGate module="Notifications" action="Delete">
                   <Button
                     size="small"
-                    icon={<Trash2 size={14} />}
+                    danger icon={<Trash2 size={14} />}
                     onClick={(e) => {
                       e.stopPropagation();
                       onDelete(item);
@@ -594,7 +594,7 @@ const AllNotifications: FC = () => {
                   <p className="text-secondary-500 text-xs mt-1">
                     {hasActiveFilters
                       ? "Try adjusting filters or clearing them"
-                      : "You're all caught up â€” new notifications will appear here"}
+                      : "You're all caught up — new notifications will appear here"}
                   </p>
                 </div>
               }

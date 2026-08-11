@@ -1,4 +1,4 @@
-ï»¿import { FileTextIcon, UploadIcon } from "lucide-react";
+import { FileTextIcon, UploadIcon } from "lucide-react";
 import { useState, useMemo } from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import SetMediaModal from "../modal/media/SetMediaModal";
@@ -13,7 +13,7 @@ interface UploadImageProps {
   mode?: "single" | "multiple";
   /**
    * What kind of file this slot holds. "document" switches the picker to PDFs
-   * and other handouts â€” without it a syllabus PDF can never be attached,
+   * and other handouts — without it a syllabus PDF can never be attached,
    * because the media picker only ever offered images.
    */
   mediaKind?: "image" | "document";
@@ -86,7 +86,7 @@ const UploadImage = ({
   };
 
   // A PDF has no thumbnail, so its tile is the file name plus a link that
-  // opens it â€” the same click that would have previewed an image.
+  // opens it — the same click that would have previewed an image.
   const DocTile = ({ url }: { url: string }) => {
     const href = url?.startsWith("http")
       ? url
@@ -137,7 +137,7 @@ const UploadImage = ({
             )}
             <button
               onClick={handleDelete}
-              className="absolute top-1 right-1 bg-white border border-primary-500 text-primary-600 p-2 rounded-lg shadow hover:bg-primary-600 hover:text-white transition-colors"
+              className="absolute top-1 right-1 bg-white border border-red-500 text-red-500 p-2 rounded-lg shadow hover:bg-red-600 hover:text-white transition-colors"
             >
               <RiDeleteBinLine size={16} />
             </button>
@@ -173,7 +173,7 @@ const UploadImage = ({
               )}
               <button
                 onClick={(e) => handleDelete(e, url)}
-                className="absolute top-1 right-1 bg-white border border-primary-500 text-primary-600 p-2 rounded-lg shadow hover:bg-primary-600 hover:text-white transition-colors"
+                className="absolute top-1 right-1 bg-white border border-red-500 text-red-500 p-2 rounded-lg shadow hover:bg-red-600 hover:text-white transition-colors"
               >
                 <RiDeleteBinLine size={16} />
               </button>

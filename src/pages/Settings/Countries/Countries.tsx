@@ -1,4 +1,4 @@
-ï»¿import {
+import {
   Button,
   Image,
   Input,
@@ -195,7 +195,7 @@ const Countries = () => {
             style={{ objectFit: "cover", borderRadius: 4 }}
           />
         ) : (
-          <span className="text-secondary-400">â€”</span>
+          <span className="text-secondary-400">—</span>
         ),
     },
     {
@@ -279,7 +279,7 @@ const Countries = () => {
           <PermissionGate module="Countries" action="Delete">
             <Tooltip title="Delete Country">
               <Button
-                icon={<Trash2 className="w-4 h-4" />}
+                danger icon={<Trash2 className="w-4 h-4" />}
                 onClick={() => handleDelete(record._id!)}
               />
             </Tooltip>
@@ -335,13 +335,13 @@ const Countries = () => {
                   rows: (all?.data?.data || []) as ICountry[],
                   isLow: (c: any) => !c.isActive,
                   cells: (c: any) => [
-                    c.serial_no ?? "â€”",
-                    c.name || "â€”",
-                    c.code || "â€”",
-                    c.role || "â€”",
-                    c.email || "â€”",
-                    c.phone || "â€”",
-                    c.accentSolid || "â€”",
+                    c.serial_no ?? "—",
+                    c.name || "—",
+                    c.code || "—",
+                    c.role || "—",
+                    c.email || "—",
+                    c.phone || "—",
+                    c.accentSolid || "—",
                     c.isActive ? "Active" : "Inactive",
                   ],
                 });

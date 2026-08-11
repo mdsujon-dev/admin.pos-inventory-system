@@ -193,7 +193,7 @@ const Roles = () => {
           <PermissionGate module="Roles" action="Delete">
             <Tooltip title="Delete Role">
               <Button
-                icon={<Trash2 className="w-4 h-4" />}
+                danger icon={<Trash2 className="w-4 h-4" />}
                 onClick={() => handleDelete(record._id)}
               />
             </Tooltip>

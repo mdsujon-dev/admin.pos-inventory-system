@@ -3,10 +3,8 @@ import {
   Barcode,
   Boxes,
   CalendarClock,
-  Layers,
   LayoutGrid,
   Package,
-  PackagePlus,
   QrCode,
   Rows3,
   Ruler,
@@ -58,13 +56,9 @@ const sidebarMenuRoutes: RouteItem[] = [
         // without this the parent stays highlighted on all of them.
         exactMatch: true,
       },
-      {
-        label: "Create Product",
-        address: "/inventory/products/create",
-        icon: PackagePlus,
-        module: "Products",
-        action: "Create",
-      },
+      // Create Product is deliberately not a sidebar entry — it is reached by
+      // the "Add Product" button on the Products list, so listing it here
+      // would be a second door to the same form.
       {
         label: "Expired Products",
         address: "/inventory/products/expired",
@@ -100,12 +94,6 @@ const sidebarMenuRoutes: RouteItem[] = [
         address: "/inventory/units",
         icon: Ruler,
         module: "Units",
-      },
-      {
-        label: "Variant Attributes",
-        address: "/inventory/variant-attributes",
-        icon: Layers,
-        module: "Variant Attributes",
       },
       {
         label: "Warranties",

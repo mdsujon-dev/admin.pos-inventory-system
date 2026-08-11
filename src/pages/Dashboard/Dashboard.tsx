@@ -112,11 +112,12 @@ const Dashboard: React.FC = () => {
 
       <motion.div
         variants={riseIn}
-        className="relative rounded-xl border-[1.5px] border-white/60 bg-white/30 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.05)] overflow-hidden"
+        className="relative rounded-xl border-[1.5px] border-white/60 bg-primary/10 backdrop-blur-2xl shadow-[0_10px_28px_-12px_rgba(16,24,40,.3)] overflow-hidden"
       >
         <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
           <div className="absolute -right-10 -top-16 h-72 w-72 rounded-full bg-primary/50 blur-[60px]" />
           <div className="absolute left-10 -bottom-10 h-32 w-48 rounded-full bg-primary/40 blur-[40px]" />
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-64 w-[600px] rounded-full bg-primary/30 blur-[70px]" />
         </div>
 
         <div className="relative flex flex-wrap items-end justify-between gap-3 px-5 py-5 z-10">

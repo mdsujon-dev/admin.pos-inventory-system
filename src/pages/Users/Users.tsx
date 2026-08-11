@@ -241,7 +241,7 @@ const Users = () => {
                 title={isSelf ? "You cannot delete yourself" : "Delete User"}
               >
                 <Button
-                  icon={<Trash2 className="w-4 h-4" />}
+                  danger icon={<Trash2 className="w-4 h-4" />}
                   disabled={!!isSelf}
                   onClick={() => handleDelete(record._id)}
                 />

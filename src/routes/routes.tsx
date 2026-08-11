@@ -16,7 +16,18 @@ import Countries from "../pages/Settings/Countries/Countries.tsx";
 import Designation from "../pages/Settings/Desgination/Designation.tsx";
 import MediaBin from "../pages/Settings/MediaBin/MediaBin.tsx";
 import NotificationSounds from "../pages/Settings/NotificationSounds/NotificationSounds.tsx";
-import UnderDevelopment from "../pages/UnderDevelopment/UnderDevelopment.tsx";
+import Brands from "../pages/Inventory/Brands/Brands.tsx";
+import Categories from "../pages/Inventory/Categories/Categories.tsx";
+import PrintBarcode from "../pages/Inventory/Print/PrintBarcode.tsx";
+import PrintQRCode from "../pages/Inventory/Print/PrintQRCode.tsx";
+import ExpiredProducts from "../pages/Inventory/Products/ExpiredProducts.tsx";
+import LowStocks from "../pages/Inventory/Products/LowStocks.tsx";
+import ProductForm from "../pages/Inventory/Products/ProductForm.tsx";
+import Products from "../pages/Inventory/Products/Products.tsx";
+import SubCategories from "../pages/Inventory/SubCategories/SubCategories.tsx";
+import Units from "../pages/Inventory/Units/Units.tsx";
+import VariantAttributes from "../pages/Inventory/VariantAttributes/VariantAttributes.tsx";
+import Warranties from "../pages/Inventory/Warranties/Warranties.tsx";
 import RolePermissions from "../pages/Users/RolePermissions.tsx";
 import Roles from "../pages/Users/Roles.tsx";
 import Users from "../pages/Users/Users.tsx";
@@ -35,25 +46,24 @@ const routes = [
     children: [
       { path: "/", element: <Dashboard /> },
       { path: "media-library", element: <AllMediaLibraryList /> },
-      // Inventory — the screens themselves aren't built yet, so every entry
-      // resolves to the placeholder. The addresses are the contract the
-      // sidebar and the permission map are already written against; swapping
-      // in a real page later touches only the `element` on that one line.
+      // Inventory — product catalog plus the reference data defining a product.
       {
         path: "inventory",
         children: [
-          { path: "products", element: <UnderDevelopment /> },
-          { path: "products/create", element: <UnderDevelopment /> },
-          { path: "products/expired", element: <UnderDevelopment /> },
-          { path: "products/low-stock", element: <UnderDevelopment /> },
-          { path: "categories", element: <UnderDevelopment /> },
-          { path: "sub-categories", element: <UnderDevelopment /> },
-          { path: "brands", element: <UnderDevelopment /> },
-          { path: "units", element: <UnderDevelopment /> },
-          { path: "variant-attributes", element: <UnderDevelopment /> },
-          { path: "warranties", element: <UnderDevelopment /> },
-          { path: "print-barcode", element: <UnderDevelopment /> },
-          { path: "print-qr-code", element: <UnderDevelopment /> },
+          { path: "products", element: <Products /> },
+          // Create and edit are one component; the id is what tells them apart.
+          { path: "products/create", element: <ProductForm /> },
+          { path: "products/edit/:id", element: <ProductForm /> },
+          { path: "products/expired", element: <ExpiredProducts /> },
+          { path: "products/low-stock", element: <LowStocks /> },
+          { path: "categories", element: <Categories /> },
+          { path: "sub-categories", element: <SubCategories /> },
+          { path: "brands", element: <Brands /> },
+          { path: "units", element: <Units /> },
+          { path: "variant-attributes", element: <VariantAttributes /> },
+          { path: "warranties", element: <Warranties /> },
+          { path: "print-barcode", element: <PrintBarcode /> },
+          { path: "print-qr-code", element: <PrintQRCode /> },
         ],
       },
       // Employee Management — primary paths

@@ -142,7 +142,7 @@ const Designation = () => {
           <PermissionGate module="Designations" action="Delete">
             <Tooltip title="Delete Designation">
               <Button
-                icon={<Trash2 className="w-4 h-4" />}
+                danger icon={<Trash2 className="w-4 h-4" />}
                 onClick={() => handleDelete(record._id)}
               />
             </Tooltip>

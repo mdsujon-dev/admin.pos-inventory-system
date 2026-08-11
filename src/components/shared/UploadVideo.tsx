@@ -1,4 +1,4 @@
-﻿import { Form, Input } from "antd";
+import { Form, Input } from "antd";
 import { UploadIcon } from "lucide-react";
 import { useState } from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
@@ -83,7 +83,7 @@ const UploadVideo = ({
           </div>
            <button
               onClick={handleDelete}
-              className="absolute top-1 right-1 bg-white border border-primary-500 text-primary-600 p-2 rounded-lg shadow hover:bg-primary-600 hover:text-white transition-colors"
+              className="absolute top-1 right-1 bg-white border border-red-500 text-red-500 p-2 rounded-lg shadow hover:bg-red-600 hover:text-white transition-colors"
             >
               <RiDeleteBinLine size={16} />
             </button>
