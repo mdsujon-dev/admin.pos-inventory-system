@@ -1,11 +1,16 @@
-
-
 import { FC, ReactNode } from "react";
 import { Link } from "react-router-dom";
 
 type ButtonProps = {
   children: ReactNode;
-  variant?: "primary" | "default" | "outline" | "link" | "custom";
+  variant?:
+    | "primary"
+    | "default"
+    | "outline"
+    | "link"
+    | "white"
+    | "black"
+    | "custom";
   size?: "sm" | "md" | "lg";
   href?: string;
   onClick?: (e: any) => void;
@@ -27,19 +32,19 @@ const Button: FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "font-medium rounded-xl shadow-md transition-all duration-300 inline-block";
+    "font-semibold rounded-[7px] shadow-sm transition-all duration-300 inline-flex items-center justify-center gap-2";
 
   let sizeClasses = "";
   switch (size) {
     case "sm":
-      sizeClasses = "px-4 py-2 text-sm";
+      sizeClasses = "h-[32px] px-3 text-sm";
       break;
     case "lg":
-      sizeClasses = "px-8 py-4 text-xl";
+      sizeClasses = "h-[48px] px-6 text-lg";
       break;
     case "md":
     default:
-      sizeClasses = "px-6 py-[15px] text-lg";
+      sizeClasses = "h-[38px] px-4 text-base";
       break;
   }
 
@@ -50,7 +55,8 @@ const Button: FC<ButtonProps> = ({
       variantClasses = "bg-primary text-white hover:bg-primary/90 shadow-md";
       break;
     case "default":
-      variantClasses = "bg-secondary-200 text-secondary-900 hover:bg-secondary-300 shadow-sm";
+      variantClasses =
+        "bg-secondary-200 text-secondary-900 hover:bg-secondary-300 shadow-sm";
       break;
     case "outline":
       variantClasses =

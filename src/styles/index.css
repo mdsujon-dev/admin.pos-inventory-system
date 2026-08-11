@@ -179,17 +179,20 @@ input[type="number"] {
   height: 38px !important;
   padding-top: 7px !important;
   padding-bottom: 7px !important;
+  font-weight: 600 !important;
+  font-size: 16px !important;
 }
 
-/* Increase default input height by 9px (default size 'md'/'middle') */
+/* Increase default input height by 8px (default size 'md'/'middle') */
 .ant-input-affix-wrapper:not(.ant-input-affix-wrapper-sm):not(.ant-input-affix-wrapper-lg),
 .ant-input:not(.ant-input-sm):not(.ant-input-lg):not(.ant-input-affix-wrapper .ant-input),
 .ant-input-number-input:not(.ant-input-number-input-sm):not(.ant-input-number-input-lg),
 .ant-select-selector:not(.ant-select-sm):not(.ant-select-lg),
 .ant-picker:not(.ant-picker-sm):not(.ant-picker-lg) {
-  height: 41px !important;
-  padding-top: 8.5px !important;
-  padding-bottom: 8.5px !important;
+  height: 40px !important;
+  padding-top: 8px !important;
+  padding-bottom: 8px !important;
+  border-radius: 8px !important;
 }
 /* AntD Css */
 .ant-modal {

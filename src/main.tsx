@@ -1,4 +1,4 @@
-﻿import "@fortawesome/fontawesome-free/css/all.min.css";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 import { ConfigProvider } from "antd";
 // Lenis's own stylesheet. Small but not optional: it is what puts
 // `overscroll-behavior: contain` on the elements marked `data-lenis-prevent`,
@@ -89,5 +89,5 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
         <RouterProvider router={router} future={{ v7_startTransition: true }} />
       </Provider>
     </ConfigProvider>
-  </React.StrictMode>
+  </React.StrictMode>,
 );

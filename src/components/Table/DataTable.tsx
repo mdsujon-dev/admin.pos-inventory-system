@@ -143,7 +143,7 @@ export default function DataTable(props: any) {
         spinning: showLoader,
         indicator: <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
       }}
-      className="border rounded-lg overflow-hidden "
+      className="border border-gray-300 rounded-lg overflow-hidden bg-white"
       rowKey={rowKey ? rowKey : "_id"}
       rowSelection={selectRow ? rowSelection : undefined}
       dataSource={data || []}

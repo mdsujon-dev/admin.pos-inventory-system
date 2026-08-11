@@ -2,7 +2,7 @@
 .ant-table-wrapper .ant-table-thead > tr > th {
   background-color: #f3f3f3 !important;
   color: #232323;
-  font-size: 12px;
+  font-size: 14px;
   border-radius: 0% !important;
   text-transform: uppercase;
   white-space: nowrap;
@@ -11,7 +11,7 @@
 /* Table Body Cell Style */
 .ant-table-wrapper .ant-table-tbody > tr > td {
   color: #232323;
-  font-size: 12px;
+  font-size: 14px;
 }
 
 /* Zebra Striping */
