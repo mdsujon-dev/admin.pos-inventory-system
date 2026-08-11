@@ -571,25 +571,21 @@ const ProductForm = () => {
             </Card>
           )}
 
-          <div className="flex justify-start">
-            <div className="rounded-xl border border-secondary-200 bg-white p-4 shadow-sm mb-6">
-              <Form.Item
-                label={<span className="font-medium text-secondary-900">Active</span>}
-                name="isActive"
-                valuePropName="checked"
-                tooltip="Inactive products stay in the catalog but are not sellable"
-                className="mb-0"
-              >
-                <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
-              </Form.Item>
-            </div>
+          <div className="flex justify-start mb-6">
+            <Form.Item
+              name="isActive"
+              valuePropName="checked"
+              className="mb-0"
+            >
+              <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+            </Form.Item>
           </div>
 
-          {/* The header's twin at the other end of the screen: same 70px band,
-              same glass, pinned the same way. The negative margins cancel the
-              layout's page padding so it spans edge to edge instead of sitting
-              inset like a card. */}
-          <div className="sticky bottom-0 z-30 -mx-3 -mb-3 flex h-[70px] items-center justify-end gap-3 border-t border-primary/20 bg-white/80 px-3 backdrop-blur-lg sm:-mx-4 sm:-mb-4 sm:px-6">
+          {/* The header's twin at the other end of the screen: same glass,
+              pinned the same way, a touch shorter than the 70px top band. The
+              negative margins cancel the layout's page padding so it spans edge
+              to edge instead of sitting inset like a card. */}
+          <div className="sticky bottom-0 z-30 -mx-3 -mb-3 flex h-[45px] items-center justify-end gap-3 border-t border-primary/20 bg-white/80 px-3 backdrop-blur-lg sm:-mx-4 sm:-mb-4 sm:px-6">
             <Button
               className="min-w-28"
               onClick={() => navigate("/inventory/products")}
