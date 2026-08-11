@@ -63,9 +63,30 @@
   background-color: #f3f3f3 !important;
 }
 
-/* Table Wrapper Background */
-.ant-table-wrapper {
+/* Table Wrapper Background.
+   No `border-bottom: none` here — the wrapper carries the `border-gray-300`
+   outline from DataTable.tsx, and killing the bottom edge left the table
+   open-ended once the scrollbar under it was hidden. */
+.ant-table-wrapper,
+.ant-table-wrapper .ant-table,
+.ant-table-wrapper .ant-table-container {
   background-color: #fff;
+}
+
+/* Horizontal scrollbar inside the table.
+   The global scrollbar rules paint a green thumb on a grey track, which under
+   the table reads as a coloured bar stuck to its bottom edge — visible even
+   when there is nothing to scroll. Drag-to-scroll below covers the
+   interaction, so the bar itself is hidden. */
+.ant-table-wrapper .ant-table-content,
+.ant-table-wrapper .ant-table-body {
+  scrollbar-width: none; /* Firefox */
+}
+
+.ant-table-wrapper .ant-table-content::-webkit-scrollbar,
+.ant-table-wrapper .ant-table-body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 /* Drag to scroll.

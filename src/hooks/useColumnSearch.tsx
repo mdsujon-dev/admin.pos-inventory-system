@@ -30,8 +30,13 @@ export const useColumnSearch = () => {
         />
       </div>
     ),
+    // The header band is the brand fill, so an active filter cannot be marked
+    // by turning the icon brand-coloured — it would vanish into the background.
+    // Full white against the header's translucent white is the contrast here.
     filterIcon: (filtered: any) => (
-      <SearchOutlined style={{ color: filtered ? "#019532" : undefined }} />
+      <SearchOutlined
+        style={{ color: filtered ? "#ffffff" : undefined }}
+      />
     ),
     onFilter: (value: any, record: any) => {
       const data = dataIndex

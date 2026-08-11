@@ -1,4 +1,4 @@
-﻿import { Button, Input, Modal, Space, Switch, Tag, Tooltip } from "antd";
+import { Button, Input, Modal, Space, Switch, Tag, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { Edit, Plus, Search, ShieldCheck, Trash2 } from "lucide-react";
@@ -261,7 +261,7 @@ const Roles = () => {
                 icon={<Plus className="w-4 h-4" />}
                 onClick={() => setIsOpenCreate(true)}
               >
-                Add New Role
+                Add New
               </Button>
             </PermissionGate>
           </div>

@@ -1,6 +1,6 @@
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
-import { ArrowDownCircle, ArrowUpCircle, Banknote } from "lucide-react";
+import { ArrowDownCircle, ArrowUpCircle, Banknote, Users, ShoppingCart, Box, Activity, TrendingUp, Package, PieChart, Tag } from "lucide-react";
 import React, { useState } from "react";
 import PageMeta from "../../components/Common/PageMeta";
 import CustomDatePicker from "../../components/shared/CustomDatePicker";
@@ -163,6 +163,64 @@ const Dashboard: React.FC = () => {
               loading={isFetching}
             />
           )}
+
+          {/* Fake Cards */}
+          <Metric
+            label="Total Users"
+            value="1,245"
+            hint="Active users in the system"
+            icon={Users}
+            accent="#019532"
+          />
+          <Metric
+            label="Total Sales"
+            value={<Money value={125000} />}
+            hint="Sales for the selected range"
+            icon={ShoppingCart}
+            accent="#019532"
+          />
+          <Metric
+            label="Products in Stock"
+            value="8,530"
+            hint="Available items"
+            icon={Box}
+            accent="#019532"
+          />
+          <Metric
+            label="Active Orders"
+            value="342"
+            hint="Orders currently in progress"
+            icon={Activity}
+            accent="#019532"
+          />
+          <Metric
+            label="Growth Rate"
+            value="+15.4%"
+            hint="Compared to last month"
+            icon={TrendingUp}
+            accent="#019532"
+          />
+          <Metric
+            label="Suppliers"
+            value="56"
+            hint="Active suppliers"
+            icon={Package}
+            accent="#019532"
+          />
+          <Metric
+            label="Conversion Rate"
+            value="4.2%"
+            hint="Visits to sales"
+            icon={PieChart}
+            accent="#019532"
+          />
+          <Metric
+            label="Total Categories"
+            value="124"
+            hint="Product categories"
+            icon={Tag}
+            accent="#019532"
+          />
         </motion.div>
       )}
 

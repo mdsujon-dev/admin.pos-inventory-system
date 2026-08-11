@@ -56,7 +56,7 @@ const CreateDesignationModal: React.FC<CreateDesignationModalProps> = ({
         </Form.Item>
 
         <Form.Item label="Description" name="description">
-          <Input.TextArea rows={3} placeholder="Enter description (optional)" />
+          <Input.TextArea rows={5} placeholder="Enter description (optional)" />
         </Form.Item>
 
         <Form.Item label="Status" name="is_active" valuePropName="checked">

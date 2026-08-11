@@ -45,7 +45,7 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       )}
       <div className="flex flex-col w-full sm:flex-row sm:items-center justify-between">
         <div>
-          <Title level={4} className="!mb-0 !text-secondary-800">
+          <Title level={4} className="!mb-0 !text-[23px] !text-secondary-800">
             {title}
           </Title>
           {subtitle && (

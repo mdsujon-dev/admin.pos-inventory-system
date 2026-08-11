@@ -1,4 +1,4 @@
-﻿import { Button, Input, Modal, Space, Switch, Tag, Tooltip } from "antd";
+import { Button, Input, Modal, Space, Switch, Tag, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { Edit, Key, Plus, Search, Trash2 } from "lucide-react";
@@ -279,7 +279,7 @@ const Users = () => {
                 icon={<Plus className="w-4 h-4" />}
                 onClick={() => setIsOpenCreateModal(true)}
               >
-                Add New User
+                Add New
               </Button>
             </PermissionGate>
           </div>
