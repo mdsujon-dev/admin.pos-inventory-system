@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+﻿import { motion } from "framer-motion";
 import React from "react";
 
 import { riseIn } from "./dashboardMotion";
@@ -102,7 +102,7 @@ export const Section = ({
   title,
   subtitle,
   icon: Icon,
-  accent = "#285F14",
+  accent = "#0F3519",
   action,
   children,
   className,

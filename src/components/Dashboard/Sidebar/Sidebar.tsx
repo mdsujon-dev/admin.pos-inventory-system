@@ -47,14 +47,17 @@ const Sidebar = () => {
     <aside
       ref={sidebar}
       className={`fixed left-0 top-0 z-50 flex flex-col h-full shrink-0 transform bg-white transition-[width,transform] duration-300 ease-in-out border-r border-primary/20
-        ${isCollapsed ? "w-[68px]" : "w-[260px]"}
+        ${isCollapsed ? "w-[98px]" : "w-[290px]"}
         ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:static lg:translate-x-0`}
       style={{ isolation: "isolate" }}
     >
+      {/* 65px, matching the header's height exactly. The two sit side by side
+          and each draws its own bottom border, so any difference here shows up
+          as one continuous line with a 5px step in the middle of it. */}
       <div
-        className={`flex relative items-center border-b border-primary/20 transition-all duration-300 bg-white/80 backdrop-blur-sm h-[60px] shrink-0 ${
+        className={`flex relative items-center border-b border-primary/20 transition-all duration-300 bg-white/80 backdrop-blur-sm h-[65px] shrink-0 ${
           isCollapsed ? "justify-center px-2" : "justify-between px-4"
         }`}
       >
@@ -62,7 +65,7 @@ const Sidebar = () => {
           className={`flex items-center gap-3 ${isCollapsed ? "justify-center w-full" : "pl-2"}`}
         >
           {isCollapsed ? (
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-[0_4px_12px_-2px_rgba(40, 95, 20,0.45)]">
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-[0_4px_12px_-2px_rgba(15,53,25,0.45)]">
               <NextImage
                 src={favicon}
                 alt="POS & Inventory"

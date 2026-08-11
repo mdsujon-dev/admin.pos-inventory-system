@@ -6,10 +6,11 @@ export default {
   theme: {
     extend: {
       boxShadow: {
-        primary: "0 4px 6px -1px rgba(40, 95, 20, 0.5)",
+        // rgb(15, 53, 25) is the brand #0F3519.
+        primary: "0 4px 6px -1px rgba(15, 53, 25, 0.5)",
         // Soft, layered elevation for cards — subtle at rest, richer on hover.
         card: "0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 16px -2px rgba(16, 24, 40, 0.08)",
-        "card-hover": "0 2px 4px rgba(16, 24, 40, 0.05), 0 12px 28px -4px rgba(40, 95, 20, 0.18)",
+        "card-hover": "0 2px 4px rgba(16, 24, 40, 0.05), 0 12px 28px -4px rgba(15, 53, 25, 0.18)",
       },
       maxWidth: {
         "8xl": "96rem", // 1536px
@@ -64,22 +65,28 @@ export default {
       },
       display: ["group-hover"],
       colors: {
-        // Brand primary — deep forest green (#285F14). Scale is built around it,
-        // so `primary` / `primary-600` are both the exact brand colour.
-        "web-primary": "#285F14",
+        // Brand primary — deep forest green (#0F3519). `primary` and
+        // `primary-600` are both the exact brand colour, so anything reaching
+        // for either gets the hex on the brand sheet.
+        //
+        // The brand sits low on the ramp (13% lightness), which leaves the
+        // 700–950 steps close together — they are near-black by definition and
+        // are only ever used as the far end of a gradient. The room in this
+        // scale is above 600, not below it.
+        "web-primary": "#0F3519",
         primary: {
-          DEFAULT: "#285F14",
-          50: "#f2fbef",
-          100: "#d8f2cf",
-          200: "#b5e5a4",
-          300: "#8ad270",
-          400: "#5bbe37",
-          500: "#3c8820",
-          600: "#285F14",
-          700: "#225010",
-          800: "#1a400d",
-          900: "#15330a",
-          950: "#0c1e05",
+          DEFAULT: "#0F3519",
+          50: "#f0faf3",
+          100: "#d9f2e0",
+          200: "#b1e2c0",
+          300: "#7fc895",
+          400: "#46aa64",
+          500: "#256f3b",
+          600: "#0F3519",
+          700: "#0c2a14",
+          800: "#08210f",
+          900: "#06190b",
+          950: "#030f06",
         },
 
         // Neutral surface shades — kept as dark grays for UI backgrounds/text.
@@ -97,21 +104,22 @@ export default {
           900: "#101010",
         },
 
-        // Secondary brand color — lighter green gradient partner (#3c8820).
+        // Secondary brand color — the mid-green gradient partner (#256f3b),
+        // light enough to read against the primary. Same ramp as `primary`.
         // Use as `bg-accent`, `text-accent`, `border-accent`, etc.
         accent: {
-          DEFAULT: "#3c8820",
-          50: "#f2fbef",
-          100: "#d8f2cf",
-          200: "#b5e5a4",
-          300: "#8ad270",
-          400: "#5bbe37",
-          500: "#3c8820",
-          600: "#285F14",
-          700: "#225010",
-          800: "#1a400d",
-          900: "#15330a",
-          950: "#0c1e05",
+          DEFAULT: "#256f3b",
+          50: "#f0faf3",
+          100: "#d9f2e0",
+          200: "#b1e2c0",
+          300: "#7fc895",
+          400: "#46aa64",
+          500: "#256f3b",
+          600: "#0F3519",
+          700: "#0c2a14",
+          800: "#08210f",
+          900: "#06190b",
+          950: "#030f06",
         },
       },
     },

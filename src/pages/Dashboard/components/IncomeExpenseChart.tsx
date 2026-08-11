@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import {
   Bar,
   BarChart,
@@ -17,7 +17,10 @@ interface Props {
   loading?: boolean;
 }
 
-const INCOME = "#285F14"; // teal
+// The brand green is very dark (13% lightness), which reads as near-black in a
+// bar. `primary-500` is the same hue two steps up — still unmistakably the brand
+// family, and it holds its colour against the rose beside it.
+const INCOME = "#256f3b"; // primary-500
 const EXPENSE = "#f43f5e"; // rose
 
 /** Estimated revenue vs expenses by month. */
@@ -54,7 +57,7 @@ const IncomeExpenseChart: React.FC<Props> = ({ data, loading }) => (
             tickFormatter={(v) => formatCompact(Number(v))}
           />
           <Tooltip
-            cursor={{ fill: "rgba(40,95,20,0.06)" }}
+            cursor={{ fill: "rgba(15,53,25,0.06)" }}
             formatter={(v: number) => `৳${Number(v).toLocaleString("en-BD")}`}
             contentStyle={{
               borderRadius: 12,

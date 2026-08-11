@@ -17,9 +17,11 @@ import "./styles/index.css";
 
 const config = {
   token: {
-    colorPrimary: "#285F14",
-    colorLink: "#285F14",
-    colorPrimaryBg: "#285F1430",
+    // Brand #0F3519 — keep in step with `--primary` in styles/index.css and
+    // `primary.DEFAULT` in tailwind.config.js. antd cannot read either.
+    colorPrimary: "#0F3519",
+    colorLink: "#0F3519",
+    colorPrimaryBg: "#0F351930",
     // Match the Tailwind/global typeface so antd components don't fall back
     // to their own default sans stack.
     fontFamily: '"Outfit", sans-serif',

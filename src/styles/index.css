@@ -8,11 +8,11 @@
 @tailwind utilities;
 
 :root {
-  --primary: #285F14;
+  --primary: #0F3519;
   --secondary: #101010;
   --red: #d41142;
   --white: #fff;
-  --soft-primary: #285F1430;
+  --soft-primary: #0F351930;
   
   /* React Toastify overrides — it ships its own `sans-serif` default, so the
      brand face has to be handed to it explicitly. */
@@ -253,7 +253,7 @@ input[type="number"] {
 }
 
 .no-error-border-input.ant-form-item-has-error .ant-input {
-  border-bottom: 1px solid #285F14 !important;
+  border-bottom: 1px solid var(--primary) !important;
   border-top: 0 !important;
   border-left: 0 !important;
   border-right: 0 !important;

@@ -1,4 +1,4 @@
-/* ---------------------------
+﻿/* ---------------------------
    Typography & Text Editor - Enhanced TinyMCE Styles
 --------------------------- */
 
@@ -339,7 +339,7 @@
      Blockquotes - Enhanced
   --------------------------- */
 .text-editor blockquote {
-  border-left: 4px solid #285F14;
+  border-left: 4px solid #0F3519;
   padding: 1rem 1.5rem;
   margin: 1.5rem 0;
   background-color: #f7fafc;
@@ -386,7 +386,7 @@
 }
 
 .text-editor img[data-mce-selected] {
-  outline: 3px solid #285F14;
+  outline: 3px solid #0F3519;
   outline-offset: 2px;
 }
 
@@ -421,14 +421,14 @@
 .text-editor a:visited *,
 .text-editor a[style*='color:'],
 .text-editor a[data-mce-style*='color:'] {
-  color: #285F14 !important;
+  color: #0F3519 !important;
   text-decoration: underline;
   transition: color 0.2s ease;
 }
 
 .text-editor a:hover,
 .text-editor a:hover * {
-  color: #225010 !important;
+  color: #0c2a14 !important;
 }
 
 .text-editor a[data-mce-selected] {

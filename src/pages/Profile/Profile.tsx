@@ -57,7 +57,7 @@ const Profile = () => {
         styles={{ body: { padding: 0 } }}
       >
         {/* Hero — primary purple */}
-        <div className="bg-gradient-to-r from-[#285F14] to-[#3c8820] text-white p-6 md:p-7">
+        <div className="bg-gradient-to-r from-primary to-accent text-white p-6 md:p-7">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
             <Avatar
               size={88}

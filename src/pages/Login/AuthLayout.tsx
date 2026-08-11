@@ -41,7 +41,7 @@ export function AuthLayout({
   return (
     <div className="flex min-h-screen flex-col bg-secondary-50 lg:flex-row">
       {/* Brand panel — desktop only */}
-      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-[#15330a] via-[#1a400d] to-[#285F14] lg:flex lg:min-h-screen lg:w-[46%] xl:w-1/2">
+      <aside className="relative hidden overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-primary lg:flex lg:min-h-screen lg:w-[46%] xl:w-1/2">
         {/* Depth: one soft wash plus two drifting orbs. Decorative only. */}
         <div
           aria-hidden
@@ -53,13 +53,13 @@ export function AuthLayout({
         />
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute -left-24 top-16 h-80 w-80 rounded-full bg-[#3c8820]/40 blur-3xl"
+          className="pointer-events-none absolute -left-24 top-16 h-80 w-80 rounded-full bg-accent/40 blur-3xl"
           animate={{ x: [0, 40, 0], y: [0, 30, 0] }}
           transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
         />
         <motion.div
           aria-hidden
-          className="pointer-events-none absolute -right-20 bottom-10 h-96 w-96 rounded-full bg-[#5bbe37]/25 blur-3xl"
+          className="pointer-events-none absolute -right-20 bottom-10 h-96 w-96 rounded-full bg-primary-400/25 blur-3xl"
           animate={{ x: [0, -36, 0], y: [0, -28, 0] }}
           transition={{ duration: 19, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -162,8 +162,8 @@ export function AuthLayout({
       <style>{`
         .auth-form .ant-form-item-label > label { font-weight: 500; color: #333333; }
         .auth-form .ant-input-affix-wrapper:hover,
-        .auth-form .ant-input-affix-wrapper-focused { border-color: #285F14 !important; }
-        .auth-form .ant-input-affix-wrapper-focused { box-shadow: 0 0 0 3px rgba(40,95,20,0.12) !important; }
+        .auth-form .ant-input-affix-wrapper-focused { border-color: #0F3519 !important; }
+        .auth-form .ant-input-affix-wrapper-focused { box-shadow: 0 0 0 3px rgba(15,53,25,0.12) !important; }
       `}</style>
     </div>
   );

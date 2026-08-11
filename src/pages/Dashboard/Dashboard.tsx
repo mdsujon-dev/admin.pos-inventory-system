@@ -1,4 +1,4 @@
-import dayjs from "dayjs";
+﻿import dayjs from "dayjs";
 import { motion } from "framer-motion";
 import { ArrowDownCircle, ArrowUpCircle, Banknote } from "lucide-react";
 import React, { useState } from "react";
@@ -159,7 +159,7 @@ const Dashboard: React.FC = () => {
               value={<Money value={net} />}
               hint="Income − Expense"
               icon={Banknote}
-              accent="#285F14"
+              accent="#0F3519"
               loading={isFetching}
             />
           )}
