@@ -1,0 +1,746 @@
+/* ---------------------------
+   Typography & Text Editor - Enhanced TinyMCE Styles
+--------------------------- */
+
+.text-editor {
+  overflow-x: auto;
+  line-height: 1.6;
+  color: #333;
+}
+
+/* ---------------------------
+     Headings
+  --------------------------- */
+.text-editor h1,
+.text-editor h2,
+.text-editor h3,
+.text-editor h4,
+.text-editor h5 {
+}
+.text-editor h1 {
+  font-weight: 800;
+  font-size: 2.55rem;
+  line-height: 1.2;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #1a202c;
+  letter-spacing: -0.025em;
+  text-transform: capitalize;
+}
+
+.text-editor h2 {
+  font-size: 2.275rem;
+  font-weight: 800;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  color: #2d3748;
+  line-height: 1.3;
+}
+
+.text-editor h3 {
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin-top: 1.25rem;
+  margin-bottom: 0.75rem;
+  color: #2d3748;
+  line-height: 1.4;
+}
+
+.text-editor h4 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+  line-height: 1.4;
+}
+
+.text-editor h5 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  margin-top: 0.75rem;
+  margin-bottom: 0.5rem;
+  color: #2d3748;
+  line-height: 1.4;
+}
+
+.text-editor h6 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+  color: #4a5568;
+  line-height: 1.4;
+}
+
+/* ---------------------------
+     Font Sizes (TinyMCE Size Options)
+  --------------------------- */
+.text-editor .mce-content-body[data-mce-font-size='8pt'] {
+  font-size: 8pt;
+}
+
+.text-editor .mce-content-body[data-mce-font-size='10pt'] {
+  font-size: 10pt;
+}
+
+.text-editor .mce-content-body[data-mce-font-size='12pt'] {
+  font-size: 12pt;
+}
+
+.text-editor .mce-content-body[data-mce-font-size='14pt'] {
+  font-size: 14pt;
+}
+
+.text-editor .mce-content-body[data-mce-font-size='18pt'] {
+  font-size: 18pt;
+}
+
+.text-editor .mce-content-body[data-mce-font-size='24pt'] {
+  font-size: 24pt;
+}
+
+.text-editor .mce-content-body[data-mce-font-size='36pt'] {
+  font-size: 36pt;
+}
+
+/* ---------------------------
+     Text Formatting
+  --------------------------- */
+.text-editor p {
+  margin-bottom: 1rem;
+  line-height: 1.7;
+
+}
+
+.text-editor strong,
+.text-editor b {
+  font-weight: 700;
+  color: #1a202c;
+}
+
+.text-editor em,
+.text-editor i {
+  font-style: italic;
+  color: #2d3748;
+}
+
+.text-editor u {
+  text-decoration: underline;
+}
+
+.text-editor s,
+.text-editor strike,
+.text-editor del {
+  text-decoration: line-through;
+  color: #718096;
+}
+
+.text-editor sub {
+  vertical-align: sub;
+  font-size: 0.75em;
+}
+
+.text-editor sup {
+  vertical-align: super;
+  font-size: 0.75em;
+}
+
+.text-editor mark {
+  background-color: #fef5e7;
+  color: #d69e2e;
+  padding: 0.1em 0.2em;
+  border-radius: 0.2em;
+}
+
+.text-editor code {
+  background-color: #f7fafc;
+  color: #e53e3e;
+  padding: 0.125em 0.25em;
+  border-radius: 0.25em;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875em;
+}
+
+.text-editor pre {
+  background-color: #f7fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.375rem;
+  padding: 1rem;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875em;
+  line-height: 1.5;
+  margin: 1rem 0;
+}
+
+.text-editor pre code {
+  background: none;
+  padding: 0;
+  border-radius: 0;
+  color: inherit;
+}
+
+/* ---------------------------
+     Text Alignment
+  --------------------------- */
+.text-editor p[data-mce-text-align='left'],
+.text-editor div[data-mce-text-align='left'] {
+  text-align: left;
+}
+
+.text-editor p[data-mce-text-align='center'],
+.text-editor div[data-mce-text-align='center'] {
+  text-align: center;
+}
+
+.text-editor p[data-mce-text-align='right'],
+.text-editor div[data-mce-text-align='right'] {
+  text-align: right;
+}
+
+.text-editor p[data-mce-text-align='justify'],
+.text-editor div[data-mce-text-align='justify'] {
+  text-align: justify;
+}
+
+/* ---------------------------
+     Lists - Enhanced
+  --------------------------- */
+.text-editor ul,
+.text-editor ol {
+  margin: 1rem 0;
+  padding-left: 2rem;
+  line-height: 1.6;
+}
+
+.text-editor ul {
+  list-style-type: disc;
+}
+
+.text-editor ol {
+  list-style-type: decimal;
+}
+
+.text-editor ul li,
+.text-editor ol li {
+  margin-bottom: 0.5rem;
+  padding-left: 0.25rem;
+}
+
+.text-editor ul ul,
+.text-editor ol ol,
+.text-editor ul ol,
+.text-editor ol ul {
+  margin: 0.5rem 0;
+  padding-left: 1.5rem;
+}
+
+.text-editor ul ul {
+  list-style-type: circle;
+}
+
+.text-editor ul ul ul {
+  list-style-type: square;
+}
+
+.text-editor ol ol {
+  list-style-type: lower-alpha;
+}
+
+.text-editor ol ol ol {
+  list-style-type: lower-roman;
+}
+
+/* Checklist Style - Enhanced */
+.text-editor .tox-checklist > li {
+  list-style: none;
+  position: relative;
+  padding-left: 1.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.text-editor .tox-checklist > .tox-checklist--checked:before {
+  content: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cg%20id%3D%22checklist-checked%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Crect%20id%3D%22Rectangle%22%20width%3D%2216%22%20height%3D%2216%22%20fill%3D%22%234099FF%22%20fill-rule%3D%22nonzero%22%20rx%3D%222%22%2F%3E%3Cpath%20id%3D%22Path%22%20fill%3D%22%23FFF%22%20fill-rule%3D%22nonzero%22%20d%3D%22M11.5703186%2C3.14417309%20C11.8516238%2C2.73724603%2012.4164781%2C2.62829933%2012.83558%2C2.89774797%20C13.260121%2C3.17069355%2013.3759736%2C3.72932262%2013.0909105%2C4.14168582%20L7.7580587%2C11.8560195%20C7.43776896%2C12.3193404%206.76483983%2C12.3852142%206.35607322%2C11.9948725%20L3.02491697%2C8.8138662%20C2.66090143%2C8.46625845%202.65798871%2C7.89594698%203.01850234%2C7.54483354%20C3.373942%2C7.19866177%203.94940006%2C7.19592841%204.30829608%2C7.5386474%20L6.85276923%2C9.9684299%20L11.5703186%2C3.14417309%20Z%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E%0A');
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  font-size: 1rem;
+}
+
+.text-editor .tox-checklist > li:before {
+  content: url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2216%22%20height%3D%2216%22%20viewBox%3D%220%200%2016%2016%22%3E%3Cg%20id%3D%22checklist-unchecked%22%20fill%3D%22none%22%20fill-rule%3D%22evenodd%22%3E%3Crect%20id%3D%22Rectangle%22%20width%3D%2215%22%20height%3D%2215%22%20x%3D%22.5%22%20y%3D%22.5%22%20fill-rule%3D%22nonzero%22%20stroke%3D%22%234C4C4C%22%20rx%3D%222%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E%0A');
+  position: absolute;
+  left: 0;
+  top: 0.1em;
+  font-size: 1rem;
+}
+
+/* ---------------------------
+     Tables - Enhanced
+  --------------------------- */
+.text-editor table {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+  border: 1px solid #e2e8f0;
+  margin: 1rem 0;
+  font-size: 0.875rem;
+  min-width: 600px;
+}
+
+.text-editor th,
+.text-editor td {
+  border: 1px solid #e2e8f0;
+  padding: 0.75rem;
+  text-align: left;
+  vertical-align: top;
+}
+
+.text-editor thead {
+  background-color: #f7fafc;
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.text-editor thead th {
+  border-bottom: 2px solid #cbd5e0;
+}
+
+.text-editor tbody tr:nth-child(even) {
+  background-color: #f8fafc;
+}
+
+.text-editor tbody tr:hover {
+  background-color: #edf2f7;
+}
+
+.text-editor tfoot {
+  background-color: #f7fafc;
+  font-weight: 600;
+}
+
+.text-editor tfoot td {
+  border-top: 2px solid #cbd5e0;
+}
+
+/* Table Cell Alignment */
+.text-editor th[data-mce-text-align='center'],
+.text-editor td[data-mce-text-align='center'] {
+  text-align: center;
+}
+
+.text-editor th[data-mce-text-align='right'],
+.text-editor td[data-mce-text-align='right'] {
+  text-align: right;
+}
+
+/* ---------------------------
+     Blockquotes - Enhanced
+  --------------------------- */
+.text-editor blockquote {
+  border-left: 4px solid #285F14;
+  padding: 1rem 1.5rem;
+  margin: 1.5rem 0;
+  background-color: #f7fafc;
+  border-radius: 0.375rem;
+  color: #4a5568;
+  font-style: italic;
+  position: relative;
+}
+
+.text-editor blockquote:before {
+  content: '"';
+  font-size: 3rem;
+  color: #cbd5e0;
+  position: absolute;
+  left: 0.5rem;
+  top: -0.5rem;
+  line-height: 1;
+}
+
+.text-editor blockquote p {
+  margin: 0;
+  line-height: 1.6;
+}
+
+.text-editor blockquote cite {
+  display: block;
+  margin-top: 0.5rem;
+  font-style: normal;
+  font-weight: 600;
+  color: #718096;
+  font-size: 0.875rem;
+}
+
+/* ---------------------------
+     Images - Enhanced
+  --------------------------- */
+.text-editor img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  margin: 1rem auto;
+  border-radius: 0.375rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.text-editor img[data-mce-selected] {
+  outline: 3px solid #285F14;
+  outline-offset: 2px;
+}
+
+/* Image Alignment */
+.text-editor img[data-mce-style*='float: left'],
+.text-editor .mce-float-left {
+  float: left;
+  margin: 0 1rem 1rem 0;
+  max-width: 50%;
+}
+
+.text-editor img[data-mce-style*='float: right'],
+.text-editor .mce-float-right {
+  float: right;
+  margin: 0 0 1rem 1rem;
+  max-width: 50%;
+}
+
+.text-editor img[data-mce-style*='float: none'],
+.text-editor .mce-float-none {
+  float: none;
+  margin: 1rem auto;
+  display: block;
+}
+
+/* ---------------------------
+     Links - Enhanced
+  --------------------------- */
+.text-editor a,
+.text-editor a *,
+.text-editor a:visited,
+.text-editor a:visited *,
+.text-editor a[style*='color:'],
+.text-editor a[data-mce-style*='color:'] {
+  color: #285F14 !important;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.text-editor a:hover,
+.text-editor a:hover * {
+  color: #225010 !important;
+}
+
+.text-editor a[data-mce-selected] {
+  background-color: #bee3f8;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+/* ---------------------------
+     Colors - Enhanced TinyMCE Color Support
+  --------------------------- */
+
+/* Direct style attribute colors - highest priority */
+.text-editor [style*='color:'] {
+  color: inherit !important;
+}
+
+.text-editor [style*='background-color:'] {
+  background-color: inherit !important;
+  padding: 0.125em 0.25em;
+  border-radius: 0.2em;
+}
+
+/* TinyMCE data attribute colors */
+.text-editor [data-mce-style*='color:'] {
+  color: inherit !important;
+}
+
+.text-editor [data-mce-style*='background-color:'] {
+  background-color: inherit !important;
+  padding: 0.125em 0.25em;
+  border-radius: 0.2em;
+}
+
+/* Specific element color support */
+.text-editor span[style*='color:'],
+.text-editor p[style*='color:'],
+.text-editor div[style*='color:'],
+.text-editor h1[style*='color:'],
+.text-editor h2[style*='color:'],
+.text-editor h3[style*='color:'],
+.text-editor h4[style*='color:'],
+.text-editor h5[style*='color:'],
+.text-editor h6[style*='color:'] {
+  color: inherit !important;
+}
+
+.text-editor span[style*='background-color:'],
+.text-editor p[style*='background-color:'],
+.text-editor div[style*='background-color:'],
+.text-editor h1[style*='background-color:'],
+.text-editor h2[style*='background-color:'],
+.text-editor h3[style*='background-color:'],
+.text-editor h4[style*='background-color:'],
+.text-editor h5[style*='background-color:'],
+.text-editor h6[style*='background-color:'] {
+  background-color: inherit !important;
+  padding: 0.125em 0.25em;
+  border-radius: 0.2em;
+
+/* Ensure the visible editor area is comfortably large for composing messages */
+.rich-text-editor-wrapper {
+  min-height: 360px;
+}
+
+.rich-text-editor-wrapper .tox .tox-editor-container {
+  min-height: 320px !important;
+}
+}
+
+/* TinyMCE color classes (if any) */
+.text-editor .mce-color {
+  color: inherit !important;
+}
+
+.text-editor .mce-bgcolor {
+  background-color: inherit !important;
+  padding: 0.125em 0.25em;
+  border-radius: 0.2em;
+}
+
+/* Foreground and background color spans */
+.text-editor .mce-foreground-color {
+  color: inherit !important;
+}
+
+.text-editor .mce-background-color {
+  background-color: inherit !important;
+  padding: 0.125em 0.25em;
+  border-radius: 0.2em;
+}
+
+/* Ensure color inheritance works properly */
+.text-editor * {
+  color: inherit;
+}
+
+/* Specific color overrides for common TinyMCE color applications */
+.text-editor span[data-mce-color],
+.text-editor span[data-mce-bgcolor] {
+  color: inherit !important;
+  background-color: inherit !important;
+}
+
+/* Font color and background color attributes */
+.text-editor [data-mce-font-color] {
+  color: inherit !important;
+}
+
+.text-editor [data-mce-background-color] {
+  background-color: inherit !important;
+  padding: 0.125em 0.25em;
+  border-radius: 0.2em;
+}
+
+/* ---------------------------
+     Indentation
+  --------------------------- */
+.text-editor p[data-mce-style*='text-indent:'],
+.text-editor div[data-mce-style*='text-indent:'] {
+  text-indent: inherit;
+}
+
+/* ---------------------------
+     Line Height
+  --------------------------- */
+.text-editor p[data-mce-style*='line-height:'],
+.text-editor div[data-mce-style*='line-height:'] {
+  line-height: inherit;
+}
+
+/* ---------------------------
+     Letter Spacing
+  --------------------------- */
+.text-editor span[data-mce-style*='letter-spacing:'],
+.text-editor p[data-mce-style*='letter-spacing:'] {
+  letter-spacing: inherit;
+}
+
+/* ---------------------------
+     Emojis Support
+  --------------------------- */
+.text-editor .emoji {
+  font-family:
+    'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  font-size: 1.2em;
+  vertical-align: middle;
+  display: inline-block;
+  line-height: 1;
+}
+
+/* ---------------------------
+     Horizontal Rules
+  --------------------------- */
+.text-editor hr {
+  border: none;
+  border-top: 1px solid #e2e8f0;
+  margin: 2rem 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+}
+
+/* ---------------------------
+     Page Breaks
+  --------------------------- */
+.text-editor .mce-pagebreak {
+  display: block;
+  width: 100%;
+  height: 1px;
+  border-top: 1px dashed #cbd5e0;
+  margin: 2rem 0;
+  position: relative;
+}
+
+.text-editor .mce-pagebreak:before {
+  content: 'Page Break';
+  position: absolute;
+  top: -0.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background: white;
+  padding: 0 0.5rem;
+  font-size: 0.75rem;
+  color: #718096;
+  border: 1px solid #cbd5e0;
+  border-radius: 0.25rem;
+}
+
+/* ---------------------------
+     Non-breaking Spaces
+  --------------------------- */
+.text-editor span[data-mce-bogus='1'] {
+  opacity: 0.5;
+}
+
+/* ---------------------------
+     Word Breaks
+  --------------------------- */
+.text-editor .mce-word-wrap {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* ---------------------------
+     Responsive Styles
+  --------------------------- */
+@media (max-width: 768px) {
+  .text-editor {
+    font-size: 0.95rem;
+  }
+
+  .text-editor h1 {
+    font-size: 2rem;
+  }
+
+  .text-editor h2 {
+    font-size: 1.5rem;
+  }
+
+  .text-editor h3 {
+    font-size: 1.25rem;
+  }
+
+  .text-editor ul,
+  .text-editor ol {
+    padding-left: 1.25rem;
+  }
+
+  .text-editor ul li,
+  .text-editor ol li {
+    font-size: 0.95rem;
+  }
+
+  .text-editor table {
+    font-size: 0.8rem;
+    min-width: auto;
+  }
+
+  .text-editor th,
+  .text-editor td {
+    padding: 0.5rem;
+  }
+
+  .text-editor blockquote {
+    padding: 0.75rem 1rem;
+  }
+
+  .text-editor img[data-mce-style*='float: left'],
+  .text-editor img[data-mce-style*='float: right'] {
+    float: none;
+    max-width: 100%;
+    margin: 1rem 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .text-editor {
+    font-size: 0.9rem;
+  }
+
+  .text-editor h1 {
+    font-size: 1.75rem;
+  }
+
+  .text-editor h2 {
+    font-size: 1.375rem;
+  }
+
+  .text-editor h3 {
+    font-size: 1.125rem;
+  }
+
+  .text-editor ul,
+  .text-editor ol {
+    padding-left: 1rem;
+  }
+
+  .text-editor table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+}
+
+/* ---------------------------
+     Print Styles
+  --------------------------- */
+@media print {
+  .text-editor {
+    font-size: 12pt;
+    line-height: 1.4;
+  }
+
+  .text-editor h1,
+  .text-editor h2,
+  .text-editor h3,
+  .text-editor h4,
+  .text-editor h5,
+  .text-editor h6 {
+    page-break-after: avoid;
+  }
+
+  .text-editor table {
+    page-break-inside: avoid;
+  }
+
+  .text-editor img {
+    max-width: 100% !important;
+    page-break-inside: avoid;
+  }
+
+  .text-editor .mce-pagebreak {
+    page-break-before: always;
+  }
+}
