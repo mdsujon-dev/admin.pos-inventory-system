@@ -38,7 +38,7 @@ export const SidebarMenuItem: FC<SidebarMenuItemProps> = ({
           isCollapsed ? "justify-center px-3 py-2" : "px-4 py-2"
         } ${
           isActive
-            ? "text-white bg-gradient-to-r from-primary to-primary-600 shadow-md shadow-primary-200"
+            ? "text-white bg-primary shadow-md shadow-primary-200"
             : "text-secondary-600 hover:bg-primary-50 hover:text-primary hover:shadow-sm"
         }`
       }

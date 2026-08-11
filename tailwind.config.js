@@ -88,7 +88,22 @@ export default {
           950: "#01230c",
         },
 
+        /**
+         * The only non-brand colour in the system, and it is not decoration.
+         *
+         * Reserved for destroying something or reporting that something broke —
+         * Logout, Delete, a failed save. Matches antd's `colorError` in
+         * main.tsx and `--red` in styles/index.css, so the three agree.
+         * Anything that is not destructive uses `primary`.
+         */
+        danger: {
+          DEFAULT: "#d41142",
+          600: "#d41142",
+          700: "#b00d37",
+        },
+
         // Neutral surface shades — kept as dark grays for UI backgrounds/text.
+        // Not a colour: this is the text/border/surface ramp.
         secondary: {
           DEFAULT: "#1a1a1a",
           50: "#f5f5f5",

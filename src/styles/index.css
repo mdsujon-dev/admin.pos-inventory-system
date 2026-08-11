@@ -1,4 +1,4 @@
-﻿@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @import "./text-editor.css";
 
 
@@ -8,11 +8,18 @@
 @tailwind utilities;
 
 :root {
+  /* The brand. Mirrored by `primary.DEFAULT` in tailwind.config.js and
+     `colorPrimary` in main.tsx — all three must say the same thing. */
   --primary: #019532;
+  /* The brand at 30% alpha — the last two digits are the alpha channel, not
+     part of the colour. Dropping them turns this into a different hue. */
+  --soft-primary: #01953230;
+  /* Neutral text/surface ramp. Not a colour. */
   --secondary: #101010;
+  /* Destructive only — Logout, Delete, failed save. Matches `danger` in
+     tailwind.config.js and `colorError` in main.tsx. */
   --red: #d41142;
   --white: #fff;
-  --soft-primary: #01953230;
   
   /* React Toastify overrides — it ships its own `sans-serif` default, so the
      brand face has to be handed to it explicitly. */
@@ -418,7 +425,7 @@ input[type="number"] {
 }
 
 .ck-content .button--green {
-  background-color: #406b1e;
+  background-color: var(--primary);
 }
 
 .ck-content .button--black {

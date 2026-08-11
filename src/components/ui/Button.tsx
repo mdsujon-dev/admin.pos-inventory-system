@@ -1,4 +1,4 @@
-﻿
+
 
 import { FC, ReactNode } from "react";
 import { Link } from "react-router-dom";
@@ -25,7 +25,7 @@ const Button: FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "font-medium rounded-xl px-6 py-3 text-lg shadow-md transition-all duration-300 inline-block";
+    "font-medium rounded-xl px-6 py-3 md:py-[13px] text-lg shadow-md transition-all duration-300 inline-block";
 
   let variantClasses = "";
 

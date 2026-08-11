@@ -1,4 +1,4 @@
-﻿import { FC, ReactNode } from 'react';
+import { FC, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
 type PrimaryButtonProps = {
@@ -30,7 +30,7 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
   switch (variant) {
     case 'primary':
       variantClasses =
-        'bg-gradient-to-br from-primary from-0% via-primary-600 via-[70%] to-primary-800 to-[100%] text-white hover:bg-primary/90 hover:!shadow-[0px_12px_40px_rgba(1,149,50,0.6)]';
+        'bg-primary text-white hover:bg-primary/90 hover:!shadow-[0px_12px_40px_rgba(1,149,50,0.6)]';
       break;
 
     case 'default':
@@ -114,7 +114,7 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
   if (href) {
     return (
       <Link
-        href={href}
+        to={href}
         {...props}
         className={isDisabled ? 'pointer-events-none' : ''}
       >

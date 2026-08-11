@@ -102,9 +102,9 @@ const Header = () => {
   ];
 
   return (
-    /* 65px, matching the sidebar's logo band so their bottom borders read as
+    /* 70px, matching the sidebar's logo band so their bottom borders read as
        one unbroken line across the top of the app. */
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-primary/20 pl-3 pr-3 sm:pr-6 !h-[65px] shrink-0 flex items-center justify-between gap-2 transition-all duration-300">
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-lg border-b border-primary/20 pl-3 pr-3 sm:pr-6 !h-[70px] shrink-0 flex items-center justify-between gap-2 transition-all duration-300">
       {/* min-w-0 so the greeting can actually shrink: without it a long name
           pushes the avatar off the right edge of a phone. */}
       <div className="flex min-w-0 items-center gap-4">

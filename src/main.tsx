@@ -22,9 +22,45 @@ const config = {
     colorPrimary: "#019532",
     colorLink: "#019532",
     colorPrimaryBg: "#01953230",
+
+    /**
+     * antd's own status palette, pointed at the brand.
+     *
+     * Left alone these default to a different hue each — success green, info
+     * blue, warning gold — and they are not a theme setting anyone sees: they
+     * leak out through Alert, Badge, Steps, Progress, message toasts and every
+     * preset Tag, so a panel that is one colour everywhere else still flashes
+     * blue and gold the moment something happens.
+     */
+    colorSuccess: "#019532",
+    colorInfo: "#019532",
+    colorWarning: "#019532",
+
+    /**
+     * The one exception, and it is deliberate: destructive stays red.
+     *
+     * Delete confirmations, failed-save messages and form validation all read
+     * through this token, and the Logout button is painted the same red by
+     * hand. A red that appears only when something is being destroyed or has
+     * gone wrong is not a second brand colour — it is the absence of the brand,
+     * which is the point.
+     */
+    colorError: "#d41142",
+
     // Match the Tailwind/global typeface so antd components don't fall back
     // to their own default sans stack.
     fontFamily: '"Outfit", sans-serif',
+
+    /**
+     * Height of a default-size ("middle") control — 34px, antd's own is 32.
+     *
+     * One token rather than a rule per component: Button, Input, Select,
+     * DatePicker and InputNumber all derive their height from this, so they
+     * grow together and a form row cannot end up with a button 2px taller than
+     * the field beside it. `controlHeightSM` / `controlHeightLG` are left alone,
+     * so only the default size moves.
+     */
+    controlHeight: 34,
   },
   components: {
     // Only buttons use a 7px corner radius.

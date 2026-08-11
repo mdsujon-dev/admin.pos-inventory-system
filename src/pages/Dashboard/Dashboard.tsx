@@ -1,4 +1,4 @@
-﻿import dayjs from "dayjs";
+import dayjs from "dayjs";
 import { motion } from "framer-motion";
 import { ArrowDownCircle, ArrowUpCircle, Banknote } from "lucide-react";
 import React, { useState } from "react";
@@ -105,9 +105,9 @@ const Dashboard: React.FC = () => {
         className="relative rounded-xl border border-secondary-100 shadow-sm"
       >
         <div className="absolute inset-0 overflow-hidden rounded-xl">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-400 via-primary-700 to-primary-900" />
+          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-300 via-primary-500 to-primary-700" />
           <div className="pointer-events-none absolute -right-10 -top-16 h-72 w-72 rounded-full bg-white/20 blur-[60px]" />
-          <div className="pointer-events-none absolute left-10 -top-6 h-32 w-48 rounded-full bg-primary-300/30 blur-[40px]" />
+          <div className="pointer-events-none absolute left-10 -top-6 h-32 w-48 rounded-full bg-primary-200/30 blur-[40px]" />
         </div>
 
         <div className="relative flex flex-wrap items-end justify-between gap-3 px-5 py-5">

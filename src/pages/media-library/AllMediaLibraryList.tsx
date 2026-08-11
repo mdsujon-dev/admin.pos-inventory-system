@@ -1,4 +1,4 @@
-﻿import { CopyOutlined, DeleteOutlined, DownOutlined, InfoCircleOutlined } from "@ant-design/icons";
+import { CopyOutlined, DeleteOutlined, DownOutlined, InfoCircleOutlined } from "@ant-design/icons";
 import {
   Button,
   Card,
@@ -357,7 +357,7 @@ const AllMediaLibraryList = () => {
                 e.currentTarget.classList.remove("ring-2", "ring-primary");
                 handleDropOnFolder(f._id);
               }}
-              className="group relative aspect-square flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-primary/10 bg-white hover:border-primary-200 transition cursor-pointer"
+              className="group relative aspect-square flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-primary bg-white transition-all duration-300 shadow-[0_8px_24px_-4px_rgba(1,149,50,0.25)] cursor-pointer"
               title={f.name}
             >
               <button

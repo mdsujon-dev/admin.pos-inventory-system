@@ -1,4 +1,4 @@
-﻿import { LogOut } from "lucide-react";
+import { LogOut } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { GoArrowLeft } from "react-icons/go";
 import { favicon, logoLight } from "../../../data";
@@ -47,17 +47,17 @@ const Sidebar = () => {
     <aside
       ref={sidebar}
       className={`fixed left-0 top-0 z-50 flex flex-col h-full shrink-0 transform bg-white transition-[width,transform] duration-300 ease-in-out border-r border-primary/20
-        ${isCollapsed ? "w-[98px]" : "w-[290px]"}
+        ${isCollapsed ? "w-[118px]" : "w-[310px]"}
         ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:static lg:translate-x-0`}
       style={{ isolation: "isolate" }}
     >
-      {/* 65px, matching the header's height exactly. The two sit side by side
+      {/* 70px, matching the header's height exactly. The two sit side by side
           and each draws its own bottom border, so any difference here shows up
           as one continuous line with a 5px step in the middle of it. */}
       <div
-        className={`flex relative items-center border-b border-primary/20 transition-all duration-300 bg-white/80 backdrop-blur-sm h-[65px] shrink-0 ${
+        className={`flex relative items-center border-b border-primary/20 transition-all duration-300 bg-white/80 backdrop-blur-sm h-[70px] shrink-0 ${
           isCollapsed ? "justify-center px-2" : "justify-between px-4"
         }`}
       >
@@ -77,7 +77,7 @@ const Sidebar = () => {
               src={logoLight}
               alt="POS & Inventory"
               accessurl={false}
-              className="w-auto h-[35px] transition-opacity duration-300"
+              className="w-auto h-[50px] transition-opacity duration-300"
             />
           )}
         </div>
@@ -102,7 +102,7 @@ const Sidebar = () => {
         >
           <button
             onClick={() => dispatch(logout())}
-            className={`border border-primary w-full rounded-md flex items-center bg-primary hover:bg-primary-700 text-white font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${
+            className={`border border-danger w-full rounded-md flex items-center !bg-danger hover:bg-danger-700 text-white font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${
               isCollapsed
                 ? "px-3 py-[9px] justify-center"
                 : "px-4 py-[9px] justify-between"
