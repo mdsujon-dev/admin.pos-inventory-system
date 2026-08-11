@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 type PrimaryButtonProps = {
   children: ReactNode;
   variant?: 'primary' | 'default' | 'outline' | 'link' | 'white' | 'black';
+  size?: 'sm' | 'md' | 'lg';
   href?: string;
   onClick?: () => void;
   className?: string;
@@ -15,6 +16,7 @@ type PrimaryButtonProps = {
 const PrimaryButton: FC<PrimaryButtonProps> = ({
   children,
   variant = 'primary',
+  size = 'md',
   href,
   onClick,
   loading = false,
@@ -23,7 +25,21 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    'font-medium rounded-xl px-6 py-3 text-lg shadow-md transition-all duration-300 inline-flex items-center justify-center';
+    'font-medium rounded-xl shadow-md transition-all duration-300 inline-flex items-center justify-center';
+
+  let sizeClasses = '';
+  switch (size) {
+    case 'sm':
+      sizeClasses = 'px-4 py-2 text-sm';
+      break;
+    case 'lg':
+      sizeClasses = 'px-8 py-4 text-xl';
+      break;
+    case 'md':
+    default:
+      sizeClasses = 'px-6 py-[15px] text-lg';
+      break;
+  }
 
   let variantClasses = '';
 
@@ -74,8 +90,8 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
   }
 
   const combinedClasses = isDisabled
-    ? `${baseClasses} ${disabledClasses} ${className}`
-    : `${baseClasses} ${variantClasses} ${className}`;
+    ? `${baseClasses} ${sizeClasses} ${disabledClasses} ${className}`
+    : `${baseClasses} ${sizeClasses} ${variantClasses} ${className}`;
 
   const handleClick = () => {
     if (!isDisabled && onClick) {

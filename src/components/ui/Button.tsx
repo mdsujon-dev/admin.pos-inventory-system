@@ -6,6 +6,7 @@ import { Link } from "react-router-dom";
 type ButtonProps = {
   children: ReactNode;
   variant?: "primary" | "default" | "outline" | "link" | "custom";
+  size?: "sm" | "md" | "lg";
   href?: string;
   onClick?: (e: any) => void;
   className?: string;
@@ -17,6 +18,7 @@ type ButtonProps = {
 const Button: FC<ButtonProps> = ({
   children,
   variant = "primary",
+  size = "md",
   href,
   onClick,
   loading = false,
@@ -25,7 +27,21 @@ const Button: FC<ButtonProps> = ({
   ...props
 }) => {
   const baseClasses =
-    "font-medium rounded-xl px-6 py-3 md:py-[13px] text-lg shadow-md transition-all duration-300 inline-block";
+    "font-medium rounded-xl shadow-md transition-all duration-300 inline-block";
+
+  let sizeClasses = "";
+  switch (size) {
+    case "sm":
+      sizeClasses = "px-4 py-2 text-sm";
+      break;
+    case "lg":
+      sizeClasses = "px-8 py-4 text-xl";
+      break;
+    case "md":
+    default:
+      sizeClasses = "px-6 py-[15px] text-lg";
+      break;
+  }
 
   let variantClasses = "";
 
@@ -99,8 +115,8 @@ const Button: FC<ButtonProps> = ({
   }
 
   const combinedClasses = isDisabled
-    ? `${baseClasses} ${disabledClasses} ${className}`
-    : `${baseClasses} ${variantClasses} ${className}`;
+    ? `${baseClasses} ${sizeClasses} ${disabledClasses} ${className}`
+    : `${baseClasses} ${sizeClasses} ${variantClasses} ${className}`;
 
   const handleClick = (e: any) => {
     if (!isDisabled && onClick) {
