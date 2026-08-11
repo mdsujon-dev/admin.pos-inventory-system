@@ -1,6 +1,15 @@
 import dayjs from "dayjs";
 import { motion } from "framer-motion";
-import { ArrowDownCircle, ArrowUpCircle, Banknote, Users, ShoppingCart, Box, Activity, TrendingUp, Package, PieChart, Tag } from "lucide-react";
+import {
+  ArrowDownCircle,
+  ArrowUpCircle,
+  Banknote,
+  Activity,
+  Calendar,
+  Clock,
+  Wallet,
+  Receipt,
+} from "lucide-react";
 import React, { useState } from "react";
 import PageMeta from "../../components/Common/PageMeta";
 import CustomDatePicker from "../../components/shared/CustomDatePicker";
@@ -15,6 +24,7 @@ import { Metric } from "./components/DashboardKit";
 import { riseIn } from "./components/dashboardMotion";
 import IncomeExpenseChart from "./components/IncomeExpenseChart";
 import WelcomeDashboard from "./components/WelcomeDashboard";
+import { StaticChartsSection } from "./components/DashboardCharts";
 
 /**
  * The dashboard.
@@ -52,13 +62,13 @@ const Dashboard: React.FC = () => {
 
   const { data: stats, isFetching } = useGetTransactionStatsQuery(
     { startDate, endDate },
-    { skip: !hasAnyKpi }
+    { skip: !hasAnyKpi },
   );
 
   const { data: financeSeries = [], isFetching: financeChartLoading } =
     useGetTransactionMonthlyQuery(
       { startDate, endDate },
-      { skip: !canIncomeExpense }
+      { skip: !canIncomeExpense },
     );
 
   if (!hasAnything) {
@@ -102,28 +112,30 @@ const Dashboard: React.FC = () => {
 
       <motion.div
         variants={riseIn}
-        className="relative rounded-xl border border-secondary-100 shadow-sm"
+        className="relative rounded-xl border-[1.5px] border-white/60 bg-white/30 backdrop-blur-2xl shadow-[0_8px_32px_rgba(0,0,0,0.05)] overflow-hidden"
       >
-        <div className="absolute inset-0 overflow-hidden rounded-xl">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary-300 via-primary-500 to-primary-700" />
-          <div className="pointer-events-none absolute -right-10 -top-16 h-72 w-72 rounded-full bg-white/20 blur-[60px]" />
-          <div className="pointer-events-none absolute left-10 -top-6 h-32 w-48 rounded-full bg-primary-200/30 blur-[40px]" />
+        <div className="absolute inset-0 overflow-hidden pointer-events-none -z-10">
+          <div className="absolute -right-10 -top-16 h-72 w-72 rounded-full bg-primary/50 blur-[60px]" />
+          <div className="absolute left-10 -bottom-10 h-32 w-48 rounded-full bg-primary/40 blur-[40px]" />
         </div>
 
-        <div className="relative flex flex-wrap items-end justify-between gap-3 px-5 py-5">
+        <div className="relative flex flex-wrap items-end justify-between gap-3 px-5 py-5 z-10">
           <div className="min-w-0">
-            <p className="text-xs font-medium uppercase tracking-[0.16em] text-white/70">
+            <p className="text-xs font-medium uppercase tracking-[0.16em] text-secondary-600">
               {dayjs().format("dddd, D MMMM YYYY")}
             </p>
-            <h1 className="mt-0.5 truncate text-2xl font-bold tracking-tight text-white">
+            <h1 className="mt-0.5 truncate text-2xl font-bold tracking-tight text-secondary-900">
               {me?.name ? `Welcome back, ${me.name.split(" ")[0]}` : "Overview"}
             </h1>
-            <p className="mt-1 text-sm text-white/70">
+            <p className="mt-1 text-sm text-secondary-600">
               The shop at a glance · {rangeLabel}
             </p>
           </div>
           {hasAnyKpi && (
-            <CustomDatePicker selectedData={dateRange} onChange={setDateRange} />
+            <CustomDatePicker
+              selectedData={dateRange}
+              onChange={setDateRange}
+            />
           )}
         </div>
       </motion.div>
@@ -131,7 +143,7 @@ const Dashboard: React.FC = () => {
       {hasAnyKpi && (
         <motion.div
           variants={riseIn}
-          className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3"
+          className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
         >
           {canIncome && (
             <Metric
@@ -143,13 +155,63 @@ const Dashboard: React.FC = () => {
               loading={isFetching}
             />
           )}
+          {hasAnyKpi && (
+            <Metric
+              label="Total Transactions"
+              value={stats?.count ?? 0}
+              hint="Number of transactions"
+              icon={Activity}
+              accent="#8b5cf6"
+              loading={isFetching}
+            />
+          )}
+          {hasAnyKpi && (
+            <Metric
+              label="Total Amount"
+              value={<Money value={stats?.totalAmount ?? 0} />}
+              hint="Overall transaction volume"
+              icon={Wallet}
+              accent="#f59e0b"
+              loading={isFetching}
+            />
+          )}
+          {hasAnyKpi && (
+            <Metric
+              label="Month Total"
+              value={<Money value={stats?.monthTotal ?? 0} />}
+              hint="Total amount this month"
+              icon={Calendar}
+              accent="#10b981"
+              loading={isFetching}
+            />
+          )}
+          {hasAnyKpi && (
+            <Metric
+              label="Today Total"
+              value={<Money value={stats?.todayTotal ?? 0} />}
+              hint="Total amount today"
+              icon={Clock}
+              accent="#06b6d4"
+              loading={isFetching}
+            />
+          )}
+          {hasAnyKpi && (
+            <Metric
+              label="Average Transaction"
+              value={<Money value={stats?.count ? (stats.totalAmount / stats.count) : 0} />}
+              hint="Average amount per transaction"
+              icon={Receipt}
+              accent="#6366f1"
+              loading={isFetching}
+            />
+          )}
           {canExpenses && (
             <Metric
               label="Expense"
               value={<Money value={expense} />}
               hint="Money out for the selected range"
               icon={ArrowUpCircle}
-              accent="#019532"
+              accent="#e91e63"
               loading={isFetching}
             />
           )}
@@ -159,70 +221,18 @@ const Dashboard: React.FC = () => {
               value={<Money value={net} />}
               hint="Income − Expense"
               icon={Banknote}
-              accent="#019532"
+              accent="#3b82f6"
               loading={isFetching}
             />
           )}
 
-          {/* Fake Cards */}
-          <Metric
-            label="Total Users"
-            value="1,245"
-            hint="Active users in the system"
-            icon={Users}
-            accent="#019532"
-          />
-          <Metric
-            label="Total Sales"
-            value={<Money value={125000} />}
-            hint="Sales for the selected range"
-            icon={ShoppingCart}
-            accent="#019532"
-          />
-          <Metric
-            label="Products in Stock"
-            value="8,530"
-            hint="Available items"
-            icon={Box}
-            accent="#019532"
-          />
-          <Metric
-            label="Active Orders"
-            value="342"
-            hint="Orders currently in progress"
-            icon={Activity}
-            accent="#019532"
-          />
-          <Metric
-            label="Growth Rate"
-            value="+15.4%"
-            hint="Compared to last month"
-            icon={TrendingUp}
-            accent="#019532"
-          />
-          <Metric
-            label="Suppliers"
-            value="56"
-            hint="Active suppliers"
-            icon={Package}
-            accent="#019532"
-          />
-          <Metric
-            label="Conversion Rate"
-            value="4.2%"
-            hint="Visits to sales"
-            icon={PieChart}
-            accent="#019532"
-          />
-          <Metric
-            label="Total Categories"
-            value="124"
-            hint="Product categories"
-            icon={Tag}
-            accent="#019532"
-          />
         </motion.div>
       )}
+
+      {/* 6 Unique Static Chart Cards */}
+      <motion.div variants={riseIn}>
+        <StaticChartsSection />
+      </motion.div>
 
       {canIncomeExpense && (
         <motion.div variants={riseIn}>

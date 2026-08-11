@@ -10,6 +10,19 @@ import sidebarMenuRoutes from "./SidebarItems";
 import { SidebarMenuItem } from "./SidebarMenuItem";
 import { SubMenuItem } from "./SubMenuItem";
 
+/**
+ * True when `pathname` belongs to this submenu entry. Detail pages sit below
+ * their list route (`/inventory/products/edit/7`), so a prefix match is what
+ * keeps the group open and the parent lit on those screens — except for entries
+ * flagged `exactMatch`, whose address is a prefix of their siblings' and would
+ * otherwise claim all of them.
+ */
+const matchesSubmenu = (submenu: SubmenuItem, pathname: string) =>
+  submenu.exactMatch
+    ? pathname === submenu.address
+    : pathname === submenu.address ||
+      pathname.startsWith(`${submenu.address}/`);
+
 const AdminMenu = () => {
   const [openSubmenu, setOpenSubmenu] = useState<string | null>(null);
   const location = useLocation();
@@ -20,7 +33,7 @@ const AdminMenu = () => {
   // so the active page is always visible in the sidebar after a refresh.
   useEffect(() => {
     const activeGroup = sidebarMenuRoutes.find((r) =>
-      r.submenus?.some((s) => s.address === location.pathname)
+      r.submenus?.some((s) => matchesSubmenu(s, location.pathname))
     );
     if (activeGroup) setOpenSubmenu(activeGroup.label);
   }, [location.pathname]);
@@ -37,7 +50,9 @@ const AdminMenu = () => {
   const isOpen = (submenu: string) => openSubmenu === submenu;
 
   const isParentActive = (submenus: SubmenuItem[]) => {
-    return submenus.some((submenu) => location.pathname === submenu.address);
+    return submenus.some((submenu) =>
+      matchesSubmenu(submenu, location.pathname)
+    );
   };
 
   return (
@@ -54,9 +69,19 @@ const AdminMenu = () => {
         return (
         <div key={index}>
           {showSectionHeader && (
-            <p className="px-4 pt-4 pb-1 text-[11px] font-bold uppercase tracking-wider text-secondary-400 first:pt-0">
-              {route.section}
-            </p>
+            // `pt` is driven off the index rather than `first:` — the header is
+            // always the first child of its own wrapper, so a `first:pt-0`
+            // variant here would match every section, not just the top one.
+            <div
+              className={`flex items-center gap-2.5 px-4 pb-1.5 ${
+                index === 0 ? "pt-0" : "pt-5"
+              }`}
+            >
+              <p className="text-[11px] font-bold uppercase tracking-[0.14em] text-secondary-400 whitespace-nowrap">
+                {route.section}
+              </p>
+              <span className="h-px flex-1 bg-gradient-to-r from-secondary-200 to-transparent" />
+            </div>
           )}
           {!route.submenus ? (
             <SidebarMenuItem
@@ -91,7 +116,7 @@ const AdminMenu = () => {
                     />
                     {!isCollapsed && (
                       <Tooltip title={route.label} placement="right">
-                        <span className="text-[15px] md:text-[16px] lg:text-[17px] font-semibold truncate whitespace-nowrap">
+                        <span className="text-[14px] md:text-[15px] lg:text-[16px] font-semibold truncate whitespace-nowrap">
                           {route.label}
                         </span>
                       </Tooltip>
@@ -125,6 +150,7 @@ const AdminMenu = () => {
                           key={subroute.label}
                           label={subroute.label}
                           address={subroute.address}
+                          icon={subroute.icon}
                           exactMatch={subroute.exactMatch}
                         />
                       ))}

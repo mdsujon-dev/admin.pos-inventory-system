@@ -1,4 +1,4 @@
-﻿import { motion } from "framer-motion";
+import { motion } from "framer-motion";
 import React from "react";
 
 import { riseIn } from "./dashboardMotion";
@@ -38,10 +38,9 @@ export const Metric = ({
   if (loading) {
     return (
       <div
-        className="h-[92px] animate-pulse rounded-xl border"
+        className="h-[92px] animate-pulse rounded-xl border-[1.5px] border-white/50 backdrop-blur-md"
         style={{
-          background: `linear-gradient(135deg, ${accent}14 0%, #ffffff 100%)`,
-          borderColor: `${accent}26`,
+          background: `linear-gradient(135deg, ${accent}14 0%, rgba(255,255,255,0.7) 100%)`,
         }}
       />
     );
@@ -51,12 +50,11 @@ export const Metric = ({
     <motion.div
       whileHover={{ y: -4 }}
       onClick={onClick}
-      className={`group relative overflow-hidden rounded-xl border p-4 transition-all duration-300 hover:shadow-[0_10px_28px_-12px_rgba(16,24,40,.3)] ${
+      className={`group relative overflow-hidden rounded-xl border-[1.5px] border-white/50 backdrop-blur-md shadow-[0_10px_28px_-12px_rgba(16,24,40,.3)] p-4 transition-all duration-300 hover:shadow-[0_14px_32px_-12px_rgba(16,24,40,.4)] hover:border-white/80 ${
         onClick ? "cursor-pointer" : ""
       }`}
       style={{
-        background: `linear-gradient(135deg, ${accent}1a 0%, ${accent}08 42%, #ffffff 100%)`,
-        borderColor: `${accent}33`,
+        background: `linear-gradient(135deg, ${accent}1a 0%, ${accent}08 42%, rgba(255,255,255,0.7) 100%)`,
       }}
     >
       <div

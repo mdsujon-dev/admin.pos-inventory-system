@@ -51,7 +51,7 @@ export const SidebarMenuItem: FC<SidebarMenuItemProps> = ({
       )}
       {!isCollapsed && (
         <Tooltip title={label} placement="right">
-          <span className="text-[15px] md:text-[16px] lg:text-[17px] font-semibold truncate whitespace-nowrap flex-1 min-w-0">
+          <span className="text-[14px] md:text-[15px] lg:text-[16px] font-semibold truncate whitespace-nowrap flex-1 min-w-0">
             {label}
           </span>
         </Tooltip>

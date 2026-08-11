@@ -16,6 +16,7 @@ import Countries from "../pages/Settings/Countries/Countries.tsx";
 import Designation from "../pages/Settings/Desgination/Designation.tsx";
 import MediaBin from "../pages/Settings/MediaBin/MediaBin.tsx";
 import NotificationSounds from "../pages/Settings/NotificationSounds/NotificationSounds.tsx";
+import UnderDevelopment from "../pages/UnderDevelopment/UnderDevelopment.tsx";
 import RolePermissions from "../pages/Users/RolePermissions.tsx";
 import Roles from "../pages/Users/Roles.tsx";
 import Users from "../pages/Users/Users.tsx";
@@ -34,6 +35,27 @@ const routes = [
     children: [
       { path: "/", element: <Dashboard /> },
       { path: "media-library", element: <AllMediaLibraryList /> },
+      // Inventory — the screens themselves aren't built yet, so every entry
+      // resolves to the placeholder. The addresses are the contract the
+      // sidebar and the permission map are already written against; swapping
+      // in a real page later touches only the `element` on that one line.
+      {
+        path: "inventory",
+        children: [
+          { path: "products", element: <UnderDevelopment /> },
+          { path: "products/create", element: <UnderDevelopment /> },
+          { path: "products/expired", element: <UnderDevelopment /> },
+          { path: "products/low-stock", element: <UnderDevelopment /> },
+          { path: "categories", element: <UnderDevelopment /> },
+          { path: "sub-categories", element: <UnderDevelopment /> },
+          { path: "brands", element: <UnderDevelopment /> },
+          { path: "units", element: <UnderDevelopment /> },
+          { path: "variant-attributes", element: <UnderDevelopment /> },
+          { path: "warranties", element: <UnderDevelopment /> },
+          { path: "print-barcode", element: <UnderDevelopment /> },
+          { path: "print-qr-code", element: <UnderDevelopment /> },
+        ],
+      },
       // Employee Management — primary paths
       {
         path: "employees",

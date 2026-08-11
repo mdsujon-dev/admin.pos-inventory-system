@@ -22,6 +22,7 @@ const CRUD = ["View", "Create", "Update", "Delete"];
 export const PERMISSION_GROUP_ORDER: string[] = [
   "Dashboard",
   "Media Library",
+  "Inventory",
   "Employee Management",
   "Accounts",
   "Logs",
@@ -61,6 +62,29 @@ export const PERMISSION_MODULES: PermissionModule[] = [
     module: "Media Library",
     permissions: ["View", "Create", "Delete"],
     group: "Media Library",
+  },
+
+  // Inventory — mirrors the Product group in the sidebar, one module per
+  // screen. The two print screens produce labels rather than records, so they
+  // get View + Print instead of CRUD.
+  { module: "Products", permissions: CRUD, group: "Inventory" },
+  { module: "Expired Products", permissions: ["View"], group: "Inventory" },
+  { module: "Low Stocks", permissions: ["View"], group: "Inventory" },
+  { module: "Categories", permissions: CRUD, group: "Inventory" },
+  { module: "Sub Categories", permissions: CRUD, group: "Inventory" },
+  { module: "Brands", permissions: CRUD, group: "Inventory" },
+  { module: "Units", permissions: CRUD, group: "Inventory" },
+  { module: "Variant Attributes", permissions: CRUD, group: "Inventory" },
+  { module: "Warranties", permissions: CRUD, group: "Inventory" },
+  {
+    module: "Print Barcode",
+    permissions: ["View", "Print"],
+    group: "Inventory",
+  },
+  {
+    module: "Print QR Code",
+    permissions: ["View", "Print"],
+    group: "Inventory",
   },
 
   // Employee Management

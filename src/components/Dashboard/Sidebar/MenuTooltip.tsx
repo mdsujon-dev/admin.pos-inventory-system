@@ -68,22 +68,28 @@ export const MenuTooltip: FC<MenuTooltipProps> = ({
         </div>
         {submenus && submenus.length > 0 && (
           <div className="py-1">
-            {submenus.map((submenu, index) => (
-              <NavLink
-                key={index}
-                to={submenu.address}
-                end
-                className={({ isActive }) =>
-                  `block px-4 py-2 text-sm transition-colors duration-200 rounded-md mx-1 ${
-                    isActive
-                      ? "text-primary bg-primary-50 font-medium"
-                      : "text-secondary-600 hover:bg-primary-50 hover:text-primary"
-                  }`
-                }
-              >
-                {submenu.label}
-              </NavLink>
-            ))}
+            {submenus.map((submenu, index) => {
+              const Icon = submenu.icon;
+              return (
+                <NavLink
+                  key={index}
+                  to={submenu.address}
+                  // Mirrors the expanded list's rule, so a route highlights the
+                  // same row whichever of the two views is on screen.
+                  end={submenu.exactMatch}
+                  className={({ isActive }) =>
+                    `flex items-center gap-2.5 px-4 py-2 text-sm transition-colors duration-200 rounded-md mx-1 ${
+                      isActive
+                        ? "text-primary bg-primary-50 font-medium"
+                        : "text-secondary-600 hover:bg-primary-50 hover:text-primary"
+                    }`
+                  }
+                >
+                  {Icon && <Icon size={16} className="shrink-0" />}
+                  <span className="truncate">{submenu.label}</span>
+                </NavLink>
+              );
+            })}
           </div>
         )}
       </div>

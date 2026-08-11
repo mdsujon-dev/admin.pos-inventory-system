@@ -33,6 +33,25 @@ export const routePermissions: Record<string, RoutePermission> = {
   // Income & Expense
   "/income-expense": { module: "Income & Expense", action: "View" },
 
+  // Inventory
+  "/inventory/products": { module: "Products", action: "View" },
+  // Creating is its own action — a view-only user who types the URL should not
+  // land on the form just because the list is open to them.
+  "/inventory/products/create": { module: "Products", action: "Create" },
+  "/inventory/products/expired": { module: "Expired Products", action: "View" },
+  "/inventory/products/low-stock": { module: "Low Stocks", action: "View" },
+  "/inventory/categories": { module: "Categories", action: "View" },
+  "/inventory/sub-categories": { module: "Sub Categories", action: "View" },
+  "/inventory/brands": { module: "Brands", action: "View" },
+  "/inventory/units": { module: "Units", action: "View" },
+  "/inventory/variant-attributes": {
+    module: "Variant Attributes",
+    action: "View",
+  },
+  "/inventory/warranties": { module: "Warranties", action: "View" },
+  "/inventory/print-barcode": { module: "Print Barcode", action: "View" },
+  "/inventory/print-qr-code": { module: "Print QR Code", action: "View" },
+
   // Employee Management
   "/employees": { module: "Employees", action: "View" },
   "/employees/roles": { module: "Roles", action: "View" },

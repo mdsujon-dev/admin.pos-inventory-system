@@ -1,4 +1,20 @@
-import { ShieldCheck, Wallet } from "lucide-react";
+import {
+  BadgeCheck,
+  Barcode,
+  Boxes,
+  CalendarClock,
+  Layers,
+  LayoutGrid,
+  Package,
+  PackagePlus,
+  QrCode,
+  Rows3,
+  Ruler,
+  ShieldCheck,
+  Tags,
+  TrendingDown,
+  Wallet,
+} from "lucide-react";
 import {
   ActionLogsIcon,
   DashboardIcon,
@@ -22,6 +38,94 @@ const sidebarMenuRoutes: RouteItem[] = [
     address: "/media-library",
     module: "Media Library",
     section: "Main",
+  },
+  // Inventory — everything that describes what is on the shelf. Catalog data
+  // (categories, brands, units, variant attributes, warranties) lives under
+  // Product rather than beside it: they exist only to define a product, so
+  // splitting them into sibling groups would spread one subject over the
+  // sidebar.
+  {
+    label: "Inventory Management",
+    icon: Boxes,
+    section: "Inventory",
+    submenus: [
+      {
+        label: "Products",
+        address: "/inventory/products",
+        icon: Package,
+        module: "Products",
+        // "/inventory/products" is a prefix of every sibling below it, so
+        // without this the parent stays highlighted on all of them.
+        exactMatch: true,
+      },
+      {
+        label: "Create Product",
+        address: "/inventory/products/create",
+        icon: PackagePlus,
+        module: "Products",
+        action: "Create",
+      },
+      {
+        label: "Expired Products",
+        address: "/inventory/products/expired",
+        icon: CalendarClock,
+        module: "Expired Products",
+      },
+      {
+        label: "Low Stocks",
+        address: "/inventory/products/low-stock",
+        icon: TrendingDown,
+        module: "Low Stocks",
+      },
+      {
+        label: "Category",
+        address: "/inventory/categories",
+        icon: LayoutGrid,
+        module: "Categories",
+      },
+      {
+        label: "Sub Category",
+        address: "/inventory/sub-categories",
+        icon: Rows3,
+        module: "Sub Categories",
+      },
+      {
+        label: "Brands",
+        address: "/inventory/brands",
+        icon: Tags,
+        module: "Brands",
+      },
+      {
+        label: "Units",
+        address: "/inventory/units",
+        icon: Ruler,
+        module: "Units",
+      },
+      {
+        label: "Variant Attributes",
+        address: "/inventory/variant-attributes",
+        icon: Layers,
+        module: "Variant Attributes",
+      },
+      {
+        label: "Warranties",
+        address: "/inventory/warranties",
+        icon: BadgeCheck,
+        module: "Warranties",
+      },
+      {
+        label: "Print Barcode",
+        address: "/inventory/print-barcode",
+        icon: Barcode,
+        module: "Print Barcode",
+      },
+      {
+        label: "Print QR Code",
+        address: "/inventory/print-qr-code",
+        icon: QrCode,
+        module: "Print QR Code",
+      },
+    ],
   },
   {
     label: "Employee Management",
