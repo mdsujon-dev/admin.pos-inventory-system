@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 
 /**
  * Reusable Font Awesome icon.
@@ -8,7 +8,7 @@ import React from "react";
  * (like ৳) that the UI font may not have.
  *
  *   <Icon name="bangladeshi-taka-sign" />
- *   <Icon name="trash" variant="regular" className="text-red-500" />
+ *   <Icon name="trash" variant="regular" className="text-primary-500" />
  */
 interface IconProps {
   /** FA icon name WITHOUT the `fa-` prefix, e.g. "bangladeshi-taka-sign". */

@@ -151,7 +151,7 @@ const ResetPassword = () => {
           loading={isLoading}
           size="large"
           block
-          className="!mt-2 !h-11 !rounded-lg !border-0 !bg-primary !text-[15px] !font-semibold !text-white !shadow-[0_8px_20px_-8px_rgba(15,53,25,0.55)] hover:!bg-primary-700"
+          className="!mt-2 !h-11 !rounded-lg !border-0 !bg-primary !text-[15px] !font-semibold !text-white !shadow-[0_8px_20px_-8px_rgba(1,149,50,0.55)] hover:!bg-primary-700"
           icon={!isLoading && <ArrowRight className="h-4 w-4" />}
           iconPosition="end"
         >

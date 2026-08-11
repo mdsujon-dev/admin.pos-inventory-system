@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+﻿import { motion } from "framer-motion";
 import { Wrench } from "lucide-react";
 import { useLocation } from "react-router-dom";
 
@@ -18,12 +18,12 @@ const UnderDevelopment = () => {
         This page is under development
       </h2>
 
-      <p className="mb-2 text-sm text-gray-500">
+      <p className="mb-2 text-sm text-secondary-500">
         Route:{" "}
         <code className="text-primary underline">{location.pathname}</code>
       </p>
 
-      <p className="mb-8 max-w-md text-gray-500">
+      <p className="mb-8 max-w-md text-secondary-500">
         We're working hard to bring you this feature. Please check back soon or
         contact support if you need help.
       </p>

@@ -40,7 +40,6 @@ const Designation = () => {
       title: "Are you sure you want to delete this designation?",
       content: "This action cannot be undone.",
       okText: "Yes, Delete",
-      okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
         try {
@@ -143,7 +142,6 @@ const Designation = () => {
           <PermissionGate module="Designations" action="Delete">
             <Tooltip title="Delete Designation">
               <Button
-                danger
                 icon={<Trash2 className="w-4 h-4" />}
                 onClick={() => handleDelete(record._id)}
               />
@@ -212,7 +210,7 @@ const Designation = () => {
       <div className="flex flex-col md:flex-row md:items-center gap-4 mb-6">
         <Input
           placeholder="Search designations by name..."
-          prefix={<Search className="w-4 h-4 text-gray-400" />}
+          prefix={<Search className="w-4 h-4 text-secondary-400" />}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           className="max-w-md"

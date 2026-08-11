@@ -1,4 +1,4 @@
-import { FC, ReactNode } from 'react';
+﻿import { FC, ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 
 type PrimaryButtonProps = {
@@ -30,17 +30,17 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
   switch (variant) {
     case 'primary':
       variantClasses =
-        'bg-gradient-to-br from-primary from-0% via-primary-600 via-[70%] to-primary-800 to-[100%] text-white hover:bg-primary/90 hover:!shadow-[0px_12px_40px_rgba(53,173,11,0.6)]';
+        'bg-gradient-to-br from-primary from-0% via-primary-600 via-[70%] to-primary-800 to-[100%] text-white hover:bg-primary/90 hover:!shadow-[0px_12px_40px_rgba(1,149,50,0.6)]';
       break;
 
     case 'default':
       variantClasses =
-        'bg-gray-200 text-gray-900 hover:bg-gray-300 hover:!shadow-[0px_12px_40px_rgba(0,0,11,0.09)]';
+        'bg-secondary-200 text-secondary-900 hover:bg-secondary-300 hover:!shadow-[0px_12px_40px_rgba(0,0,11,0.09)]';
       break;
 
     case 'outline':
       variantClasses =
-        'border border-primary text-primary hover:bg-primary hover:text-white hover:!shadow-[0px_12px_40px_rgba(53,173,11,0.6)]';
+        'border border-primary text-primary hover:bg-primary hover:text-white hover:!shadow-[0px_12px_40px_rgba(1,149,50,0.6)]';
       break;
 
     case 'link':
@@ -51,7 +51,7 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
     // ✅ NEW WHITE
     case 'white':
       variantClasses =
-        'bg-white text-black border border-gray-200 hover:bg-gray-100 ';
+        'bg-white text-black border border-secondary-200 hover:bg-secondary-100 ';
       break;
 
     // ✅ NEW BLACK
@@ -70,7 +70,7 @@ const PrimaryButton: FC<PrimaryButtonProps> = ({
 
   if (isDisabled) {
     disabledClasses =
-      'bg-gray-200 text-gray-400 shadow-none cursor-not-allowed pointer-events-none border-none';
+      'bg-secondary-200 text-secondary-400 shadow-none cursor-not-allowed pointer-events-none border-none';
   }
 
   const combinedClasses = isDisabled

@@ -1,4 +1,4 @@
-import { DeleteOutlined, FileOutlined, InboxOutlined } from "@ant-design/icons";
+﻿import { DeleteOutlined, FileOutlined, InboxOutlined } from "@ant-design/icons";
 import { Card, Image, Input, message, Modal, Upload } from "antd";
 import type { RcFile } from "antd/es/upload/interface";
 import { useEffect, useState } from "react";
@@ -300,7 +300,7 @@ const MediaLibraryUploadModal = ({
               <div className="mb-2">
                 <label
                   htmlFor={`custom-name-${file.uid}`}
-                  className="block mb-1 font-medium text-gray-700"
+                  className="block mb-1 font-medium text-secondary-700"
                 >
                   Custom Filename
                 </label>

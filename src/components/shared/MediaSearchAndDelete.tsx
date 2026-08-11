@@ -1,4 +1,4 @@
-import { Button, Checkbox } from "antd";
+﻿import { Button, Checkbox } from "antd";
 import { useState } from "react";
 import { HiPlus } from "react-icons/hi2";
 import { toast } from "react-toastify";
@@ -109,7 +109,7 @@ const MediaSearchAndDelete = ({
                 onChange={(e) => handleSelectAll(e.target.checked)}
                 className="text-sm font-medium"
               >
-                <span className="ml-2 text-gray-700">
+                <span className="ml-2 text-secondary-700">
                   Select All ({selectedItems.length}/{images.length})
                 </span>
               </Checkbox>
@@ -129,7 +129,7 @@ const MediaSearchAndDelete = ({
             )}
           </div>
           {/* Total Count */}
-          <div className="text-sm text-gray-500 font-medium">
+          <div className="text-sm text-secondary-500 font-medium">
             Total: {data?.data.meta?.total || 0} items
           </div>
         </div>

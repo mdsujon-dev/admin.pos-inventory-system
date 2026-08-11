@@ -74,10 +74,10 @@ const Header = () => {
       key: "user-info",
       label: (
         <div className="flex flex-col">
-          <span className="font-medium text-gray-800">
+          <span className="font-medium text-secondary-800">
             {user?.name || "Guest"}
           </span>
-          <span className="text-sm text-gray-500">
+          <span className="text-sm text-secondary-500">
             {user?.email || "No Email"}
           </span>
         </div>
@@ -164,7 +164,7 @@ const Header = () => {
             style={{
               verticalAlign: "middle",
             }}
-            className="bg-primary text-white font-semibold cursor-pointer select-none border border-gray-200"
+            className="bg-primary text-white font-semibold cursor-pointer select-none border border-primary/20"
             gap={1}
           >
             {!user?.profilePhoto && (user?.name?.charAt(0) || "?")}

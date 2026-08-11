@@ -48,7 +48,7 @@ export function AuthLayout({
           className="pointer-events-none absolute inset-0"
           style={{
             background:
-              "radial-gradient(ellipse at 25% 15%, rgba(91,190,55,0.28) 0%, transparent 60%)",
+              "radial-gradient(ellipse at 25% 15%, rgba(1,149,50,0.28) 0%, transparent 60%)",
           }}
         />
         <motion.div
@@ -162,8 +162,8 @@ export function AuthLayout({
       <style>{`
         .auth-form .ant-form-item-label > label { font-weight: 500; color: #333333; }
         .auth-form .ant-input-affix-wrapper:hover,
-        .auth-form .ant-input-affix-wrapper-focused { border-color: #0F3519 !important; }
-        .auth-form .ant-input-affix-wrapper-focused { box-shadow: 0 0 0 3px rgba(15,53,25,0.12) !important; }
+        .auth-form .ant-input-affix-wrapper-focused { border-color: #019532 !important; }
+        .auth-form .ant-input-affix-wrapper-focused { box-shadow: 0 0 0 3px rgba(1,149,50,0.12) !important; }
       `}</style>
     </div>
   );

@@ -258,11 +258,11 @@ const RolePermissions = () => {
 
       <Spin spinning={loading}>
         {/* Controls. Scrolls with the page like everything else. */}
-        <div className="mb-5 rounded-xl border border-gray-200 bg-gradient-to-r from-gray-50 to-primary-50/40 p-4">
+        <div className="mb-5 rounded-xl border border-secondary-200 bg-gradient-to-r from-secondary-50 to-primary-50/40 p-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <Input
               placeholder="Search modules..."
-              prefix={<Search className="h-4 w-4 text-gray-400" />}
+              prefix={<Search className="h-4 w-4 text-secondary-400" />}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               allowClear
@@ -273,7 +273,7 @@ const RolePermissions = () => {
                 Saving lives at the foot of the sheet, after the thing being
                 saved. */}
             <div className="text-right">
-              <span className="block text-xs font-bold uppercase tracking-tight text-gray-400">
+              <span className="block text-xs font-bold uppercase tracking-tight text-secondary-400">
                 Selected
               </span>
               <span className="text-sm font-bold text-primary">
@@ -282,8 +282,8 @@ const RolePermissions = () => {
             </div>
           </div>
 
-          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-gray-200/70 pt-3">
-            <span className="mr-1 text-xs font-bold uppercase tracking-widest text-gray-500">
+          <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-secondary-200/70 pt-3">
+            <span className="mr-1 text-xs font-bold uppercase tracking-widest text-secondary-500">
               Quick grant:
             </span>
             {/* `custom` rather than `outline`: the outline variant fills with
@@ -301,7 +301,7 @@ const RolePermissions = () => {
                   className={`!rounded-[6px] !px-4 !py-1.5 !text-xs !font-semibold !shadow-none transition-all hover:!shadow-card-hover ${
                     isFullySelected
                       ? "!border !border-primary !bg-primary !text-white"
-                      : "!border !border-gray-200 !bg-white !text-gray-700 hover:!border-gray-300"
+                      : "!border !border-secondary-200 !bg-white !text-secondary-700 hover:!border-secondary-300"
                   }`}
                   onClick={() => handleQuickGrant(a)}
                 >
@@ -311,7 +311,7 @@ const RolePermissions = () => {
             })}
             <Button
               variant="custom"
-              className="!ml-auto !rounded-[6px] !border !border-red-200 !bg-white !px-4 !py-1.5 !text-xs !font-semibold !text-red-600 !shadow-none hover:!border-red-300 hover:!shadow-card-hover"
+              className="!ml-auto !rounded-[6px] !border !border-primary-200 !bg-white !px-4 !py-1.5 !text-xs !font-semibold !text-primary-600 !shadow-none hover:!border-primary-300 hover:!shadow-card-hover"
               onClick={handleClearAll}
             >
               Reset All
@@ -327,7 +327,7 @@ const RolePermissions = () => {
               e.target.checked ? handleSelectAll() : handleClearAll()
             }
           >
-            <span className="text-sm font-semibold text-gray-700">
+            <span className="text-sm font-semibold text-secondary-700">
               Select all system permissions
             </span>
           </Checkbox>
@@ -342,11 +342,11 @@ const RolePermissions = () => {
             {groupedModules.map(({ group, modules }) => (
               <div key={group}>
                 <div className="mb-3 flex items-center gap-3">
-                  <h3 className="m-0 whitespace-nowrap text-sm font-bold uppercase tracking-wide text-gray-700">
+                  <h3 className="m-0 whitespace-nowrap text-sm font-bold uppercase tracking-wide text-secondary-700">
                     {group}
                   </h3>
-                  <span className="h-px flex-1 bg-gray-200" />
-                  <span className="text-xs font-medium text-gray-400">
+                  <span className="h-px flex-1 bg-secondary-200" />
+                  <span className="text-xs font-medium text-secondary-400">
                     {modules.length} module{modules.length === 1 ? "" : "s"}
                   </span>
                 </div>
@@ -365,11 +365,11 @@ const RolePermissions = () => {
                         className={`rounded-xl border bg-white p-5 transition-all hover:shadow-card-hover ${
                           isAll
                             ? "border-primary/60 ring-1 ring-primary/10"
-                            : "border-gray-200"
+                            : "border-secondary-200"
                         }`}
                       >
-                        <div className="mb-4 flex items-center justify-between gap-2 border-b border-gray-100 pb-3">
-                          <h4 className="m-0 truncate text-xs font-bold uppercase tracking-wide text-gray-800">
+                        <div className="mb-4 flex items-center justify-between gap-2 border-b border-secondary-100 pb-3">
+                          <h4 className="m-0 truncate text-xs font-bold uppercase tracking-wide text-secondary-800">
                             {m.module}
                           </h4>
                           <Checkbox
@@ -394,7 +394,7 @@ const RolePermissions = () => {
                                 className={`inline-flex items-center gap-1 !rounded-[6px] !px-3 !py-1.5 !text-xs !font-semibold !shadow-none hover:!shadow-card-hover ${
                                   active
                                     ? ""
-                                    : "!border !border-gray-200 !bg-white !text-gray-600 hover:!border-gray-300"
+                                    : "!border !border-secondary-200 !bg-white !text-secondary-600 hover:!border-secondary-300"
                                 }`}
                               >
                                 {active && <Check className="h-3 w-3" />}
@@ -414,14 +414,14 @@ const RolePermissions = () => {
 
         {/* after everything it saves —
             the order the page is actually worked through. */}
-        <div className="mt-6 flex flex-wrap items-center justify-end gap-3 border-t border-gray-200 pt-5">
-          <span className="mr-auto text-sm text-gray-500">
+        <div className="mt-6 flex flex-wrap items-center justify-end gap-3 border-t border-secondary-200 pt-5">
+          <span className="mr-auto text-sm text-secondary-500">
             <span className="font-bold text-primary">{selected.length}</span> of{" "}
             {TOTAL_PERMISSION_COUNT} permissions selected
           </span>
           <Button
             variant="custom"
-            className="!rounded-[6px] !border !border-gray-200 !bg-white !px-6 !py-2 !text-sm !font-semibold !text-gray-700 !shadow-none hover:!border-gray-300 hover:!shadow-card-hover"
+            className="!rounded-[6px] !border !border-secondary-200 !bg-white !px-6 !py-2 !text-sm !font-semibold !text-secondary-700 !shadow-none hover:!border-secondary-300 hover:!shadow-card-hover"
             onClick={() => navigate("/employees/roles")}
             disabled={saving}
           >

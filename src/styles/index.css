@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
+﻿@import url("https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap");
 @import "./text-editor.css";
 
 
@@ -8,11 +8,11 @@
 @tailwind utilities;
 
 :root {
-  --primary: #0F3519;
+  --primary: #019532;
   --secondary: #101010;
   --red: #d41142;
   --white: #fff;
-  --soft-primary: #0F351930;
+  --soft-primary: #01953230;
   
   /* React Toastify overrides — it ships its own `sans-serif` default, so the
      brand face has to be handed to it explicitly. */

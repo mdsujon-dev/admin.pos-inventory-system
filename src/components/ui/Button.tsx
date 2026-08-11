@@ -1,4 +1,4 @@
-
+﻿
 
 import { FC, ReactNode } from "react";
 import { Link } from "react-router-dom";
@@ -34,7 +34,7 @@ const Button: FC<ButtonProps> = ({
       variantClasses = "bg-primary text-white hover:bg-primary/90 shadow-md";
       break;
     case "default":
-      variantClasses = "bg-gray-200 text-gray-900 hover:bg-gray-300 shadow-sm";
+      variantClasses = "bg-secondary-200 text-secondary-900 hover:bg-secondary-300 shadow-sm";
       break;
     case "outline":
       variantClasses =
@@ -59,7 +59,7 @@ const Button: FC<ButtonProps> = ({
         break;
       case "default":
         disabledClasses =
-          "bg-gray-200 text-gray-400 shadow-none cursor-not-allowed pointer-events-none";
+          "bg-secondary-200 text-secondary-400 shadow-none cursor-not-allowed pointer-events-none";
         break;
       case "outline":
         disabledClasses =
@@ -78,23 +78,23 @@ const Button: FC<ButtonProps> = ({
     switch (variant) {
       case "primary":
         disabledClasses =
-          "bg-gray-200 shadow-none text-gray-300 cursor-not-allowed pointer-events-none";
+          "bg-secondary-200 shadow-none text-secondary-300 cursor-not-allowed pointer-events-none";
         break;
       case "default":
         disabledClasses =
-          "bg-gray-200 shadow-none text-gray-300 cursor-not-allowed pointer-events-none";
+          "bg-secondary-200 shadow-none text-secondary-300 cursor-not-allowed pointer-events-none";
         break;
       case "outline":
         disabledClasses =
-          "bg-gray-200 shadow-none text-gray-300 cursor-not-allowed pointer-events-none";
+          "bg-secondary-200 shadow-none text-secondary-300 cursor-not-allowed pointer-events-none";
         break;
       case "link":
         disabledClasses =
-          "bg-gray-200 shadow-none text-gray-300 cursor-not-allowed pointer-events-none";
+          "bg-secondary-200 shadow-none text-secondary-300 cursor-not-allowed pointer-events-none";
         break;
       default:
         disabledClasses =
-          "bg-gray-200 shadow-none text-gray-300 cursor-not-allowed pointer-events-none";
+          "bg-secondary-200 shadow-none text-secondary-300 cursor-not-allowed pointer-events-none";
     }
   }
 

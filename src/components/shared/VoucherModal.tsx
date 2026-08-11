@@ -193,7 +193,7 @@ const VoucherModal = ({ open, onClose, data }: Props) => {
               <p className="text-[11px] text-secondary-500">Balance due</p>
               <p
                 className={`text-sm font-semibold ${
-                  (data.totalDue || 0) > 0 ? "text-red-600" : ""
+                  (data.totalDue || 0) > 0 ? "text-primary-600" : ""
                 }`}
               >
                 ৳ {Number(data.totalDue || 0).toLocaleString("en-BD")}

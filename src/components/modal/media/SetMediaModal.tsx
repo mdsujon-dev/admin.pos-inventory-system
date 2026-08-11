@@ -1,4 +1,4 @@
-import {
+﻿import {
   CopyOutlined,
   DeleteOutlined,
   FileOutlined,
@@ -345,7 +345,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
           <div className="flex gap-2 mb-3">
             <Input
               placeholder="Search media by name..."
-              prefix={<Search className="w-4 h-4 text-gray-400" />}
+              prefix={<Search className="w-4 h-4 text-secondary-400" />}
               value={searchText}
               onChange={(e) => {
                 setSearchText(e.target.value);
@@ -389,7 +389,6 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                 cancelText="No"
               >
                 <Button
-                  danger
                   loading={isDeleting}
                   className="flex items-center gap-1"
                   size="middle"
@@ -417,7 +416,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
               className={`flex items-center gap-1 px-2 py-0.5 rounded-md transition-colors ${
                 currentFolderId === null
                   ? "text-primary font-semibold bg-primary-50"
-                  : "text-gray-500 hover:bg-primary-50 hover:text-primary"
+                  : "text-secondary-500 hover:bg-primary-50 hover:text-primary"
               }`}
             >
               <Folder className="w-3.5 h-3.5" />
@@ -426,7 +425,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
 
             {breadcrumb.map((crumb, i) => (
               <span key={crumb.id} className="flex items-center gap-1">
-                <ChevronRight className="w-3 h-3 text-gray-400" />
+                <ChevronRight className="w-3 h-3 text-secondary-400" />
                 <button
                   onClick={() => goToCrumb(i)}
                   onDragOver={(e) => {
@@ -443,7 +442,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                   className={`px-2 py-0.5 rounded-md transition-colors ${
                     i === breadcrumb.length - 1
                       ? "text-primary font-semibold bg-primary-50"
-                      : "text-gray-500 hover:bg-primary-50 hover:text-primary"
+                      : "text-secondary-500 hover:bg-primary-50 hover:text-primary"
                   }`}
                 >
                   {crumb.name}
@@ -507,7 +506,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                             );
                             handleDropOnFolder(f._id);
                           }}
-                          className="group relative rounded-lg border border-gray-200 hover:border-primary cursor-pointer overflow-hidden transition-all duration-200 flex flex-col items-center justify-center p-3 bg-gray-50 hover:bg-primary-50/30 h-[140px]"
+                          className="group relative rounded-lg border border-secondary-200 hover:border-primary cursor-pointer overflow-hidden transition-all duration-200 flex flex-col items-center justify-center p-3 bg-secondary-50 hover:bg-primary-50/30 h-[140px]"
                           title={`Double-click to open • Drag media here to move`}
                         >
                           {/* Open button */}
@@ -517,7 +516,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                           >
                             <FolderOutlined className="text-4xl text-primary" />
                             <p
-                              className="text-xs font-semibold truncate w-full text-center px-1 text-gray-700"
+                              className="text-xs font-semibold truncate w-full text-center px-1 text-secondary-700"
                               title={f.name}
                             >
                               {f.name}
@@ -537,7 +536,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                                     name: f.name,
                                   });
                                 }}
-                                className="p-1 rounded bg-white/90 hover:bg-primary-50 text-gray-500 hover:text-primary shadow-sm transition-colors"
+                                className="p-1 rounded bg-white/90 hover:bg-primary-50 text-secondary-500 hover:text-primary shadow-sm transition-colors"
                               >
                                 <Pencil className="w-3 h-3" />
                               </button>
@@ -550,11 +549,10 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                               }}
                               okText="Yes"
                               cancelText="No"
-                              okButtonProps={{ danger: true }}
                             >
                               <button
                                 onClick={(e) => e.stopPropagation()}
-                                className="p-1 rounded bg-white/90 hover:bg-red-50 text-gray-500 hover:text-red-600 shadow-sm transition-colors"
+                                className="p-1 rounded bg-white/90 hover:bg-primary-50 text-secondary-500 hover:text-primary-600 shadow-sm transition-colors"
                               >
                                 <DeleteOutlined className="text-xs" />
                               </button>
@@ -599,7 +597,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                           className={`relative rounded-lg border cursor-grab active:cursor-grabbing overflow-hidden transition-all duration-200 ${
                             isSelected
                               ? "ring-[2px] ring-primary border-primary shadow-md"
-                              : "border-gray-200 ring-[1px] ring-transparent hover:border-primary-100 hover:ring-primary-100"
+                              : "border-secondary-200 ring-[1px] ring-transparent hover:border-primary-100 hover:ring-primary-100"
                           }`}
                           onClick={() => handleImageClick(img.url, img.name)}
                         >
@@ -626,17 +624,16 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                                 }}
                                 okText="Yes"
                                 cancelText="No"
-                                okButtonProps={{ danger: true }}
                               >
                                 <DeleteOutlined
-                                  className="text-red-500 hover:text-red-700 cursor-pointer text-base p-1 rounded bg-white shadow-sm"
+                                  className="text-primary-500 hover:text-primary-700 cursor-pointer text-base p-1 rounded bg-white shadow-sm"
                                   onClick={(e) => e.stopPropagation()}
                                 />
                               </Popconfirm>
                             </Tooltip>
                           </div>
 
-                          <div className="h-[90px] flex items-center justify-center bg-gray-50 overflow-hidden">
+                          <div className="h-[90px] flex items-center justify-center bg-secondary-50 overflow-hidden">
                             {isVideoMode ? (
                               <video
                                 className="max-w-full max-h-full object-contain bg-[#f5f5f5]"
@@ -648,7 +645,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                             ) : isDocMode ? (
                               // A document has no thumbnail, so the extension
                               // is what tells them apart at a glance.
-                              <div className="flex flex-col items-center gap-1 text-gray-400">
+                              <div className="flex flex-col items-center gap-1 text-secondary-400">
                                 <FileOutlined className="text-2xl" />
                                 <span className="text-[10px] font-semibold uppercase">
                                   {String(img.name || "")
@@ -671,7 +668,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                               {img.name}
                             </p>
                             {img.dimensions && (
-                              <p className="text-[8px] xs:text-[10px] text-gray-500">
+                              <p className="text-[8px] xs:text-[10px] text-secondary-500">
                                 {img.dimensions.width}x{img.dimensions.height}
                               </p>
                             )}
@@ -702,7 +699,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                         responsive
                         size="small"
                         showTotal={(total, range) => (
-                          <span className="text-xs text-gray-500 hidden sm:inline">
+                          <span className="text-xs text-secondary-500 hidden sm:inline">
                             {range[0]}-{range[1]} of {total}
                           </span>
                         )}

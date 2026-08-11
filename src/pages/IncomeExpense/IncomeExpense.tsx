@@ -136,7 +136,7 @@ const TransactionList: React.FC<{ type: "income" | "expense" }> = ({ type }) => 
         return (
           <span
             className={`inline-flex items-center gap-1 font-semibold ${
-              positive ? "text-emerald-600" : "text-rose-600"
+              positive ? "text-primary-600" : "text-primary-600"
             }`}
           >
             {refund ? "↩ " : ""}
@@ -202,39 +202,39 @@ const TransactionList: React.FC<{ type: "income" | "expense" }> = ({ type }) => 
           label={`Total ${isIncome ? "Income" : "Expense"}`}
           value={<Money value={stats?.totalAmount} />}
           icon={isIncome ? ArrowUpCircle : ArrowDownCircle}
-          accent={isIncome ? "#10b981" : "#f43f5e"}
+          accent={isIncome ? "#019532" : "#019532"}
         />
         <StatCard
           label="Entries"
           value={stats?.count ?? 0}
           icon={Hash}
-          accent="#6366f1"
+          accent="#019532"
         />
         <StatCard
           label="This Month"
           value={<Money value={stats?.monthTotal} />}
           icon={CalendarDays}
-          accent="#0ea5e9"
+          accent="#019532"
         />
         <StatCard
           label="Today"
           value={<Money value={stats?.todayTotal} />}
           icon={Clock}
-          accent="#f59e0b"
+          accent="#019532"
         />
         <StatCard
           label={(stats?.net ?? 0) >= 0 ? "Net Profit" : "Net Loss"}
           value={
             <span
               className={
-                (stats?.net ?? 0) >= 0 ? "text-emerald-600" : "text-rose-600"
+                (stats?.net ?? 0) >= 0 ? "text-primary-600" : "text-primary-600"
               }
             >
               <Money value={Math.abs(stats?.net ?? 0)} />
             </span>
           }
           icon={Scale}
-          accent={(stats?.net ?? 0) >= 0 ? "#10b981" : "#f43f5e"}
+          accent={(stats?.net ?? 0) >= 0 ? "#019532" : "#019532"}
         />
       </div>
 
@@ -242,7 +242,7 @@ const TransactionList: React.FC<{ type: "income" | "expense" }> = ({ type }) => 
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <Input
           placeholder="Search by reason..."
-          prefix={<Search className="h-4 w-4 text-gray-400" />}
+          prefix={<Search className="h-4 w-4 text-secondary-400" />}
           value={searchText}
           onChange={(e) => {
             setSearchText(e.target.value);

@@ -16,8 +16,8 @@ const MainLayout = () => {
   useSmoothScroll(scrollArea, scrollContent);
 
   return (
-    <div className="w-full h-screen bg-[#F4F7FE]">
-      <div className="flex h-full max-w-9xl mx-auto bg-[#F4F7FE] overflow-hidden shadow-sm">
+    <div className="w-full h-screen bg-primary-50">
+      <div className="flex h-full max-w-9xl mx-auto bg-primary-50 overflow-hidden shadow-sm">
         {/* Sits above every page: an account still on its issued password gets
             no further until it has been replaced. */}
         <ForcePasswordChangeModal />

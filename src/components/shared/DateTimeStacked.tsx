@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 
 interface DateTimeStackedProps {
   /** ISO string, Date object, or anything `new Date(...)` accepts. */
@@ -19,12 +19,12 @@ const DateTimeStacked: React.FC<DateTimeStackedProps> = ({
   className,
 }) => {
   if (!value) {
-    return <span className="text-xs text-gray-400">{emptyText}</span>;
+    return <span className="text-xs text-secondary-400">{emptyText}</span>;
   }
 
   const d = new Date(value);
   if (Number.isNaN(d.getTime())) {
-    return <span className="text-xs text-gray-400">{emptyText}</span>;
+    return <span className="text-xs text-secondary-400">{emptyText}</span>;
   }
 
   const datePart = d.toLocaleDateString("en-US", {
@@ -41,8 +41,8 @@ const DateTimeStacked: React.FC<DateTimeStackedProps> = ({
     <div
       className={`text-xs leading-tight whitespace-nowrap ${className ?? ""}`}
     >
-      <div className="text-gray-700">{datePart}</div>
-      <div className="text-gray-400">{timePart}</div>
+      <div className="text-secondary-700">{datePart}</div>
+      <div className="text-secondary-400">{timePart}</div>
     </div>
   );
 };

@@ -17,11 +17,12 @@ interface Props {
   loading?: boolean;
 }
 
-// The brand green is very dark (13% lightness), which reads as near-black in a
-// bar. `primary-500` is the same hue two steps up — still unmistakably the brand
-// family, and it holds its colour against the rose beside it.
-const INCOME = "#256f3b"; // primary-500
-const EXPENSE = "#f43f5e"; // rose
+// One colour, two weights. The palette is a single hue now, so the two series
+// are separated by lightness instead: the solid brand for money in, a pale tint
+// of the same green for money out. Two adjacent shades (600 and 500) would sit
+// beside each other in a bar chart and read as one series.
+const INCOME = "#019532"; // primary-600 — the brand
+const EXPENSE = "#a8f0c0"; // primary-200
 
 /** Estimated revenue vs expenses by month. */
 const IncomeExpenseChart: React.FC<Props> = ({ data, loading }) => (
@@ -40,16 +41,16 @@ const IncomeExpenseChart: React.FC<Props> = ({ data, loading }) => (
     ) : (
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} margin={{ top: 6, right: 8, left: -8, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" stroke="#eef2f1" vertical={false} />
+          <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" vertical={false} />
           <XAxis
             dataKey="label"
-            stroke="#94a3b8"
+            stroke="#858585"
             fontSize={12}
             tickLine={false}
             axisLine={false}
           />
           <YAxis
-            stroke="#94a3b8"
+            stroke="#858585"
             fontSize={12}
             tickLine={false}
             axisLine={false}
@@ -57,11 +58,11 @@ const IncomeExpenseChart: React.FC<Props> = ({ data, loading }) => (
             tickFormatter={(v) => formatCompact(Number(v))}
           />
           <Tooltip
-            cursor={{ fill: "rgba(15,53,25,0.06)" }}
+            cursor={{ fill: "rgba(1,149,50,0.06)" }}
             formatter={(v: number) => `৳${Number(v).toLocaleString("en-BD")}`}
             contentStyle={{
               borderRadius: 12,
-              border: "1px solid #e2e8f0",
+              border: "1px solid #e0e0e0",
               fontSize: 12,
             }}
           />

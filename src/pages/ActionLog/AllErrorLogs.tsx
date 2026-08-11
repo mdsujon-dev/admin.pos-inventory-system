@@ -45,7 +45,7 @@ const { confirm } = Modal;
 const statusBadge = (statusCode: number) => {
   if (statusCode >= 500) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800 ring-1 ring-red-200">
+      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-800 ring-1 ring-primary-200">
         <AlertOctagon className="w-3 h-3" />
         {statusCode}
       </span>
@@ -53,14 +53,14 @@ const statusBadge = (statusCode: number) => {
   }
   if (statusCode >= 400) {
     return (
-      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800 ring-1 ring-amber-200">
+      <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-bold bg-primary-100 text-primary-800 ring-1 ring-primary-200">
         <AlertTriangle className="w-3 h-3" />
         {statusCode}
       </span>
     );
   }
   return (
-    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+    <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-secondary-100 text-secondary-800">
       {statusCode}
     </span>
   );
@@ -69,16 +69,16 @@ const statusBadge = (statusCode: number) => {
 const methodBadge = (method?: string) => {
   if (!method) return null;
   const colors: Record<string, string> = {
-    GET: "bg-blue-100 text-blue-800",
-    POST: "bg-green-100 text-green-800",
-    PUT: "bg-yellow-100 text-yellow-800",
-    DELETE: "bg-red-100 text-red-800",
-    PATCH: "bg-purple-100 text-purple-800",
+    GET: "bg-primary-100 text-primary-800",
+    POST: "bg-primary-100 text-primary-800",
+    PUT: "bg-primary-100 text-primary-800",
+    DELETE: "bg-primary-100 text-primary-800",
+    PATCH: "bg-primary-100 text-primary-800",
   };
   return (
     <span
       className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-bold ${
-        colors[method] || "bg-gray-100 text-gray-800"
+        colors[method] || "bg-secondary-100 text-secondary-800"
       }`}
     >
       {method}
@@ -175,7 +175,6 @@ const AllErrorLogs = () => {
       title: "Delete this error log?",
       content: "This action cannot be undone.",
       okText: "Yes, delete",
-      okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
         try {
@@ -194,7 +193,6 @@ const AllErrorLogs = () => {
       content:
         "Every error log will be permanently removed. This cannot be undone.",
       okText: "Yes, clear all",
-      okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
         try {
@@ -233,7 +231,7 @@ const AllErrorLogs = () => {
           placement="topLeft"
           overlayStyle={{ maxWidth: 480 }}
         >
-          <div className="font-medium text-gray-900 line-clamp-2 cursor-help">
+          <div className="font-medium text-secondary-900 line-clamp-2 cursor-help">
             {record.message}
           </div>
         </Tooltip>
@@ -247,12 +245,12 @@ const AllErrorLogs = () => {
         <div className="space-y-1.5 min-w-0">
           <div className="flex items-center gap-2">
             {methodBadge(record.method)}
-            <span className="text-xs font-mono text-gray-700 truncate">
+            <span className="text-xs font-mono text-secondary-700 truncate">
               {record.route || "—"}
             </span>
           </div>
           {record.errorName && (
-            <Tag color="red" className="font-mono text-xs">
+            <Tag color="var(--primary)" className="font-mono text-xs">
               {record.errorName}
             </Tag>
           )}
@@ -265,7 +263,7 @@ const AllErrorLogs = () => {
       width: 180,
       render: (_: any, record: any) => (
         <div className="space-y-0.5 whitespace-nowrap">
-          <div className="text-sm text-gray-900 truncate">
+          <div className="text-sm text-secondary-900 truncate">
             {record.email || <Text type="secondary">guest</Text>}
           </div>
           {record.role && (
@@ -282,13 +280,13 @@ const AllErrorLogs = () => {
       width: 160,
       render: (_: any, record: any) => (
         <div className="space-y-1 text-xs">
-          <div className="flex items-center gap-1 text-gray-600">
+          <div className="flex items-center gap-1 text-secondary-600">
             <Globe className="w-3 h-3" />
             <span className="font-mono">
               {record.leadDetails?.ipAddress || "—"}
             </span>
           </div>
-          <div className="text-gray-500 truncate max-w-[150px]">
+          <div className="text-secondary-500 truncate max-w-[150px]">
             {record.leadDetails?.userAgent?.split(" ")[0] || ""}
           </div>
         </div>
@@ -310,7 +308,6 @@ const AllErrorLogs = () => {
           <PermissionGate module="Error Logs" action="Delete">
             <Tooltip title="Delete">
               <Button
-                danger
                 icon={<Trash2 className="w-4 h-4" />}
                 onClick={() => handleDelete(record._id)}
               />
@@ -346,7 +343,6 @@ const AllErrorLogs = () => {
             <ExportMenu sheet={buildSheet} disabled={logs.length === 0} />
             <PermissionGate module="Error Logs" action="Delete">
               <Button
-                danger
                 loading={isClearing}
                 icon={<Trash2 className="w-4 h-4" />}
                 onClick={handleClearAll}
@@ -360,43 +356,43 @@ const AllErrorLogs = () => {
 
       {/* Stats strip */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-        <Card className="!border-gray-200">
+        <Card className="!border-secondary-200">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs uppercase tracking-wider text-gray-500 font-semibold">
+              <div className="text-xs uppercase tracking-wider text-secondary-500 font-semibold">
                 Total Errors
               </div>
-              <div className="text-2xl font-bold text-gray-900 mt-1">
+              <div className="text-2xl font-bold text-secondary-900 mt-1">
                 {stats.total}
               </div>
             </div>
-            <XCircle className="w-7 h-7 text-gray-400" />
+            <XCircle className="w-7 h-7 text-secondary-400" />
           </div>
         </Card>
-        <Card className="!border-red-200 bg-red-50/40">
+        <Card className="!border-primary-200 bg-primary-50/40">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs uppercase tracking-wider text-red-700 font-semibold">
+              <div className="text-xs uppercase tracking-wider text-primary-700 font-semibold">
                 Server (5xx)
               </div>
-              <div className="text-2xl font-bold text-red-700 mt-1">
+              <div className="text-2xl font-bold text-primary-700 mt-1">
                 {stats.server}
               </div>
             </div>
-            <AlertOctagon className="w-7 h-7 text-red-500" />
+            <AlertOctagon className="w-7 h-7 text-primary-500" />
           </div>
         </Card>
-        <Card className="!border-amber-200 bg-amber-50/40">
+        <Card className="!border-primary-200 bg-primary-50/40">
           <div className="flex items-center justify-between">
             <div>
-              <div className="text-xs uppercase tracking-wider text-amber-700 font-semibold">
+              <div className="text-xs uppercase tracking-wider text-primary-700 font-semibold">
                 Lead (4xx)
               </div>
-              <div className="text-2xl font-bold text-amber-700 mt-1">
+              <div className="text-2xl font-bold text-primary-700 mt-1">
                 {stats.lead}
               </div>
             </div>
-            <AlertTriangle className="w-7 h-7 text-amber-500" />
+            <AlertTriangle className="w-7 h-7 text-primary-500" />
           </div>
         </Card>
       </div>
@@ -477,7 +473,7 @@ const AllErrorLogs = () => {
       <Drawer
         title={
           <div className="flex items-center gap-2">
-            <AlertOctagon className="w-5 h-5 text-red-500" />
+            <AlertOctagon className="w-5 h-5 text-primary-500" />
             <span>Error Details</span>
           </div>
         }
@@ -491,7 +487,7 @@ const AllErrorLogs = () => {
               {statusBadge(selected.statusCode)}
               {methodBadge(selected.method)}
               {selected.errorName && (
-                <Tag color="red" className="font-mono">
+                <Tag color="var(--primary)" className="font-mono">
                   {selected.errorName}
                 </Tag>
               )}
@@ -510,7 +506,7 @@ const AllErrorLogs = () => {
               <Text type="secondary" className="text-xs uppercase">
                 Route
               </Text>
-              <div className="font-mono text-sm bg-gray-50 px-3 py-2 rounded mt-1 break-all">
+              <div className="font-mono text-sm bg-secondary-50 px-3 py-2 rounded mt-1 break-all">
                 {selected.route}
               </div>
             </div>
@@ -525,14 +521,14 @@ const AllErrorLogs = () => {
                     {selected.errorSources.map((s: any, i: number) => (
                       <li
                         key={i}
-                        className="text-sm bg-red-50 border border-red-100 rounded px-3 py-1.5"
+                        className="text-sm bg-primary-50 border border-primary-100 rounded px-3 py-1.5"
                       >
                         {s.path ? (
-                          <span className="font-mono text-red-700 mr-2">
+                          <span className="font-mono text-primary-700 mr-2">
                             {s.path}:
                           </span>
                         ) : null}
-                        <span className="text-gray-800">{s.message}</span>
+                        <span className="text-secondary-800">{s.message}</span>
                       </li>
                     ))}
                   </ul>
@@ -570,17 +566,17 @@ const AllErrorLogs = () => {
                 <Text type="secondary" className="text-xs uppercase">
                   Lead
                 </Text>
-                <div className="text-xs font-mono bg-gray-50 px-3 py-2 rounded mt-1 space-y-1 break-all">
+                <div className="text-xs font-mono bg-secondary-50 px-3 py-2 rounded mt-1 space-y-1 break-all">
                   <div>
-                    <span className="text-gray-500">IP:</span>{" "}
+                    <span className="text-secondary-500">IP:</span>{" "}
                     {selected.leadDetails.ipAddress || "—"}
                   </div>
                   <div>
-                    <span className="text-gray-500">URL:</span>{" "}
+                    <span className="text-secondary-500">URL:</span>{" "}
                     {selected.leadDetails.browserUrl || "—"}
                   </div>
                   <div>
-                    <span className="text-gray-500">UA:</span>{" "}
+                    <span className="text-secondary-500">UA:</span>{" "}
                     {selected.leadDetails.userAgent || "—"}
                   </div>
                 </div>
@@ -597,7 +593,7 @@ const AllErrorLogs = () => {
                     moves the page behind it instead of the trace. */}
                 <pre
                   data-lenis-prevent
-                  className="text-xs font-mono bg-gray-900 text-gray-100 px-3 py-2 rounded mt-1 overflow-auto overscroll-contain max-h-72"
+                  className="text-xs font-mono bg-secondary-900 text-secondary-100 px-3 py-2 rounded mt-1 overflow-auto overscroll-contain max-h-72"
                 >
                   {selected.stack}
                 </pre>

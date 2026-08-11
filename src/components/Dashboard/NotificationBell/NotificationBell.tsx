@@ -1,4 +1,4 @@
-import { Badge, Dropdown, Empty, Skeleton, Tooltip } from "antd";
+﻿import { Badge, Dropdown, Empty, Skeleton, Tooltip } from "antd";
 import { formatDistanceToNow } from "date-fns";
 import {
   Bell,
@@ -30,7 +30,7 @@ const TYPE_ICON: Record<NotificationType, LucideIcon> = {
 };
 
 const PRIORITY_RING: Record<NotificationPriority, string> = {
-  high: "ring-rose-200 bg-rose-50 text-rose-600",
+  high: "ring-primary-200 bg-primary-50 text-primary-600",
   normal: "ring-primary-100 bg-primary-50 text-primary-600",
   low: "ring-secondary-100 bg-secondary-50 text-secondary-500",
 };
@@ -112,7 +112,7 @@ const NotificationRow: FC<RowProps> = ({ item, onMarkRead, isMarking }) => {
             ) : (
               <Check
                 size={14}
-                className="flex-shrink-0 text-emerald-500 mt-1 transition-opacity duration-300"
+                className="flex-shrink-0 text-primary-500 mt-1 transition-opacity duration-300"
               />
             )}
           </div>
@@ -271,7 +271,7 @@ const NotificationBell: FC = () => {
           overflowCount={99}
           size="small"
           offset={[-2, 2]}
-          color="#e11d48"
+          color="#019532"
         >
           <Bell size={20} />
         </Badge>

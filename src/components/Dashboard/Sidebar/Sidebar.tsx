@@ -65,7 +65,7 @@ const Sidebar = () => {
           className={`flex items-center gap-3 ${isCollapsed ? "justify-center w-full" : "pl-2"}`}
         >
           {isCollapsed ? (
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-[0_4px_12px_-2px_rgba(15,53,25,0.45)]">
+            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center shadow-[0_4px_12px_-2px_rgba(1,149,50,0.45)]">
               <NextImage
                 src={favicon}
                 alt="POS & Inventory"
@@ -102,7 +102,7 @@ const Sidebar = () => {
         >
           <button
             onClick={() => dispatch(logout())}
-            className={`border w-full rounded-md flex items-center bg-red-500  text-white font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${
+            className={`border border-primary w-full rounded-md flex items-center bg-primary hover:bg-primary-700 text-white font-semibold shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all duration-300 ${
               isCollapsed
                 ? "px-3 py-[9px] justify-center"
                 : "px-4 py-[9px] justify-between"

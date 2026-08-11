@@ -129,7 +129,6 @@ const Countries = () => {
       title: "Are you sure you want to delete this country?",
       content: "This action cannot be undone.",
       okText: "Yes, Delete",
-      okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
         try {
@@ -196,7 +195,7 @@ const Countries = () => {
             style={{ objectFit: "cover", borderRadius: 4 }}
           />
         ) : (
-          <span className="text-gray-400">—</span>
+          <span className="text-secondary-400">—</span>
         ),
     },
     {
@@ -206,8 +205,8 @@ const Countries = () => {
       width: 150,
       render: (name: string, record) => (
         <div>
-          <p className="font-semibold text-gray-800 m-0">{name}</p>
-          <span className="text-xs text-gray-400">{record.code}</span>
+          <p className="font-semibold text-secondary-800 m-0">{name}</p>
+          <span className="text-xs text-secondary-400">{record.code}</span>
         </div>
       ),
     },
@@ -216,7 +215,7 @@ const Countries = () => {
       dataIndex: "role",
       key: "role",
       width: 160,
-      render: (role: string) => <Tag color="blue">{role}</Tag>,
+      render: (role: string) => <Tag color="var(--primary)">{role}</Tag>,
     },
     {
       title: "Email",
@@ -239,10 +238,10 @@ const Countries = () => {
       render: (color: string) => (
         <div className="flex items-center justify-center gap-2">
           <span
-            className="inline-block w-5 h-5 rounded-full border border-gray-200"
+            className="inline-block w-5 h-5 rounded-full border border-secondary-200"
             style={{ background: color }}
           />
-          <span className="text-xs font-mono text-gray-500">{color}</span>
+          <span className="text-xs font-mono text-secondary-500">{color}</span>
         </div>
       ),
     },
@@ -280,7 +279,6 @@ const Countries = () => {
           <PermissionGate module="Countries" action="Delete">
             <Tooltip title="Delete Country">
               <Button
-                danger
                 icon={<Trash2 className="w-4 h-4" />}
                 onClick={() => handleDelete(record._id!)}
               />
@@ -366,7 +364,7 @@ const Countries = () => {
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <Input
           placeholder="Search by name, code, role, email..."
-          prefix={<Search className="w-4 h-4 text-gray-400" />}
+          prefix={<Search className="w-4 h-4 text-secondary-400" />}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           className="max-w-md"

@@ -69,7 +69,7 @@
   font-weight: 600;
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
-  color: #4a5568;
+  color: #4d4d4d;
   line-height: 1.4;
 }
 
@@ -164,7 +164,7 @@
 
 .text-editor pre {
   background-color: #f7fafc;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e0e0e0;
   border-radius: 0.375rem;
   padding: 1rem;
   overflow-x: auto;
@@ -283,7 +283,7 @@
   width: 100%;
   border-collapse: collapse;
   border-spacing: 0;
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e0e0e0;
   margin: 1rem 0;
   font-size: 0.875rem;
   min-width: 600px;
@@ -291,7 +291,7 @@
 
 .text-editor th,
 .text-editor td {
-  border: 1px solid #e2e8f0;
+  border: 1px solid #e0e0e0;
   padding: 0.75rem;
   text-align: left;
   vertical-align: top;
@@ -339,12 +339,12 @@
      Blockquotes - Enhanced
   --------------------------- */
 .text-editor blockquote {
-  border-left: 4px solid #0F3519;
+  border-left: 4px solid #019532;
   padding: 1rem 1.5rem;
   margin: 1.5rem 0;
   background-color: #f7fafc;
   border-radius: 0.375rem;
-  color: #4a5568;
+  color: #4d4d4d;
   font-style: italic;
   position: relative;
 }
@@ -386,7 +386,7 @@
 }
 
 .text-editor img[data-mce-selected] {
-  outline: 3px solid #0F3519;
+  outline: 3px solid #019532;
   outline-offset: 2px;
 }
 
@@ -421,14 +421,14 @@
 .text-editor a:visited *,
 .text-editor a[style*='color:'],
 .text-editor a[data-mce-style*='color:'] {
-  color: #0F3519 !important;
+  color: #019532 !important;
   text-decoration: underline;
   transition: color 0.2s ease;
 }
 
 .text-editor a:hover,
 .text-editor a:hover * {
-  color: #0c2a14 !important;
+  color: #017527 !important;
 }
 
 .text-editor a[data-mce-selected] {
@@ -585,10 +585,10 @@
   --------------------------- */
 .text-editor hr {
   border: none;
-  border-top: 1px solid #e2e8f0;
+  border-top: 1px solid #e0e0e0;
   margin: 2rem 0;
   height: 1px;
-  background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+  background: linear-gradient(to right, transparent, #e0e0e0, transparent);
 }
 
 /* ---------------------------

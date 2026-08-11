@@ -1,4 +1,4 @@
-import { FileTextIcon, UploadIcon } from "lucide-react";
+﻿import { FileTextIcon, UploadIcon } from "lucide-react";
 import { useState, useMemo } from "react";
 import { RiDeleteBinLine } from "react-icons/ri";
 import SetMediaModal from "../modal/media/SetMediaModal";
@@ -98,7 +98,7 @@ const UploadImage = ({
         target="_blank"
         rel="noreferrer"
         title={name}
-        className="flex h-full w-full flex-col items-center justify-center gap-1 rounded-md border border-gray-200 bg-gray-50 p-2 text-gray-500 hover:border-primary-400"
+        className="flex h-full w-full flex-col items-center justify-center gap-1 rounded-md border border-secondary-200 bg-secondary-50 p-2 text-secondary-500 hover:border-primary-400"
       >
         <FileTextIcon className="h-7 w-7" />
         <span className="w-full truncate text-center text-[10px]">{name}</span>
@@ -132,12 +132,12 @@ const UploadImage = ({
                 src={imageUrls}
                 accessurl={!imageUrls?.startsWith("http")}
                 alt="Preview"
-                className="w-full h-full object-cover rounded-md border border-gray-200 shadow-sm"
+                className="w-full h-full object-cover rounded-md border border-secondary-200 shadow-sm"
               />
             )}
             <button
               onClick={handleDelete}
-              className="absolute top-1 right-1 bg-white border border-red-500 text-red-600 p-2 rounded-lg shadow hover:bg-red-600 hover:text-white transition-colors"
+              className="absolute top-1 right-1 bg-white border border-primary-500 text-primary-600 p-2 rounded-lg shadow hover:bg-primary-600 hover:text-white transition-colors"
             >
               <RiDeleteBinLine size={16} />
             </button>
@@ -146,10 +146,10 @@ const UploadImage = ({
           <button
             type="button"
             onClick={() => setOpenSetImageModal(true)}
-            className="flex flex-col items-center justify-center w-32 h-32 border border-dashed border-gray-300 rounded-lg bg-gray-50 hover:border-primary-400 transition-colors duration-200 cursor-pointer"
+            className="flex flex-col items-center justify-center w-32 h-32 border border-dashed border-secondary-300 rounded-lg bg-secondary-50 hover:border-primary-400 transition-colors duration-200 cursor-pointer"
           >
-            <UploadIcon className="w-8 h-8 text-gray-400 mb-2" />
-            <span className="text-sm text-gray-500 text-center">
+            <UploadIcon className="w-8 h-8 text-secondary-400 mb-2" />
+            <span className="text-sm text-secondary-500 text-center">
               {uploadLabel}
             </span>
           </button>
@@ -168,12 +168,12 @@ const UploadImage = ({
                   src={url}
                   accessurl={!url?.startsWith("http")}
                   alt="Preview"
-                  className="w-full h-full object-cover rounded-md border border-gray-200 shadow-sm"
+                  className="w-full h-full object-cover rounded-md border border-secondary-200 shadow-sm"
                 />
               )}
               <button
                 onClick={(e) => handleDelete(e, url)}
-                className="absolute top-1 right-1 bg-white border border-red-500 text-red-600 p-2 rounded-lg shadow hover:bg-red-600 hover:text-white transition-colors"
+                className="absolute top-1 right-1 bg-white border border-primary-500 text-primary-600 p-2 rounded-lg shadow hover:bg-primary-600 hover:text-white transition-colors"
               >
                 <RiDeleteBinLine size={16} />
               </button>
@@ -184,10 +184,10 @@ const UploadImage = ({
           <button
             type="button"
             onClick={() => setOpenSetImageModal(true)}
-            className="flex flex-col items-center justify-center w-32 h-32 border border-dashed border-gray-300 rounded-lg bg-gray-50 hover:border-primary-400 transition-colors duration-200 cursor-pointer"
+            className="flex flex-col items-center justify-center w-32 h-32 border border-dashed border-secondary-300 rounded-lg bg-secondary-50 hover:border-primary-400 transition-colors duration-200 cursor-pointer"
           >
-            <UploadIcon className="w-8 h-8 text-gray-400 mb-2" />
-            <span className="text-sm text-gray-500 text-center">
+            <UploadIcon className="w-8 h-8 text-secondary-400 mb-2" />
+            <span className="text-sm text-secondary-500 text-center">
               {uploadLabel}
             </span>
           </button>

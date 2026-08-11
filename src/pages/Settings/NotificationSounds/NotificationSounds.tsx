@@ -77,13 +77,13 @@ const NotificationSounds = () => {
         <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             {enabled ? (
-              <Volume2 className="w-5 h-5 text-green-600" />
+              <Volume2 className="w-5 h-5 text-primary-600" />
             ) : (
-              <VolumeX className="w-5 h-5 text-gray-400" />
+              <VolumeX className="w-5 h-5 text-secondary-400" />
             )}
             <div>
               <div className="font-medium">Notification sounds</div>
-              <div className="text-sm text-gray-500">
+              <div className="text-sm text-secondary-500">
                 {enabled
                   ? "A sound plays when a new notification arrives."
                   : "Notifications are silent."}
@@ -97,7 +97,7 @@ const NotificationSounds = () => {
           </div>
 
           <div className="flex items-center gap-3 md:w-80">
-            <span className="text-sm text-gray-500 w-16">Volume</span>
+            <span className="text-sm text-secondary-500 w-16">Volume</span>
             <Slider
               className="flex-1"
               min={0}
@@ -106,7 +106,7 @@ const NotificationSounds = () => {
               disabled={!enabled}
               onChange={(v) => dispatch(setVolume((v as number) / 100))}
             />
-            <span className="text-sm text-gray-700 w-10 text-right">
+            <span className="text-sm text-secondary-700 w-10 text-right">
               {volumePct}%
             </span>
           </div>
@@ -127,14 +127,14 @@ const NotificationSounds = () => {
               return (
                 <div
                   key={sound.id}
-                  className="flex items-center justify-between rounded-lg border border-gray-200 px-4 py-3 hover:border-gray-300"
+                  className="flex items-center justify-between rounded-lg border border-secondary-200 px-4 py-3 hover:border-secondary-300"
                 >
                   <Radio value={sound.id}>
                     <span className="font-medium">{sound.name}</span>
                   </Radio>
                   <div className="flex items-center gap-3">
                     {isActive && enabled && (
-                      <Tag color="green" className="m-0">
+                      <Tag color="var(--primary)" className="m-0">
                         Active
                       </Tag>
                     )}

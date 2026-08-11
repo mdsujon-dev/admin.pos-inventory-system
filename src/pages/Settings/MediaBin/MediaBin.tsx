@@ -79,19 +79,18 @@ const MediaBin: React.FC = () => {
   const handlePermanentDelete = (key: string, name: string) => {
     confirm({
       title: "Permanently delete this file?",
-      icon: <ExclamationCircleOutlined className="text-red-500" />,
+      icon: <ExclamationCircleOutlined className="text-primary-500" />,
       content: (
         <div>
-          <p className="text-gray-600 mb-1">
+          <p className="text-secondary-600 mb-1">
             <strong>"{name}"</strong> will be permanently removed from storage.
           </p>
-          <p className="text-red-500 text-sm font-medium">
+          <p className="text-primary-500 text-sm font-medium">
             ⚠️ This action cannot be undone.
           </p>
         </div>
       ),
       okText: "Yes, Delete Forever",
-      okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
         try {
@@ -124,14 +123,13 @@ const MediaBin: React.FC = () => {
     if (selectedKeys.length === 0) return;
     confirm({
       title: `Permanently delete ${selectedKeys.length} file(s)?`,
-      icon: <ExclamationCircleOutlined className="text-red-500" />,
+      icon: <ExclamationCircleOutlined className="text-primary-500" />,
       content: (
-        <p className="text-red-500 font-medium">
+        <p className="text-primary-500 font-medium">
           ⚠️ All selected files will be removed from R2 storage. This cannot be undone.
         </p>
       ),
       okText: `Delete ${selectedKeys.length} File(s)`,
-      okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
         try {
@@ -181,15 +179,15 @@ const MediaBin: React.FC = () => {
       />
 
       {/* ── Stats / info banner ─────────────────────────────────────────── */}
-      <div className="mb-4 flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-red-50 to-orange-50 border border-red-100">
-        <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-          <Trash2 className="w-5 h-5 text-red-500" />
+      <div className="mb-4 flex items-center gap-3 p-4 rounded-xl bg-gradient-to-r from-primary-50 to-primary-50 border border-primary-100">
+        <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+          <Trash2 className="w-5 h-5 text-primary-500" />
         </div>
         <div>
-          <p className="font-semibold text-red-700">
+          <p className="font-semibold text-primary-700">
             {meta.total ?? 0} file{(meta.total ?? 0) !== 1 ? "s" : ""} in bin
           </p>
-          <p className="text-sm text-red-500">
+          <p className="text-sm text-primary-500">
             Restore to bring files back, or permanently delete to free storage.
           </p>
         </div>
@@ -201,7 +199,7 @@ const MediaBin: React.FC = () => {
           className={`mb-4 flex flex-wrap items-center gap-3 px-4 py-3 rounded-lg border transition-all duration-200 ${
             selectedKeys.length > 0
               ? "bg-primary-50 border-primary-200 shadow-sm"
-              : "bg-gray-50 border-gray-200"
+              : "bg-secondary-50 border-secondary-200"
           }`}
         >
           {/* Select all checkbox */}
@@ -211,7 +209,7 @@ const MediaBin: React.FC = () => {
             onChange={toggleSelectAll}
             className="font-medium"
           >
-            <span className="text-sm text-gray-700">
+            <span className="text-sm text-secondary-700">
               {isAllSelected
                 ? "Deselect All"
                 : isIndeterminate
@@ -222,7 +220,7 @@ const MediaBin: React.FC = () => {
 
           {selectedKeys.length > 0 && (
             <>
-              <div className="h-4 w-px bg-gray-300" />
+              <div className="h-4 w-px bg-secondary-300" />
               <span className="text-sm font-semibold text-primary">
                 <CheckSquareOutlined className="mr-1" />
                 {selectedKeys.length} file{selectedKeys.length > 1 ? "s" : ""} selected
@@ -238,7 +236,7 @@ const MediaBin: React.FC = () => {
                     icon={<RedoOutlined />}
                     loading={isBulkRestoring}
                     onClick={handleBulkRestore}
-                    className="!bg-green-500 !border-green-500 hover:!bg-green-600 font-semibold"
+                    className="!bg-primary-500 !border-primary-500 hover:!bg-primary-600 font-semibold"
                   >
                     Restore {selectedKeys.length} Selected
                   </Button>
@@ -250,10 +248,8 @@ const MediaBin: React.FC = () => {
                     onConfirm={handleBulkPurge}
                     okText="Delete All"
                     cancelText="Cancel"
-                    okButtonProps={{ danger: true }}
                   >
                     <Button
-                      danger
                       icon={<DeleteOutlined />}
                       loading={isBulkPurging}
                       className="font-semibold"
@@ -275,14 +271,14 @@ const MediaBin: React.FC = () => {
         </div>
       ) : items.length === 0 ? (
         <div className="flex flex-col items-center justify-center h-64 gap-3">
-          <div className="w-16 h-16 rounded-full bg-green-50 flex items-center justify-center">
-            <Trash2 className="w-8 h-8 text-green-400" />
+          <div className="w-16 h-16 rounded-full bg-primary-50 flex items-center justify-center">
+            <Trash2 className="w-8 h-8 text-primary-400" />
           </div>
           <Empty
             description={
               <div className="text-center">
-                <p className="font-semibold text-gray-700">Media Bin is Empty</p>
-                <p className="text-sm text-gray-500">
+                <p className="font-semibold text-secondary-700">Media Bin is Empty</p>
+                <p className="text-sm text-secondary-500">
                   No deleted files found. Deleted media will appear here.
                 </p>
               </div>
@@ -307,7 +303,7 @@ const MediaBin: React.FC = () => {
                   className={`group relative bg-white rounded-xl border overflow-hidden transition-all duration-200 ${
                     isChecked
                       ? "border-primary ring-2 ring-primary shadow-md"
-                      : "border-red-100 hover:border-red-200 hover:shadow-md"
+                      : "border-primary-100 hover:border-primary-200 hover:shadow-md"
                   }`}
                 >
                   {/* ── Checkbox top-left ─────────────────────────────── */}
@@ -323,7 +319,7 @@ const MediaBin: React.FC = () => {
                   {/* ── Deleted tag top-right ─────────────────────────── */}
                   <div className="absolute top-1.5 right-1.5 z-20">
                     <Tag
-                      color="red"
+                      color="var(--primary)"
                       className="text-[10px] font-semibold px-1.5 py-0 m-0 leading-tight"
                     >
                       Deleted
@@ -332,7 +328,7 @@ const MediaBin: React.FC = () => {
 
                   {/* ── Media preview ─────────────────────────────────── */}
                   <div
-                    className="h-[170px] flex items-center justify-center bg-red-50/20 overflow-hidden relative cursor-pointer"
+                    className="h-[170px] flex items-center justify-center bg-primary-50/20 overflow-hidden relative cursor-pointer"
                     onClick={() => toggleSelect(item.path)}
                   >
                     {isImage ? (
@@ -350,7 +346,7 @@ const MediaBin: React.FC = () => {
                         preload="metadata"
                       />
                     ) : (
-                      <div className="flex flex-col items-center gap-1 text-gray-400">
+                      <div className="flex flex-col items-center gap-1 text-secondary-400">
                         <DeleteOutlined className="text-3xl" />
                         <span className="text-xs uppercase font-semibold">
                           {item.extension?.replace(".", "") || "file"}
@@ -371,7 +367,7 @@ const MediaBin: React.FC = () => {
                               e.stopPropagation();
                               handleRestore(item.path, item.name);
                             }}
-                            className="!bg-green-500 !border-green-500 hover:!bg-green-600 shadow-lg"
+                            className="!bg-primary-500 !border-primary-500 hover:!bg-primary-600 shadow-lg"
                           >
                             Restore
                           </Button>
@@ -380,7 +376,6 @@ const MediaBin: React.FC = () => {
                       <PermissionGate module="Media Bin" action="Delete">
                         <Tooltip title="Delete forever">
                           <Button
-                            danger
                             size="small"
                             icon={<DeleteOutlined />}
                             loading={deletingKey === item.path}
@@ -398,33 +393,33 @@ const MediaBin: React.FC = () => {
                   </div>
 
                   {/* ── Info ──────────────────────────────────────────── */}
-                  <div className="p-2 border-t border-red-50">
+                  <div className="p-2 border-t border-primary-50">
                     <p
-                      className="text-xs font-semibold truncate text-gray-700 mb-0.5"
+                      className="text-xs font-semibold truncate text-secondary-700 mb-0.5"
                       title={item.name}
                     >
                       {item.name}
                     </p>
                     <div className="flex items-center justify-between gap-1">
-                      <span className="text-[10px] text-gray-400">{item.size}</span>
+                      <span className="text-[10px] text-secondary-400">{item.size}</span>
                       {item.dimensions && (
-                        <span className="text-[10px] text-gray-400">
+                        <span className="text-[10px] text-secondary-400">
                           {item.dimensions.width}×{item.dimensions.height}
                         </span>
                       )}
                     </div>
-                    <p className="text-[10px] text-red-400 mt-0.5 truncate">
+                    <p className="text-[10px] text-primary-400 mt-0.5 truncate">
                       {item.date}
                     </p>
                   </div>
 
                   {/* ── Bottom quick actions ───────────────────────────── */}
-                  <div className="flex border-t border-red-50">
+                  <div className="flex border-t border-primary-50">
                     <Tooltip title="Restore">
                       <button
                         disabled={restoringKey === item.path}
                         onClick={() => handleRestore(item.path, item.name)}
-                        className="flex-1 py-1.5 flex items-center justify-center gap-1 text-green-600 hover:bg-green-50 transition-colors text-xs font-semibold disabled:opacity-50"
+                        className="flex-1 py-1.5 flex items-center justify-center gap-1 text-primary-600 hover:bg-primary-50 transition-colors text-xs font-semibold disabled:opacity-50"
                       >
                         {restoringKey === item.path ? (
                           <Spin size="small" />
@@ -434,18 +429,17 @@ const MediaBin: React.FC = () => {
                         Restore
                       </button>
                     </Tooltip>
-                    <div className="w-px bg-red-50" />
+                    <div className="w-px bg-primary-50" />
                     <Popconfirm
                       title="Permanently delete?"
                       description="This cannot be undone."
                       onConfirm={() => handlePermanentDelete(item.path, item.name)}
                       okText="Delete"
                       cancelText="Cancel"
-                      okButtonProps={{ danger: true }}
                     >
                       <button
                         disabled={deletingKey === item.path}
-                        className="flex-1 py-1.5 flex items-center justify-center gap-1 text-red-500 hover:bg-red-50 transition-colors text-xs font-semibold disabled:opacity-50"
+                        className="flex-1 py-1.5 flex items-center justify-center gap-1 text-primary-500 hover:bg-primary-50 transition-colors text-xs font-semibold disabled:opacity-50"
                       >
                         {deletingKey === item.path ? (
                           <Spin size="small" />

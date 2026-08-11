@@ -290,7 +290,7 @@ const AllMediaLibraryList = () => {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <Input
           placeholder="Search media by name..."
-          prefix={<Search className="w-4 h-4 text-gray-400" />}
+          prefix={<Search className="w-4 h-4 text-secondary-400" />}
           value={searchTerm}
           onChange={(e) => {
             setSearchTerm(e.target.value);
@@ -393,9 +393,8 @@ const AllMediaLibraryList = () => {
                   onConfirm={() => handleDeleteFolder(f._id)}
                   okText="Yes"
                   cancelText="No"
-                  okButtonProps={{ danger: true }}
                 >
-                  <button className="p-1 rounded bg-white/90 hover:bg-red-50 text-secondary-500 hover:text-red-600 shadow-sm">
+                  <button className="p-1 rounded bg-white/90 hover:bg-primary-50 text-secondary-500 hover:text-primary-600 shadow-sm">
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
                 </Popconfirm>
@@ -463,13 +462,13 @@ const AllMediaLibraryList = () => {
                   <Tooltip title="Copy URL" key="copy">
                     <CopyOutlined
                       onClick={() => handleCopy(img.url)}
-                      className="text-blue-500 hover:text-blue-700 cursor-pointer text-lg transition-colors duration-200"
+                      className="text-primary hover:text-primary-700 cursor-pointer text-lg transition-colors duration-200"
                     />
                   </Tooltip>,
                   <Tooltip title="Usage Info" key="usage">
                     <InfoCircleOutlined
                       onClick={() => setUsageModal({ open: true, id: img.id })}
-                      className="text-green-500 hover:text-green-700 cursor-pointer text-lg transition-colors duration-200"
+                      className="text-primary-500 hover:text-primary-700 cursor-pointer text-lg transition-colors duration-200"
                     />
                   </Tooltip>,
                   <Tooltip title="Rename" key="rename">
@@ -492,9 +491,8 @@ const AllMediaLibraryList = () => {
                             onConfirm={() => handleDelete(img.path)}
                             okText="Yes"
                             cancelText="No"
-                            okButtonProps={{ danger: true }}
                           >
-                            <DeleteOutlined className="text-red-500 hover:text-red-700 cursor-pointer text-lg transition-colors duration-200" />
+                            <DeleteOutlined className="text-primary-500 hover:text-primary-700 cursor-pointer text-lg transition-colors duration-200" />
                           </Popconfirm>
                         </Tooltip>,
                       ]

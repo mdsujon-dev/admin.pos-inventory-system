@@ -1,4 +1,4 @@
-import { Button } from "antd";
+﻿import { Button } from "antd";
 import { motion } from "framer-motion";
 import { ArrowLeft, Home, RefreshCcw } from "lucide-react";
 import { Link, useRouteError } from "react-router-dom";
@@ -20,12 +20,12 @@ const ErrorPage = () => {
       <h2 className="mb-6 text-3xl font-semibold">
         {error?.statusText || error?.message || 'Page Not Found'}
       </h2>
-      <p className="mb-8 max-w-md text-gray-500 dark:text-gray-400">
+      <p className="mb-8 max-w-md text-secondary-500 dark:text-secondary-400">
         {error?.data || "The page you are looking for might have been removed, had its name changed, or is temporarily unavailable."}
       </p>
       
       {error && (
-        <pre className="text-left bg-gray-100 p-4 rounded mb-8 text-red-500 max-w-2xl overflow-auto text-sm">
+        <pre className="text-left bg-secondary-100 p-4 rounded mb-8 text-primary-500 max-w-2xl overflow-auto text-sm">
           {error.stack || JSON.stringify(error, null, 2)}
         </pre>
       )}

@@ -1,4 +1,4 @@
-import { Editor } from '@tinymce/tinymce-react';
+﻿import { Editor } from '@tinymce/tinymce-react';
 import { useRef } from 'react';
 
 interface RichTextEditorProps {
@@ -78,7 +78,7 @@ const renderFontList = (filter: string) => {
     ? FONT_FAMILIES.filter((f) => f.label.toLowerCase().includes(q))
     : FONT_FAMILIES;
   if (matches.length === 0) {
-    return '<div style="padding:16px;color:#9ca3af;text-align:center;font-size:13px;">No fonts match</div>';
+    return '<div style="padding:16px;color:#858585;text-align:center;font-size:13px;">No fonts match</div>';
   }
   return matches
     .map(
@@ -86,7 +86,7 @@ const renderFontList = (filter: string) => {
       <button type="button" class="rte-font-item"
         data-stack="${escapeHtml(f.stack)}"
         data-label="${escapeHtml(f.label)}"
-        style="display:block;width:100%;text-align:left;padding:10px 14px;border:0;border-bottom:1px solid #f1f5f9;background:#fff;cursor:pointer;font-family:${escapeHtml(f.stack)};font-size:15px;color:#1f2937;line-height:1.3;">
+        style="display:block;width:100%;text-align:left;padding:10px 14px;border:0;border-bottom:1px solid #e0e0e0;background:#fff;cursor:pointer;font-family:${escapeHtml(f.stack)};font-size:15px;color:#1a1a1a;line-height:1.3;">
         ${escapeHtml(f.label)}
       </button>`
     )
@@ -102,7 +102,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
   const editorRef = useRef<any>(null);
 
   return (
-    <div className="rich-text-editor-wrapper border border-gray-200 overflow-hidden focus-within:border-primary focus-within:ring-2 rounded-lg focus-within:ring-primary/15 transition-colors">
+    <div className="rich-text-editor-wrapper border border-secondary-200 overflow-hidden focus-within:border-primary focus-within:ring-2 rounded-lg focus-within:ring-primary/15 transition-colors">
       <Editor
         tinymceScriptSrc="/tinymce/tinymce.min.js"
         licenseKey="gpl"
@@ -219,7 +219,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               onAction: () => {
                 const items = SNIPPETS.map(
                   (s, i) =>
-                    `<button type="button" class="rte-snippet-item" data-idx="${i}" style="display:block;width:100%;text-align:left;padding:10px 14px;border:0;border-bottom:1px solid #f1f5f9;background:#fff;cursor:pointer;font-size:14px;color:#1f2937;">${escapeHtml(s.label)}</button>`
+                    `<button type="button" class="rte-snippet-item" data-idx="${i}" style="display:block;width:100%;text-align:left;padding:10px 14px;border:0;border-bottom:1px solid #e0e0e0;background:#fff;cursor:pointer;font-size:14px;color:#1a1a1a;">${escapeHtml(s.label)}</button>`
                 ).join('');
 
                 const dlg = editor.windowManager.open({
@@ -230,7 +230,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                     items: [
                       {
                         type: 'htmlpanel',
-                        html: `<div id="rte-snippet-list" style="max-height:400px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:6px;background:#fff;">${items}</div>`,
+                        html: `<div id="rte-snippet-list" style="max-height:400px;overflow-y:auto;border:1px solid #e0e0e0;border-radius:6px;background:#fff;">${items}</div>`,
                       },
                     ],
                   },
@@ -276,9 +276,9 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                               id="rte-font-search"
                               placeholder="Type to search fonts..."
                               autocomplete="off"
-                              style="width:100%;padding:10px 12px;border:1px solid #e5e7eb;border-radius:6px;font-size:14px;outline:none;"
+                              style="width:100%;padding:10px 12px;border:1px solid #e0e0e0;border-radius:6px;font-size:14px;outline:none;"
                             />
-                            <div id="rte-font-list" style="max-height:380px;overflow-y:auto;border:1px solid #e5e7eb;border-radius:6px;background:#fff;">
+                            <div id="rte-font-list" style="max-height:380px;overflow-y:auto;border:1px solid #e0e0e0;border-radius:6px;background:#fff;">
                               ${renderFontList('')}
                             </div>
                           </div>
@@ -494,8 +494,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   block: 'div',
                   classes: 'callout callout-info',
                   styles: {
-                    background: '#eff6ff',
-                    'border-left': '4px solid #3b82f6',
+                    background: '#edfdf2',
+                    'border-left': '4px solid #019532',
                     padding: '12px 16px',
                     'border-radius': '6px',
                     margin: '12px 0',
@@ -506,8 +506,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   block: 'div',
                   classes: 'callout callout-success',
                   styles: {
-                    background: '#ecfdf5',
-                    'border-left': '4px solid #10b981',
+                    background: '#edfdf2',
+                    'border-left': '4px solid #019532',
                     padding: '12px 16px',
                     'border-radius': '6px',
                     margin: '12px 0',
@@ -518,8 +518,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   block: 'div',
                   classes: 'callout callout-warning',
                   styles: {
-                    background: '#fffbeb',
-                    'border-left': '4px solid #f59e0b',
+                    background: '#edfdf2',
+                    'border-left': '4px solid #019532',
                     padding: '12px 16px',
                     'border-radius': '6px',
                     margin: '12px 0',
@@ -530,8 +530,8 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                   block: 'div',
                   classes: 'callout callout-danger',
                   styles: {
-                    background: '#fef2f2',
-                    'border-left': '4px solid #ef4444',
+                    background: '#edfdf2',
+                    'border-left': '4px solid #019532',
                     padding: '12px 16px',
                     'border-radius': '6px',
                     margin: '12px 0',
@@ -545,17 +545,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
                 {
                   title: 'Yellow highlight',
                   inline: 'span',
-                  styles: { 'background-color': '#fef08a', padding: '0 4px' },
+                  styles: { 'background-color': '#d3f8df', padding: '0 4px' },
                 },
                 {
                   title: 'Green highlight',
                   inline: 'span',
-                  styles: { 'background-color': '#bbf7d0', padding: '0 4px' },
+                  styles: { 'background-color': '#a8f0c0', padding: '0 4px' },
                 },
                 {
                   title: 'Pink highlight',
                   inline: 'span',
-                  styles: { 'background-color': '#fbcfe8', padding: '0 4px' },
+                  styles: { 'background-color': '#edfdf2', padding: '0 4px' },
                 },
               ],
             },
@@ -666,7 +666,7 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
               font-family: Outfit, 'Segoe UI', system-ui, -apple-system, sans-serif;
               font-size: 15px;
               line-height: 1.65;
-              color: #1f2937;
+              color: #1a1a1a;
               padding: 16px;
             }
             body p { margin: 0 0 0.75em; }
@@ -676,17 +676,17 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             body h4 { font-size: 1.1em; font-weight: 600; margin: 0.4em 0 0.3em; }
             body h5, body h6 { font-weight: 600; margin: 0.4em 0 0.3em; }
             body ul, body ol { padding-left: 1.5em; margin: 0.5em 0; }
-            body a { color: #35ad0b; text-decoration: underline; }
+            body a { color: #019532; text-decoration: underline; }
             body blockquote {
-              border-left: 3px solid #e5e7eb;
+              border-left: 3px solid #e0e0e0;
               padding: 0.25em 0 0.25em 1em;
               margin: 0.75em 0;
-              color: #6b7280;
+              color: #666666;
               font-style: italic;
             }
             body img { max-width: 100%; height: auto; border-radius: 4px; }
             body pre {
-              background: #f3f4f6;
+              background: #f5f5f5;
               padding: 1em;
               border-radius: 6px;
               font-family: 'Fira Code', Consolas, Monaco, monospace;
@@ -695,15 +695,15 @@ const RichTextEditor: React.FC<RichTextEditorProps> = ({
             }
             body hr {
               border: none;
-              border-top: 1px solid #e5e7eb;
+              border-top: 1px solid #e0e0e0;
               margin: 1.5em 0;
             }
             body table { border-collapse: collapse; margin: 1em 0; }
             body table td, body table th {
-              border: 1px solid #e5e7eb;
+              border: 1px solid #e0e0e0;
               padding: 0.5em 0.75em;
             }
-            body table th { background: #f9fafb; font-weight: 600; }
+            body table th { background: #f5f5f5; font-weight: 600; }
           `,
         }}
       />

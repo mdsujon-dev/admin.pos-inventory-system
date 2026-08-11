@@ -139,7 +139,7 @@ const Dashboard: React.FC = () => {
               value={<Money value={income} />}
               hint="Money in for the selected range"
               icon={ArrowDownCircle}
-              accent="#16a34a"
+              accent="#019532"
               loading={isFetching}
             />
           )}
@@ -149,7 +149,7 @@ const Dashboard: React.FC = () => {
               value={<Money value={expense} />}
               hint="Money out for the selected range"
               icon={ArrowUpCircle}
-              accent="#dc2626"
+              accent="#019532"
               loading={isFetching}
             />
           )}
@@ -159,7 +159,7 @@ const Dashboard: React.FC = () => {
               value={<Money value={net} />}
               hint="Income − Expense"
               icon={Banknote}
-              accent="#0F3519"
+              accent="#019532"
               loading={isFetching}
             />
           )}

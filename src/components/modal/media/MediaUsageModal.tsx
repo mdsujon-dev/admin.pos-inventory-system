@@ -1,4 +1,4 @@
-import React from "react";
+﻿import React from "react";
 import { Modal, Table, Tag, Spin } from "antd";
 import { Link } from "react-router-dom";
 import { useGetMediaUsageQuery } from "../../../redux/features/media-library/media-libraryApi";
@@ -65,7 +65,7 @@ const MediaUsageModal: React.FC<MediaUsageModalProps> = ({ open, setOpen, mediaI
                 size="small"
               />
             ) : (
-              <div className="text-center text-gray-500 py-8">
+              <div className="text-center text-secondary-500 py-8">
                 This image is not currently used anywhere.
               </div>
             )}

@@ -62,7 +62,6 @@ const Roles = () => {
       content:
         "This will remove the role. Existing users with this role keep their role string but won't be linked to it anymore.",
       okText: "Yes, Delete",
-      okType: "danger",
       cancelText: "Cancel",
       onOk: async () => {
         try {
@@ -194,7 +193,6 @@ const Roles = () => {
           <PermissionGate module="Roles" action="Delete">
             <Tooltip title="Delete Role">
               <Button
-                danger
                 icon={<Trash2 className="w-4 h-4" />}
                 onClick={() => handleDelete(record._id)}
               />
@@ -273,7 +271,7 @@ const Roles = () => {
       <div className="flex flex-col md:flex-row gap-4 mb-6">
         <Input
           placeholder="Search roles by name..."
-          prefix={<Search className="w-4 h-4 text-gray-400" />}
+          prefix={<Search className="w-4 h-4 text-secondary-400" />}
           value={searchText}
           onChange={(e) => setSearchText(e.target.value)}
           className="max-w-md"

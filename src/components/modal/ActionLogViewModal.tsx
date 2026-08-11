@@ -1,4 +1,4 @@
-import {
+﻿import {
   ApiOutlined,
   CheckCircleOutlined,
   ClockCircleOutlined,
@@ -70,7 +70,7 @@ const ActionLogViewModal = ({
               </div>
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Role:</span>
-                <Tag color="blue">{data?.role}</Tag>
+                <Tag color="var(--primary)">{data?.role}</Tag>
               </div>
             </div>
           </div>

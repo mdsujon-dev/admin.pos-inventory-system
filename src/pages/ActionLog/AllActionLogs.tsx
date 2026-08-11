@@ -44,28 +44,28 @@ const AllActionLogs = () => {
   const getStatusBadge = (statusCode: number) => {
     if (statusCode >= 200 && statusCode < 300) {
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
           <CheckCircle className="w-3 h-3" />
           {statusCode}
         </span>
       );
     } else if (statusCode >= 400 && statusCode < 500) {
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
           <AlertCircle className="w-3 h-3" />
           {statusCode}
         </span>
       );
     } else if (statusCode >= 500) {
       return (
-        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800">
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
           <XCircle className="w-3 h-3" />
           {statusCode}
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+      <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-secondary-100 text-secondary-800">
         {statusCode}
       </span>
     );
@@ -73,17 +73,17 @@ const AllActionLogs = () => {
 
   const getMethodBadge = (method: string) => {
     const colors = {
-      GET: "bg-blue-100 text-blue-800",
-      POST: "bg-green-100 text-green-800",
-      PUT: "bg-yellow-100 text-yellow-800",
-      DELETE: "bg-red-100 text-red-800",
-      PATCH: "bg-purple-100 text-purple-800",
+      GET: "bg-primary-100 text-primary-800",
+      POST: "bg-primary-100 text-primary-800",
+      PUT: "bg-primary-100 text-primary-800",
+      DELETE: "bg-primary-100 text-primary-800",
+      PATCH: "bg-primary-100 text-primary-800",
     };
 
     return (
       <span
         className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-          colors[method as keyof typeof colors] || "bg-gray-100 text-gray-800"
+          colors[method as keyof typeof colors] || "bg-secondary-100 text-secondary-800"
         }`}
       >
         {method}
@@ -94,14 +94,14 @@ const AllActionLogs = () => {
   const getRoleBadge = (role: string) => {
     const colors = {
       admin: "bg-primary text-white",
-      user: "bg-blue-100 text-blue-800",
-      moderator: "bg-orange-100 text-orange-800",
+      user: "bg-primary-100 text-primary-800",
+      moderator: "bg-primary-100 text-primary-800",
     };
 
     return (
       <span
         className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-          colors[role as keyof typeof colors] || "bg-gray-100 text-gray-800"
+          colors[role as keyof typeof colors] || "bg-secondary-100 text-secondary-800"
         }`}
       >
         {role}
@@ -124,12 +124,12 @@ const AllActionLogs = () => {
       render: (_: any, record: any) => (
         <div className="space-y-2 whitespace-nowrap">
           <div className="flex items-center gap-2">
-            <User className="w-4 h-4 text-gray-400" />
-            <span className="font-medium text-gray-900">{record.email}</span>
+            <User className="w-4 h-4 text-secondary-400" />
+            <span className="font-medium text-secondary-900">{record.email}</span>
           </div>
           <div className="flex items-center gap-2">
             {getRoleBadge(record.role)}
-            <span className="text-sm text-gray-600">• {record.action}</span>
+            <span className="text-sm text-secondary-600">• {record.action}</span>
           </div>
         </div>
       ),
@@ -144,7 +144,7 @@ const AllActionLogs = () => {
             {getStatusBadge(record.requestStatusCode)} <LuArrowRightLeft />
             {getStatusBadge(record.responseStatusCode)}
           </div>
-          <div className="text-sm text-gray-600 font-mono bg-gray-50 px-2 py-1 rounded max-w-xs truncate">
+          <div className="text-sm text-secondary-600 font-mono bg-secondary-50 px-2 py-1 rounded max-w-xs truncate">
             {record.route}
           </div>
         </div>
@@ -156,15 +156,15 @@ const AllActionLogs = () => {
       render: (_: any, record: any) => (
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm">
-            <Globe className="w-3 h-3 text-gray-400" />
-            <span className="font-mono text-gray-600 whitespace-nowrap">
+            <Globe className="w-3 h-3 text-secondary-400" />
+            <span className="font-mono text-secondary-600 whitespace-nowrap">
               {record.leadDetails.ipAddress}
             </span>
           </div>
-          <div className="text-xs text-gray-500 max-w-xs truncate">
+          <div className="text-xs text-secondary-500 max-w-xs truncate">
             {record.leadDetails.browserUrl}
           </div>
-          <div className="text-xs text-gray-500 max-w-xs truncate">
+          <div className="text-xs text-secondary-500 max-w-xs truncate">
             {record.leadDetails.userAgent.split(" ")[0]}...
           </div>
         </div>
@@ -176,15 +176,15 @@ const AllActionLogs = () => {
       render: (_: any, record: any) => (
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm">
-            <Monitor className="w-3 h-3 text-gray-400" />
-            <span className="font-mono text-gray-600 whitespace-nowrap">
+            <Monitor className="w-3 h-3 text-secondary-400" />
+            <span className="font-mono text-secondary-600 whitespace-nowrap">
               {record.serverDetails.hostname}
             </span>
           </div>
-          <div className="text-xs text-gray-500 whitespace-nowrap uppercase">
+          <div className="text-xs text-secondary-500 whitespace-nowrap uppercase">
             {record.serverDetails.platform}
           </div>
-          <div className="text-xs text-gray-500 whitespace-nowrap">
+          <div className="text-xs text-secondary-500 whitespace-nowrap">
             Uptime: {record.serverDetails.uptime}
           </div>
         </div>

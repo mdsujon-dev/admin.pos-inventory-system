@@ -31,7 +31,7 @@ export const useColumnSearch = () => {
       </div>
     ),
     filterIcon: (filtered: any) => (
-      <SearchOutlined style={{ color: filtered ? "#0F3519" : undefined }} />
+      <SearchOutlined style={{ color: filtered ? "#019532" : undefined }} />
     ),
     onFilter: (value: any, record: any) => {
       const data = dataIndex
@@ -42,7 +42,7 @@ export const useColumnSearch = () => {
     render: (text: any) =>
       searchedColumn === dataIndex ? (
         <Highlighter
-          highlightStyle={{ backgroundColor: "#ffc069", padding: 0 }}
+          highlightStyle={{ backgroundColor: "#a8f0c0", padding: 0 }}
           searchWords={[searchText]}
           autoEscape
           textToHighlight={text ? text.toString() : ""}

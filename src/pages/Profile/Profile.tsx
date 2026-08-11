@@ -56,7 +56,7 @@ const Profile = () => {
         className="!rounded-xl !overflow-hidden"
         styles={{ body: { padding: 0 } }}
       >
-        {/* Hero — primary purple */}
+        {/* Hero — brand green, primary into accent */}
         <div className="bg-gradient-to-r from-primary to-accent text-white p-6 md:p-7">
           <div className="flex flex-col md:flex-row md:items-center gap-6">
             <Avatar
@@ -114,31 +114,31 @@ const Profile = () => {
         <div className="p-6 md:p-7 bg-white">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6 gap-y-5">
             <div className="min-w-0">
-              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              <div className="text-[11px] font-semibold text-secondary-500 uppercase tracking-wider mb-1">
                 Name
               </div>
-              <div className="text-sm text-gray-900 truncate">
+              <div className="text-sm text-secondary-900 truncate">
                 {me?.name || "—"}
               </div>
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              <div className="text-[11px] font-semibold text-secondary-500 uppercase tracking-wider mb-1">
                 Email
               </div>
-              <div className="text-sm text-gray-900 truncate">
+              <div className="text-sm text-secondary-900 truncate">
                 {me?.email || "—"}
               </div>
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              <div className="text-[11px] font-semibold text-secondary-500 uppercase tracking-wider mb-1">
                 Phone
               </div>
-              <div className="text-sm text-gray-900 truncate">
+              <div className="text-sm text-secondary-900 truncate">
                 {me?.phone || "—"}
               </div>
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              <div className="text-[11px] font-semibold text-secondary-500 uppercase tracking-wider mb-1">
                 Role
               </div>
               <div>
@@ -148,10 +148,10 @@ const Profile = () => {
               </div>
             </div>
             <div className="min-w-0">
-              <div className="text-[11px] font-semibold text-gray-500 uppercase tracking-wider mb-1">
+              <div className="text-[11px] font-semibold text-secondary-500 uppercase tracking-wider mb-1">
                 Designation
               </div>
-              <div className="text-sm text-gray-900 truncate">
+              <div className="text-sm text-secondary-900 truncate">
                 {designationName || "—"}
               </div>
             </div>
@@ -164,7 +164,7 @@ const Profile = () => {
         className="!rounded-xl mt-5"
         title={
           <div className="flex items-center justify-between">
-            <span className="font-bold text-gray-900">My Permissions</span>
+            <span className="font-bold text-secondary-900">My Permissions</span>
             {!isSuperAdmin && (
               <Tag color="var(--primary)" className="font-semibold">
                 {totalActions} action{totalActions === 1 ? "" : "s"} ·{" "}
@@ -184,7 +184,7 @@ const Profile = () => {
               <div className="font-bold text-primary-700 text-base">
                 Full system access
               </div>
-              <div className="text-sm text-gray-600 mt-0.5">
+              <div className="text-sm text-secondary-600 mt-0.5">
                 As a SUPER_ADMIN you bypass every permission check.
               </div>
             </div>
@@ -199,10 +199,10 @@ const Profile = () => {
             {permissions.map((p: any) => (
               <div
                 key={p.module}
-                className="rounded-xl border border-gray-200 bg-white p-4 hover:border-primary/50 transition-all"
+                className="rounded-xl border border-secondary-200 bg-white p-4 hover:border-primary/50 transition-all"
               >
-                <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-gray-100">
-                  <h4 className="font-bold text-gray-800 text-xs uppercase tracking-wide m-0 truncate">
+                <div className="flex items-center justify-between gap-2 mb-3 pb-2 border-b border-secondary-100">
+                  <h4 className="font-bold text-secondary-800 text-xs uppercase tracking-wide m-0 truncate">
                     {p.module}
                   </h4>
                   <Tag

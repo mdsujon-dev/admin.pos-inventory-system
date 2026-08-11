@@ -1,4 +1,4 @@
-import { Button, ColorPicker, Form } from "antd";
+﻿import { Button, ColorPicker, Form } from "antd";
 import { toast } from "react-toastify";
 import {
   ICountry,
@@ -25,7 +25,7 @@ const CreateCountryModal = ({
       const accent =
         typeof values.accentSolid === "string"
           ? values.accentSolid
-          : values.accentSolid?.toHexString?.() || "#22c55e";
+          : values.accentSolid?.toHexString?.() || "#019532";
 
       const payload = {
         ...values,
@@ -72,7 +72,7 @@ const CreateCountryModal = ({
         layout="vertical"
         onFinish={handleSubmit}
         className="space-y-4"
-        initialValues={{ accentSolid: "#22c55e", isActive: true }}
+        initialValues={{ accentSolid: "#019532", isActive: true }}
       >
         <Form.Item
           label="Flag"

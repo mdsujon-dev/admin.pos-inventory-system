@@ -1,4 +1,4 @@
-import { EyeOutlined, FileOutlined } from "@ant-design/icons";
+﻿import { EyeOutlined, FileOutlined } from "@ant-design/icons";
 import { Modal } from "antd";
 import { useState } from "react";
 import { config } from "../../config";
@@ -77,7 +77,7 @@ function MediaLibraryPdfPreview({
         <iframe
           title={item.name}
           src={src}
-          className="w-full h-full min-h-[min(78vh,820px)] border-0 bg-[#525659]"
+          className="w-full h-full min-h-[min(78vh,820px)] border-0 bg-[#4d4d4d]"
         />
       </Modal>
     </>

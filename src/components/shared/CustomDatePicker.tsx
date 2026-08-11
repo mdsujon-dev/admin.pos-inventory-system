@@ -1,4 +1,4 @@
-import { DatePicker } from "antd";
+﻿import { DatePicker } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { Calendar, ChevronDown } from "lucide-react";
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -170,9 +170,9 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
         }`}
         onClick={toggleOpen}
       >
-        <div className="flex items-center justify-between gap-2 px-3 py-[6px] border border-[#d8dbe1] rounded-[6px] bg-white cursor-pointer">
+        <div className="flex items-center justify-between gap-2 px-3 py-[6px] border border-[#e0e0e0] rounded-[6px] bg-white cursor-pointer">
           <div className="flex items-center gap-2 truncate">
-            <Calendar className="w-4 h-4 text-gray-500" />
+            <Calendar className="w-4 h-4 text-secondary-500" />
             <span className="text-[13px] text-[rgba(0,0,0,0.88)] truncate">
               {selectedKey === "custom" && dates[0] && dates[1]
                 ? `${formatDate(dates[0])} to ${formatDate(dates[1])}`
@@ -182,7 +182,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
             </span>
           </div>
           <ChevronDown
-            className={`w-4 h-4 text-gray-400 transition-transform ${
+            className={`w-4 h-4 text-secondary-400 transition-transform ${
               visible ? "rotate-180" : ""
             }`}
           />
@@ -199,7 +199,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
          */
         <div
           data-lenis-prevent
-          className={`absolute z-[99999] right-0 min-w-[320px] max-h-[300px] overflow-auto overscroll-contain bg-white border border-gray-200 rounded-lg p-2 shadow-lg ${
+          className={`absolute z-[99999] right-0 min-w-[320px] max-h-[300px] overflow-auto overscroll-contain bg-white border border-secondary-200 rounded-lg p-2 shadow-lg ${
             dropUp ? "bottom-full mb-2" : "top-full mt-2"
           }`}
         >
@@ -211,9 +211,9 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
                   e.stopPropagation();
                   handleItemClick(item);
                 }}
-                className={`w-full justify-start border text-left !px-3 !py-1.5 !text-[13px] !border-gray-300 !rounded-[7px] ${
+                className={`w-full justify-start border text-left !px-3 !py-1.5 !text-[13px] !border-secondary-300 !rounded-[7px] ${
                   selectedKey !== item.key
-                    ? "!text-gray-700 !bg-white hover:!bg-gray-50"
+                    ? "!text-secondary-700 !bg-white hover:!bg-secondary-50"
                     : ""
                 }`}
               >
@@ -221,7 +221,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({
               </Button>
 
               {item.key === "custom" && customOpen && (
-                <div className="mt-2 px-3 py-2 border-t !border-gray-200 ">
+                <div className="mt-2 px-3 py-2 border-t !border-secondary-200 ">
                   <RangePicker
                     getPopupContainer={(trigger) =>
                       trigger.parentElement || document.body

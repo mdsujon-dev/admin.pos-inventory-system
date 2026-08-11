@@ -1,4 +1,4 @@
-import "@fortawesome/fontawesome-free/css/all.min.css";
+﻿import "@fortawesome/fontawesome-free/css/all.min.css";
 import { ConfigProvider } from "antd";
 // Lenis's own stylesheet. Small but not optional: it is what puts
 // `overscroll-behavior: contain` on the elements marked `data-lenis-prevent`,
@@ -17,11 +17,11 @@ import "./styles/index.css";
 
 const config = {
   token: {
-    // Brand #0F3519 — keep in step with `--primary` in styles/index.css and
+    // Brand #019532 — keep in step with `--primary` in styles/index.css and
     // `primary.DEFAULT` in tailwind.config.js. antd cannot read either.
-    colorPrimary: "#0F3519",
-    colorLink: "#0F3519",
-    colorPrimaryBg: "#0F351930",
+    colorPrimary: "#019532",
+    colorLink: "#019532",
+    colorPrimaryBg: "#01953230",
     // Match the Tailwind/global typeface so antd components don't fall back
     // to their own default sans stack.
     fontFamily: '"Outfit", sans-serif',

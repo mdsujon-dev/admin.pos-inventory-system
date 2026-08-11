@@ -45,10 +45,12 @@ const PageHeader: React.FC<PageHeaderProps> = ({
       )}
       <div className="flex flex-col w-full sm:flex-row sm:items-center justify-between">
         <div>
-          <Title level={4} className="!mb-0 !text-gray-800">
+          <Title level={4} className="!mb-0 !text-secondary-800">
             {title}
           </Title>
-          {subtitle && <p className="text-gray-500 text-sm mt-1">{subtitle}</p>}
+          {subtitle && (
+            <p className="text-secondary-500 text-sm mt-1">{subtitle}</p>
+          )}
         </div>
         {extra && <div className="mt-4 sm:mt-0">{extra}</div>}
       </div>
