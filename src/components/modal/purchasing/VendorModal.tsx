@@ -15,6 +15,7 @@ import {
   useCreateVendorMutation,
   useUpdateVendorMutation,
 } from "../../../redux/features/purchasing/vendorApi";
+import { useGetPaymentProvidersQuery } from "../../../redux/features/settings/paymentProviderApi";
 import { FormInput } from "../../Form/FormInput";
 import { FormSelect } from "../../Form/FormSelect";
 import InventoryFormModal from "../inventory/InventoryFormModal";
@@ -46,12 +47,20 @@ const VendorModal = ({
 
   const { data: categoryData } = useGetCategoriesQuery(activeOnly);
   const { data: subCategoryData } = useGetSubCategoriesQuery(activeOnly);
+  const { data: providersData } = useGetPaymentProvidersQuery(activeOnly);
 
   const categories: ICategory[] = categoryData?.data?.data || [];
   const subCategories: ISubCategory[] = useMemo(
     () => subCategoryData?.data?.data || [],
     [subCategoryData]
   );
+  const providers = providersData?.data?.data || [];
+  const bankOptions = providers
+    .filter((p: any) => p.type === "Bank" && p.isActive)
+    .map((p: any) => ({ label: p.name, value: p.name }));
+  const mobileOptions = providers
+    .filter((p: any) => p.type === "Mobile Banking" && p.isActive)
+    .map((p: any) => ({ label: p.name, value: p.name }));
 
   const watchedCategories = Form.useWatch("categories", form);
   // Memoised because the filter below depends on it; the `?? []` fallback
@@ -268,11 +277,13 @@ const VendorModal = ({
                         if (methodType === "Bank") {
                           return (
                             <>
-                              <FormInput
+                              <FormSelect
                                 {...restField}
                                 label="Bank Name"
                                 name={[name, "provider"]}
-                                placeholder="e.g. Dutch Bangla Bank"
+                                showSearch
+                                options={bankOptions}
+                                placeholder="Select or type..."
                               />
                               <FormInput
                                 {...restField}
@@ -303,12 +314,9 @@ const VendorModal = ({
                                 {...restField}
                                 label="Provider"
                                 name={[name, "provider"]}
-                                options={[
-                                  { label: "bKash", value: "bKash" },
-                                  { label: "Nagad", value: "Nagad" },
-                                  { label: "Rocket", value: "Rocket" },
-                                  { label: "Upay", value: "Upay" },
-                                ]}
+                                showSearch
+                                options={mobileOptions}
+                                placeholder="Select Provider"
                               />
                               <FormInput
                                 {...restField}

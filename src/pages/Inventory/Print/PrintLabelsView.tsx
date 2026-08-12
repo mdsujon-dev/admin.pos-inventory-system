@@ -6,6 +6,7 @@ import {
   Input,
   InputNumber,
   Segmented,
+  Switch,
   Table,
   Tag,
 } from "antd";
@@ -36,6 +37,14 @@ export interface LabelItem {
    */
   codeSource: "barcode" | "sku";
   price: number;
+  /**
+   * How many are on the shelf.
+   *
+   * A shelf label is for something on a shelf, so this both filters the list
+   * and answers the question anyone printing is actually asking: how many
+   * copies do I need.
+   */
+  stock: number;
 }
 
 /**
@@ -59,6 +68,7 @@ const toLabelItems = (products: IProduct[]): LabelItem[] =>
               code,
               codeSource: own ? ("barcode" as const) : ("sku" as const),
               price: product.sellingPrice,
+              stock: product.quantity ?? 0,
             },
           ]
         : [];
@@ -78,6 +88,7 @@ const toLabelItems = (products: IProduct[]): LabelItem[] =>
           code,
           codeSource: own ? ("barcode" as const) : ("sku" as const),
           price: variant.sellingPrice,
+          stock: variant.quantity ?? 0,
         };
       })
       .filter((item): item is LabelItem => item !== null);
@@ -131,6 +142,14 @@ const PrintLabelsView = () => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [showName, setShowName] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
+  /**
+   * Out-of-stock rows are hidden by default.
+   *
+   * A shelf label goes on a shelf, and there is nothing to put it on. The
+   * switch exists because printing ahead of a delivery is a real thing people
+   * do — but it is the exception, so it is not what the screen opens on.
+   */
+  const [includeOutOfStock, setIncludeOutOfStock] = useState(false);
 
   const sheetRef = useRef<HTMLDivElement>(null);
   const handlePrint = useReactToPrint({
@@ -154,7 +173,17 @@ const PrintLabelsView = () => {
   // be a new array identity on every render, so the flattening below would
   // re-run (and re-key every label) even when nothing changed.
   const products: IProduct[] = useMemo(() => data?.data?.data || [], [data]);
-  const labelItems = useMemo(() => toLabelItems(products), [products]);
+  const allItems = useMemo(() => toLabelItems(products), [products]);
+
+  const labelItems = useMemo(
+    () =>
+      includeOutOfStock
+        ? allItems
+        : allItems.filter((item) => item.stock > 0),
+    [allItems, includeOutOfStock]
+  );
+
+  const hiddenCount = allItems.length - labelItems.length;
 
   const selectedItems = useMemo(
     () => labelItems.filter((item) => selectedKeys.includes(item.key)),
@@ -209,6 +238,19 @@ const PrintLabelsView = () => {
       dataIndex: "price",
       key: "price",
       width: 100,
+    },
+    {
+      title: "In stock",
+      key: "stock",
+      width: 90,
+      render: (_, record) =>
+        record.stock > 0 ? (
+          <span className="font-medium text-secondary-800">{record.stock}</span>
+        ) : (
+          <Tag className="!m-0 !border-danger/30 !bg-danger/10 !text-[11px] !text-danger">
+            None
+          </Tag>
+        ),
     },
     {
       title: "Copies",
@@ -279,8 +321,25 @@ const PrintLabelsView = () => {
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
             allowClear
-            className="mb-4"
+            className="mb-3"
           />
+
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+            <label className="flex items-center gap-2 text-sm text-secondary-600">
+              <Switch
+                size="small"
+                checked={includeOutOfStock}
+                onChange={setIncludeOutOfStock}
+              />
+              Include out of stock
+            </label>
+            {!includeOutOfStock && hiddenCount > 0 && (
+              <span className="text-xs text-secondary-400">
+                {hiddenCount} item{hiddenCount === 1 ? "" : "s"} hidden — nothing
+                on the shelf to label
+              </span>
+            )}
+          </div>
           <Table
             dataSource={labelItems}
             columns={columns}
@@ -293,8 +352,9 @@ const PrintLabelsView = () => {
               onChange: (keys) => setSelectedKeys(keys as string[]),
             }}
             locale={{
-              emptyText:
-                "No printable items. A product needs a SKU or barcode to produce a label.",
+              emptyText: hiddenCount > 0
+                ? "Nothing in stock to label. Turn on 'Include out of stock' to print ahead of a delivery."
+                : "No printable items. A product needs a SKU or barcode to produce a label.",
             }}
           />
         </Card>

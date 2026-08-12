@@ -13,6 +13,8 @@ export interface IPaymentMethod {
   accountName?: string;
   accountNumber?: string;
   routingNumber?: string;
+  branch?: string;
+  accountType?: string;
   details?: string;
 }
 

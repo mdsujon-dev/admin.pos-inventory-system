@@ -117,6 +117,7 @@ export const routePermissions: Record<string, RoutePermission> = {
   // permission.
   "/settings/designation": { module: "Designations", action: "View" },
   "/settings/countries": { module: "Countries", action: "View" },
+  "/settings/payment-providers": { module: "Payment Providers", action: "View" },
   "/settings/media-bin": { module: "Media Bin", action: "View" },
   // /settings/notification-sounds — intentionally unguarded: it edits a
   // browser-local preference, no backend involvement, so any logged-in user

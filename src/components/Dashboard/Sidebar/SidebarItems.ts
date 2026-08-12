@@ -321,6 +321,11 @@ const sidebarMenuRoutes: RouteItem[] = [
         address: "/settings/countries",
         module: "Countries",
       },
+      {
+        label: "Payment Providers",
+        address: "/settings/payment-providers",
+        module: "Payment Providers",
+      },
       // Temporarily hidden — feature not in use yet.
       // {
       //   label: "Notification Sounds",
