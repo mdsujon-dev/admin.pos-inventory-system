@@ -276,6 +276,11 @@ const SalesList = () => {
         isPaginate={total > limit}
         loading={isFetching}
         rowKey="_id"
+        emptyText={
+          searchText || status || method || range
+            ? "No invoices match those filters"
+            : "Nothing sold yet. Invoices appear here as the till rings them up."
+        }
       />
     </div>
   );

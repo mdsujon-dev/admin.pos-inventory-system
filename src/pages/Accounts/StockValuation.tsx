@@ -98,6 +98,11 @@ const StockValuation = () => {
           rowKey={(row: any) => `${row.productId}-${row.variantId ?? "none"}`}
           loading={isFetching}
           size="small"
+          locale={{
+            emptyText: search
+              ? `Nothing in stock matches "${search}"`
+              : "Nothing in stock. Value appears here once a purchase puts something on the shelf.",
+          }}
           pagination={{ pageSize: 25, showSizeChanger: true }}
           columns={[
             {

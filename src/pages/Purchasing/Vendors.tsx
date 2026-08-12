@@ -257,6 +257,11 @@ const Vendors = () => {
         isPaginate={total > limit}
         loading={isFetching}
         rowKey="_id"
+        emptyText={
+          searchText
+            ? `No vendor matches "${searchText}"`
+            : "No vendors yet. Stock enters through a purchase, and a purchase needs a supplier — add the first one."
+        }
       />
 
       {isOpenModal && (

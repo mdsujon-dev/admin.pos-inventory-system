@@ -91,6 +91,9 @@ const EmployeeSales = () => {
           rowKey={(row: any) => String(row._id ?? "unassigned")}
           loading={isFetching}
           size="small"
+          locale={{
+            emptyText: "Nobody sold anything in this period",
+          }}
           pagination={{ pageSize: 20, hideOnSinglePage: true }}
           columns={[
             {

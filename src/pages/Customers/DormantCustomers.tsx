@@ -90,6 +90,9 @@ const DormantCustomers = () => {
           rowKey="_id"
           loading={isFetching}
           size="small"
+          locale={{
+            emptyText: `Nobody has been away ${days}+ days — everyone who buys is still coming back`,
+          }}
           pagination={{ pageSize: 20, showSizeChanger: true }}
           columns={[
             {

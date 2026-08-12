@@ -216,6 +216,11 @@ const Purchases = () => {
         isPaginate={total > limit}
         loading={isFetching}
         rowKey="_id"
+        emptyText={
+          searchText || status || range
+            ? "No bills match those filters"
+            : "No purchases yet. Every unit of stock arrives on a bill — record the first one."
+        }
       />
     </div>
   );

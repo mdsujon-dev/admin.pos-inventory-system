@@ -246,6 +246,11 @@ const Customers = () => {
         isPaginate={total > limit}
         loading={isFetching}
         rowKey="_id"
+        emptyText={
+          searchText
+            ? `No customer matches "${searchText}"`
+            : "No customers yet. One is saved the first time a phone number is typed at the till."
+        }
       />
 
       {isOpen && (

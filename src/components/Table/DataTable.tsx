@@ -25,6 +25,12 @@ export default function DataTable(props: any) {
     onTableChange,
     expandable,
     onRow,
+    /**
+     * What an empty result says. Left off, AntD's "No Data" stands — which is
+     * accurate and useless: a list can be empty because nothing exists yet or
+     * because a filter excluded everything, and only the screen knows which.
+     */
+    emptyText,
   } = props;
 
   const showLoader = loading || isFetching;
@@ -149,6 +155,7 @@ export default function DataTable(props: any) {
       dataSource={data || []}
       columns={columns}
       expandable={expandable}
+      locale={emptyText ? { emptyText } : undefined}
       scroll={{ x: true }}
       pagination={
         isPaginate
