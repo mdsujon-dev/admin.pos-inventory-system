@@ -28,6 +28,9 @@ import SubCategories from "../pages/Inventory/SubCategories/SubCategories.tsx";
 import Units from "../pages/Inventory/Units/Units.tsx";
 import VariantAttributes from "../pages/Inventory/VariantAttributes/VariantAttributes.tsx";
 import Warranties from "../pages/Inventory/Warranties/Warranties.tsx";
+import InvoiceView from "../pages/Sales/InvoiceView.tsx";
+import PointOfSale from "../pages/Sales/PointOfSale.tsx";
+import SalesList from "../pages/Sales/SalesList.tsx";
 import RolePermissions from "../pages/Users/RolePermissions.tsx";
 import Roles from "../pages/Users/Roles.tsx";
 import Users from "../pages/Users/Users.tsx";
@@ -64,6 +67,15 @@ const routes = [
           { path: "warranties", element: <Warranties /> },
           { path: "print-barcode", element: <PrintBarcode /> },
           { path: "print-qr-code", element: <PrintQRCode /> },
+        ],
+      },
+      // Selling — the till, and everything it wrote down.
+      {
+        path: "sales",
+        children: [
+          { path: "pos", element: <PointOfSale /> },
+          { path: "invoices", element: <SalesList /> },
+          { path: "invoices/:id", element: <InvoiceView /> },
         ],
       },
       // Employee Management — primary paths

@@ -1,12 +1,15 @@
 import { Button, Form, FormInstance } from "antd";
 import {
+  Contact,
   FolderTree,
+  Landmark,
   Layers,
   LucideIcon,
   Package,
   Ruler,
   ShieldCheck,
   Tag,
+  Warehouse,
   X,
 } from "lucide-react";
 import { ReactNode } from "react";
@@ -24,6 +27,9 @@ const ENTITY_ICONS: Record<string, LucideIcon> = {
   Unit: Ruler,
   Warranty: ShieldCheck,
   "Variant Attribute": Layers,
+  Vendor: Warehouse,
+  Customer: Contact,
+  "Expense Category": Landmark,
 };
 
 interface InventoryFormModalProps {

@@ -1,17 +1,30 @@
 import {
   BadgeCheck,
-  Barcode,
   Boxes,
   CalendarClock,
+  ClipboardList,
+  Contact,
+  FileText,
+  HeartHandshake,
+  Landmark,
   LayoutGrid,
+  Layers,
   Package,
-  QrCode,
+  PhoneCall,
+  PieChart,
+  Receipt,
   Rows3,
   Ruler,
+  ScanLine,
   ShieldCheck,
+  ShoppingCart,
   Tags,
+  Truck,
   TrendingDown,
+  UserRoundX,
+  Users,
   Wallet,
+  Warehouse,
 } from "lucide-react";
 import {
   ActionLogsIcon,
@@ -101,20 +114,162 @@ const sidebarMenuRoutes: RouteItem[] = [
         icon: BadgeCheck,
         module: "Warranties",
       },
+      // One screen for both formats. Barcode and QR were two entries printing
+      // the same rows off the same picker, differing only in which symbol they
+      // drew — see the Print Labels page.
       {
-        label: "Print Barcode",
-        address: "/inventory/print-barcode",
-        icon: Barcode,
-        module: "Print Barcode",
+        label: "Print Labels",
+        address: "/inventory/print-labels",
+        icon: ScanLine,
+        module: "Print Labels",
       },
       {
-        label: "Print QR Code",
-        address: "/inventory/print-qr-code",
-        icon: QrCode,
-        module: "Print QR Code",
+        label: "Stock Batches",
+        address: "/inventory/stock-lots",
+        icon: Layers,
+        module: "Stock Batches",
       },
     ],
   },
+
+  // Selling. Its own section rather than a corner of Inventory: the till is
+  // used all day by people who never touch the catalog.
+  {
+    label: "Point of Sale",
+    address: "/sales/pos",
+    icon: ScanLine,
+    module: "Sales",
+    section: "Sales",
+  },
+  {
+    label: "Sales",
+    icon: ShoppingCart,
+    section: "Sales",
+    submenus: [
+      {
+        label: "Invoices",
+        address: "/sales/invoices",
+        icon: Receipt,
+        module: "Sales",
+        exactMatch: true,
+      },
+      {
+        label: "Customer Dues",
+        address: "/sales/receivables",
+        icon: FileText,
+        module: "Accounts",
+      },
+    ],
+  },
+  {
+    label: "Customers",
+    icon: Users,
+    section: "Sales",
+    submenus: [
+      {
+        label: "All Customers",
+        address: "/customers",
+        icon: Contact,
+        module: "Customers",
+        exactMatch: true,
+      },
+      {
+        label: "Follow-ups",
+        address: "/customers/follow-ups",
+        icon: PhoneCall,
+        module: "CRM",
+      },
+      {
+        label: "Dormant Customers",
+        address: "/customers/dormant",
+        icon: UserRoundX,
+        module: "CRM",
+      },
+    ],
+  },
+
+  // Buying. Where every unit of stock comes from, and who is owed for it.
+  {
+    label: "Purchases",
+    icon: Truck,
+    section: "Purchasing",
+    submenus: [
+      {
+        label: "New Purchase",
+        address: "/purchases/new",
+        icon: ClipboardList,
+        module: "Purchases",
+      },
+      {
+        label: "Purchase Bills",
+        address: "/purchases",
+        icon: Receipt,
+        module: "Purchases",
+        exactMatch: true,
+      },
+      {
+        label: "Vendor Dues",
+        address: "/purchases/payables",
+        icon: FileText,
+        module: "Accounts",
+      },
+    ],
+  },
+  {
+    label: "Vendors",
+    address: "/vendors",
+    icon: Warehouse,
+    module: "Vendors",
+    section: "Purchasing",
+  },
+
+  // The books.
+  {
+    label: "Accounts",
+    icon: Landmark,
+    section: "Accounts",
+    submenus: [
+      {
+        label: "Overview",
+        address: "/accounts",
+        icon: PieChart,
+        module: "Accounts",
+        exactMatch: true,
+      },
+      {
+        label: "Profit & Loss",
+        address: "/accounts/profit-loss",
+        icon: TrendingDown,
+        module: "Accounts",
+      },
+      {
+        label: "Stock Valuation",
+        address: "/accounts/stock-valuation",
+        icon: Warehouse,
+        module: "Accounts",
+      },
+      {
+        label: "Cash Flow",
+        address: "/accounts/cash-flow",
+        icon: Wallet,
+        module: "Accounts",
+      },
+      {
+        label: "Expense Categories",
+        address: "/accounts/expense-categories",
+        icon: LayoutGrid,
+        module: "Accounts",
+      },
+    ],
+  },
+  {
+    label: "Staff Performance",
+    address: "/reports/employee-sales",
+    icon: HeartHandshake,
+    module: "CRM",
+    section: "Accounts",
+  },
+
   {
     label: "Employee Management",
     icon: ShieldCheck,

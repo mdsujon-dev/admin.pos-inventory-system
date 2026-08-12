@@ -164,6 +164,17 @@ export const baseApi = createApi({
     "variant-attributes",
     "warranties",
     "products",
+    // Buying
+    "vendors",
+    "purchases",
+    "stock-lots",
+    // Selling
+    "sales",
+    "customers",
+    // The books and the customer relationship
+    "expense-categories",
+    "reports",
+    "crm",
   ],
   endpoints: () => ({}),
 });

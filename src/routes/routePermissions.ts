@@ -50,8 +50,42 @@ export const routePermissions: Record<string, RoutePermission> = {
     action: "View",
   },
   "/inventory/warranties": { module: "Warranties", action: "View" },
-  "/inventory/print-barcode": { module: "Print Barcode", action: "View" },
-  "/inventory/print-qr-code": { module: "Print QR Code", action: "View" },
+  "/inventory/print-labels": { module: "Print Labels", action: "View" },
+  "/inventory/stock-lots": { module: "Stock Batches", action: "View" },
+  // The old split screens. Kept so a bookmark still lands somewhere it is
+  // allowed to be; both now redirect to Print Labels.
+  "/inventory/print-barcode": { module: "Print Labels", action: "View" },
+  "/inventory/print-qr-code": { module: "Print Labels", action: "View" },
+
+  // Selling. The till is gated on Create, not View: standing at a counter
+  // means ringing sales up, and a cashier who may only look at invoices has
+  // no business on that screen.
+  "/sales/pos": { module: "Sales", action: "Create" },
+  "/sales/invoices": { module: "Sales", action: "View" },
+  "/sales/invoices/:id": { module: "Sales", action: "View" },
+  "/sales/receivables": { module: "Accounts", action: "View" },
+
+  // Customers and the relationship around them
+  "/customers": { module: "Customers", action: "View" },
+  "/customers/:id": { module: "Customers", action: "View" },
+  "/customers/follow-ups": { module: "CRM", action: "View" },
+  "/customers/dormant": { module: "CRM", action: "View" },
+
+  // Buying
+  "/vendors": { module: "Vendors", action: "View" },
+  "/vendors/:id": { module: "Vendors", action: "View" },
+  "/purchases": { module: "Purchases", action: "View" },
+  "/purchases/new": { module: "Purchases", action: "Create" },
+  "/purchases/payables": { module: "Accounts", action: "View" },
+  "/purchases/:id": { module: "Purchases", action: "View" },
+
+  // The books
+  "/accounts": { module: "Accounts", action: "View" },
+  "/accounts/profit-loss": { module: "Accounts", action: "View" },
+  "/accounts/stock-valuation": { module: "Accounts", action: "View" },
+  "/accounts/cash-flow": { module: "Accounts", action: "View" },
+  "/accounts/expense-categories": { module: "Accounts", action: "View" },
+  "/reports/employee-sales": { module: "CRM", action: "View" },
 
   // Employee Management
   "/employees": { module: "Employees", action: "View" },
