@@ -2,7 +2,6 @@ import {
   Banknote,
   Boxes,
   CalendarClock,
-  ClipboardList,
   Contact,
   FileText,
   HeartHandshake,
@@ -183,12 +182,9 @@ const sidebarMenuRoutes: RouteItem[] = [
     icon: Truck,
     section: "Purchasing",
     submenus: [
-      {
-        label: "New Purchase",
-        address: "/purchases/new",
-        icon: ClipboardList,
-        module: "Purchases",
-      },
+      // New Purchase is deliberately not a sidebar entry — it is reached by
+      // the button on the Purchase Bills list, so listing it here would be a
+      // second door to the same form. Same reasoning as Create Product.
       {
         label: "Purchase Bills",
         address: "/purchases",

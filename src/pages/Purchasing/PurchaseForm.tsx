@@ -1,4 +1,5 @@
 import {
+  Alert,
   Button,
   DatePicker,
   Empty,
@@ -18,11 +19,12 @@ import {
   Truck,
   Wallet,
 } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
+import { Loading } from "../../components/shared/Loading";
 import QuickVendorModal from "../../components/modal/purchasing/QuickVendorModal";
 import DataTable from "../../components/Table/DataTable";
 import Money from "../../components/shared/Money";
@@ -30,7 +32,12 @@ import {
   IProduct,
   useGetProductsQuery,
 } from "../../redux/features/inventory/productApi";
-import { useCreatePurchaseMutation } from "../../redux/features/purchasing/purchaseApi";
+import {
+  useCreatePurchaseMutation,
+  useGetPurchaseByIdQuery,
+  useGetPurchaseEditableScopeQuery,
+  useUpdatePurchaseMutation,
+} from "../../redux/features/purchasing/purchaseApi";
 import {
   IVendor,
   useGetVendorsQuery,
@@ -82,6 +89,8 @@ interface LineOption {
  */
 const PurchaseForm = () => {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditing = Boolean(id);
 
   const [vendor, setVendor] = useState<string | undefined>();
   const [billNo, setBillNo] = useState("");
@@ -112,7 +121,24 @@ const PurchaseForm = () => {
     () => productData?.data?.data || [],
     [productData]
   );
-  const [createPurchase, { isLoading: saving }] = useCreatePurchaseMutation();
+  const [createPurchase, { isLoading: creating }] = useCreatePurchaseMutation();
+  const [updatePurchase, { isLoading: updating }] = useUpdatePurchaseMutation();
+  const saving = creating || updating;
+
+  const { data: billData, isFetching: loadingBill } = useGetPurchaseByIdQuery(
+    id as string,
+    { skip: !isEditing }
+  );
+  const { data: scopeData } = useGetPurchaseEditableScopeQuery(id as string, {
+    skip: !isEditing,
+  });
+  const bill = billData?.data;
+  /**
+   * Once any of a bill's stock has been sold, its goods are frozen — rewriting
+   * them would change the cost of goods on invoices already in a customer's
+   * hand. Only the bill number and note stay open.
+   */
+  const detailsOnly = scopeData?.data?.scope === "details";
 
   /**
    * One option per sellable thing, not per product.
@@ -199,6 +225,41 @@ const PurchaseForm = () => {
   const settled = paid == null ? totals.grandTotal : Math.min(paid, totals.grandTotal);
   const due = round2(Math.max(0, totals.grandTotal - settled));
 
+  /**
+   * Fills the form from the bill being edited.
+   *
+   * Keyed on the bill's id rather than run once: the read is async, so the
+   * form is mounted and empty before the data lands.
+   */
+  useEffect(() => {
+    if (!bill) return;
+    setVendor(typeof bill.vendor === "string" ? bill.vendor : bill.vendor._id);
+    setBillNo(bill.billNo ?? "");
+    setPurchaseDate(dayjs(bill.purchaseDate));
+    setDiscount(bill.discount ?? 0);
+    setShippingCost(bill.shippingCost ?? 0);
+    setOtherCost(bill.otherCost ?? 0);
+    setVatPercent(bill.vatPercent ?? 0);
+    setPaid(bill.paid ?? null);
+    setPaymentMethod(bill.paymentMethod ?? "cash");
+    setNote(bill.note ?? "");
+    setLines(
+      (bill.items ?? []).map((item: any) => ({
+        key: `${item.product}:${item.variantId ?? ""}`,
+        product: item.product,
+        variantId: item.variantId ?? null,
+        name: item.name,
+        variantName: item.variantName ?? "",
+        sku: item.sku,
+        quantity: item.quantity,
+        // The bill's own price, without the freight share — that is
+        // recalculated from the shipping figure on save.
+        unitCost: item.unitCost,
+        expiryDate: item.expiryDate ? dayjs(item.expiryDate) : null,
+      }))
+    );
+  }, [bill]);
+
   const save = async () => {
     if (!vendor) {
       toast.error("Pick a vendor first");
@@ -213,27 +274,38 @@ const PurchaseForm = () => {
       return;
     }
 
-    try {
-      const result = await createPurchase({
-        vendor,
-        billNo,
-        items: lines.map((line) => ({
-          product: line.product,
-          variantId: line.variantId,
-          quantity: line.quantity,
-          unitCost: line.unitCost,
-          expiryDate: line.expiryDate ? line.expiryDate.toISOString() : null,
-        })),
-        discount,
-        shippingCost,
-        otherCost,
-        vatPercent,
-        paid: paid ?? totals.grandTotal,
-        paymentMethod,
-        purchaseDate: purchaseDate.toISOString(),
-        note,
-      }).unwrap();
+    const payload = {
+      vendor,
+      billNo,
+      items: lines.map((line) => ({
+        product: line.product,
+        variantId: line.variantId,
+        quantity: line.quantity,
+        unitCost: line.unitCost,
+        expiryDate: line.expiryDate ? line.expiryDate.toISOString() : null,
+      })),
+      discount,
+      shippingCost,
+      otherCost,
+      vatPercent,
+      paid: paid ?? totals.grandTotal,
+      paymentMethod,
+      purchaseDate: purchaseDate.toISOString(),
+      note,
+    };
 
+    try {
+      if (isEditing) {
+        const result = await updatePurchase({
+          id: id as string,
+          data: payload,
+        }).unwrap();
+        toast.success(`${result.data.purchaseNo} updated — batches rebuilt`);
+        navigate(`/purchases/${id}`);
+        return;
+      }
+
+      const result = await createPurchase(payload).unwrap();
       toast.success(`Saved as ${result.data.purchaseNo} — stock is on the shelf`);
       navigate(`/purchases/${result.data._id}`);
     } catch (error: any) {
@@ -241,15 +313,25 @@ const PurchaseForm = () => {
     }
   };
 
+  if (isEditing && loadingBill) return <Loading />;
+
   return (
     <div className="flex min-h-[calc(100dvh-94px)] flex-col gap-4 sm:min-h-[calc(100dvh-102px)]">
       <PageMeta
-        title="New Purchase - POS & Inventory"
+        title={`${isEditing ? "Edit" : "New"} Purchase - POS & Inventory`}
         description="Receive stock against a supplier's bill"
         noindex
       />
+      {detailsOnly && (
+        <Alert
+          type="warning"
+          showIcon
+          message="Some of this stock has already been sold"
+          description="The goods and costs on this bill are frozen — changing them would rewrite the cost of goods on invoices that are already printed. The bill number and note can still be saved; correct anything else with a purchase return."
+        />
+      )}
       <PageHeader
-        title="New Purchase"
+        title={isEditing ? `Edit ${bill?.purchaseNo ?? "Purchase"}` : "New Purchase"}
         subtitle="Every unit of stock enters here, with what it cost and who supplied it"
         breadcrumbs={[
           { title: "Dashboard", path: "/" },
@@ -593,7 +675,7 @@ const PurchaseForm = () => {
           icon={<ClipboardList className="h-4 w-4" />}
           className="min-w-44 !border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 shadow-primary"
         >
-          Receive Stock
+          {isEditing ? "Save Changes" : "Receive Stock"}
         </Button>
       </div>
 

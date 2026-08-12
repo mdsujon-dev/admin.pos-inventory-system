@@ -16,21 +16,11 @@
 
 /* Zebra Striping */
 .ant-table-wrapper .ant-table-tbody > tr:nth-child(odd) > td {
-  background-color: #f7f7f7; /* হালকা গ্রে */
+  background-color: #f7f7f7 !important; /* হালকা গ্রে */
 }
 
 .ant-table-wrapper .ant-table-tbody > tr:nth-child(even) > td {
-  background-color: #ffffff; /* সাদা */
-}
-
-/* Row Hover Effect
-   Solid, never translucent. A pinned column paints over the cells scrolling
-   underneath it, so anything less than fully opaque here shows the rows sliding
-   past *through* the frozen column — which reads as the column going
-   transparent whenever the pointer is on the row. */
-.ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td {
-  background: #f1f7ee;
-  cursor: pointer;
+  background-color: #ffffff !important; /* সাদা */
 }
 
 /* Pinned (fixed) columns — left or right.
@@ -49,13 +39,24 @@
 
 .ant-table-wrapper
   .ant-table-tbody
-  > tr.ant-table-row:hover
+  > tr.ant-table-row:nth-child(odd):hover
   > td.ant-table-cell-fix-left,
 .ant-table-wrapper
   .ant-table-tbody
-  > tr.ant-table-row:hover
+  > tr.ant-table-row:nth-child(odd):hover
   > td.ant-table-cell-fix-right {
-  background-color: #f1f7ee;
+  background-color: #f7f7f7 !important;
+}
+
+.ant-table-wrapper
+  .ant-table-tbody
+  > tr.ant-table-row:nth-child(even):hover
+  > td.ant-table-cell-fix-left,
+.ant-table-wrapper
+  .ant-table-tbody
+  > tr.ant-table-row:nth-child(even):hover
+  > td.ant-table-cell-fix-right {
+  background-color: #ffffff !important;
 }
 
 .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-left,

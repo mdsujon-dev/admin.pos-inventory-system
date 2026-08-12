@@ -161,7 +161,7 @@ const Purchases = () => {
               type="primary"
               icon={<Plus className="h-4 w-4" />}
               onClick={() => navigate("/purchases/new")}
-              className="!border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 shadow-primary"
+              className="!border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500"
             >
               New Purchase
             </Button>
@@ -169,7 +169,7 @@ const Purchases = () => {
         }
       />
 
-      <div className="mb-6 flex flex-col gap-4 md:flex-row">
+      <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <Input
           placeholder="Bill no, vendor or item..."
           prefix={<Search className="h-4 w-4 text-secondary-400" />}
@@ -179,30 +179,32 @@ const Purchases = () => {
             setCurrentPage(1);
           }}
           allowClear
-          className="max-w-md"
+          className="w-full md:max-w-md"
         />
-        <RangePicker
-          value={range as never}
-          onChange={(value) => {
-            setRange(value as never);
-            setCurrentPage(1);
-          }}
-        />
-        <Select
-          placeholder="Status"
-          value={status}
-          onChange={(value) => {
-            setStatus(value);
-            setCurrentPage(1);
-          }}
-          allowClear
-          className="min-w-[150px]"
-          options={[
-            { label: "Settled", value: "paid" },
-            { label: "Partial", value: "partial" },
-            { label: "Unpaid", value: "due" },
-          ]}
-        />
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+          <RangePicker
+            value={range as never}
+            onChange={(value) => {
+              setRange(value as never);
+              setCurrentPage(1);
+            }}
+          />
+          <Select
+            placeholder="Status"
+            value={status}
+            onChange={(value) => {
+              setStatus(value);
+              setCurrentPage(1);
+            }}
+            allowClear
+            className="min-w-[150px]"
+            options={[
+              { label: "Settled", value: "paid" },
+              { label: "Partial", value: "partial" },
+              { label: "Unpaid", value: "due" },
+            ]}
+          />
+        </div>
       </div>
 
       <DataTable

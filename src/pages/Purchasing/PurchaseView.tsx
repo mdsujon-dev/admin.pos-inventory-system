@@ -1,18 +1,17 @@
-import { Button, InputNumber, Modal, Select, Table, Tag } from "antd";
+import { Button, Table, Tag } from "antd";
 import dayjs from "dayjs";
-import { ArrowLeft, Layers, Receipt, Truck, Wallet } from "lucide-react";
+import { ArrowLeft, Edit, Layers, Receipt, Truck, Wallet } from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { toast } from "react-toastify";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import PermissionGate from "../../components/Common/PermissionGate";
+import VendorPaymentModal from "../../components/modal/purchasing/VendorPaymentModal";
 import { Loading } from "../../components/shared/Loading";
 import Money from "../../components/shared/Money";
 import {
   IPurchase,
   useGetPurchaseByIdQuery,
-  useRecordPurchasePaymentMutation,
 } from "../../redux/features/purchasing/purchaseApi";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
 import { SectionCard, StatTile } from "../Inventory/Products/ProductFormUI";
@@ -20,22 +19,19 @@ import { SectionCard, StatTile } from "../Inventory/Products/ProductFormUI";
 /**
  * One supplier bill, and the batches it put on the shelf.
  *
- * The bill cannot be edited — it opened stock lots that sales have already
- * eaten from, and rewriting it would change the cost of goods on invoices
- * that are already printed. Paying it down is the one thing that still moves.
+ * Editable only while none of its stock has been sold — rewriting a bill whose
+ * goods are gone would change the cost of goods on invoices already printed.
+ * Paying it down is always open, and uses the same payment form the vendor's
+ * own page does, pre-pointed at this bill.
  */
 const PurchaseView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [paying, setPaying] = useState(false);
-  const [amount, setAmount] = useState<number | null>(null);
-  const [method, setMethod] = useState("cash");
 
   const { data, isFetching } = useGetPurchaseByIdQuery(id as string, {
     skip: !id,
   });
-  const [recordPayment, { isLoading: saving }] =
-    useRecordPurchasePaymentMutation();
 
   if (isFetching) return <Loading />;
 
@@ -44,24 +40,6 @@ const PurchaseView = () => {
 
   const vendor =
     typeof purchase.vendor === "object" ? purchase.vendor : null;
-
-  const submitPayment = async () => {
-    if (!amount || amount <= 0) {
-      toast.error("Enter an amount");
-      return;
-    }
-    try {
-      await recordPayment({
-        id: purchase._id,
-        data: { amount, paymentMethod: method },
-      }).unwrap();
-      toast.success("Payment recorded");
-      setPaying(false);
-      setAmount(null);
-    } catch (error: any) {
-      toast.error(error?.data?.message || "Could not record the payment");
-    }
-  };
 
   return (
     <div>
@@ -89,15 +67,20 @@ const PurchaseView = () => {
             >
               All bills
             </Button>
+            <PermissionGate module="Purchases" action="Update">
+              <Button
+                icon={<Edit className="h-4 w-4" />}
+                onClick={() => navigate(`/purchases/${purchase._id}/edit`)}
+              >
+                Edit
+              </Button>
+            </PermissionGate>
             {purchase.due > 0 && (
               <PermissionGate module="Purchases" action="Update">
                 <Button
                   type="primary"
                   icon={<Wallet className="h-4 w-4" />}
-                  onClick={() => {
-                    setAmount(purchase.due);
-                    setPaying(true);
-                  }}
+                  onClick={() => setPaying(true)}
                   className="!border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 shadow-primary"
                 >
                   Record Payment
@@ -260,39 +243,33 @@ const PurchaseView = () => {
         </SectionCard>
       </div>
 
-      <Modal
-        open={paying}
-        onCancel={() => setPaying(false)}
-        title="Record a payment"
-        okText="Record"
-        confirmLoading={saving}
-        onOk={submitPayment}
-      >
-        <p className="mb-3 text-sm text-secondary-500">
-          Owing on this bill: <Money value={purchase.due} />
-        </p>
-        <label className="mb-1 block text-[13px] font-medium text-secondary-700">
-          Amount
-        </label>
-        <InputNumber
-          min={0}
-          max={purchase.due}
-          value={amount}
-          onChange={(value) => setAmount(value == null ? null : Number(value))}
-          className="mb-3 w-full"
+      {/*
+        The same payment screen the vendor's own page uses, pre-pointed at this
+        bill. Paying from where the debt is written down is the natural place
+        to do it, and using one form for both means a payment made here carries
+        the method, date and reference a payment made there does.
+      */}
+      {paying && vendor && (
+        <VendorPaymentModal
+          open
+          setOpen={() => setPaying(false)}
+          vendor={{
+            _id: vendor._id,
+            name: vendor.name,
+            totalDue: purchase.due,
+          }}
+          bills={[
+            {
+              _id: purchase._id,
+              purchaseNo: purchase.purchaseNo,
+              billNo: purchase.billNo,
+              purchaseDate: purchase.purchaseDate,
+              grandTotal: purchase.grandTotal,
+              due: purchase.due,
+            },
+          ]}
         />
-        <label className="mb-1 block text-[13px] font-medium text-secondary-700">
-          Method
-        </label>
-        <Select
-          value={method}
-          onChange={setMethod}
-          className="w-full"
-          options={Object.entries(PAYMENT_METHOD_LABELS).map(
-            ([value, label]) => ({ value, label })
-          )}
-        />
-      </Modal>
+      )}
     </div>
   );
 };

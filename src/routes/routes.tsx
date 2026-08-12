@@ -138,6 +138,7 @@ const routes = [
           { path: "new", element: <PurchaseForm /> },
           { path: "payables", element: <Receivables mode="payable" /> },
           { path: "payments", element: <VendorPayments /> },
+          { path: ":id/edit", element: <PurchaseForm /> },
           { path: ":id", element: <PurchaseView /> },
         ],
       },

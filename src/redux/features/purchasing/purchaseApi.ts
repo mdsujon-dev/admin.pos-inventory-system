@@ -124,6 +124,34 @@ const purchaseApi = baseApi.injectEndpoints({
       ],
     }),
 
+    /**
+     * "full" while none of the bill's stock has been sold, "details" once some
+     * has — see the note in the service. The form asks before it opens.
+     */
+    getPurchaseEditableScope: builder.query({
+      query: (id: string) => ({
+        url: `/purchases/${id}/editable`,
+        method: "GET",
+      }),
+      providesTags: ["purchases", "stock-lots"],
+    }),
+
+    updatePurchase: builder.mutation({
+      query: ({ id, data }: { id: string; data: Record<string, unknown> }) => ({
+        url: `/purchases/${id}`,
+        method: "PUT",
+        body: data,
+      }),
+      // An edit rebuilds the batches, so stock and every money report move.
+      invalidatesTags: [
+        "purchases",
+        "vendors",
+        "products",
+        "stock-lots",
+        "reports",
+      ],
+    }),
+
     recordPurchasePayment: builder.mutation({
       query: ({ id, data }: { id: string; data: Record<string, unknown> }) => ({
         url: `/purchases/${id}/payment`,
@@ -141,6 +169,8 @@ export const {
   useGetPurchaseByIdQuery,
   useGetVendorLedgerQuery,
   useGetProductLotsQuery,
+  useGetPurchaseEditableScopeQuery,
   useCreatePurchaseMutation,
+  useUpdatePurchaseMutation,
   useRecordPurchasePaymentMutation,
 } = purchaseApi;
