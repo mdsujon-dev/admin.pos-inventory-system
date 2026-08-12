@@ -219,9 +219,20 @@ const VendorForm = () => {
         <div className="flex flex-1 flex-col gap-4">
           <SectionCard
             icon={Warehouse}
-            title="Who they are"
-            subtitle="The phone number is the identity — one number, one supplier"
+            title="Vendor Information"
+            subtitle="Complete the vendor profile by filling in the details below"
           >
+            {/* --- Section 1: Who they are --- */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
+                <div className="bg-primary/10 p-2 rounded-lg text-primary">
+                  <Warehouse className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-secondary-900 leading-tight">Who they are</h3>
+                  <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">The phone number is the identity — one number, one supplier</p>
+                </div>
+              </div>
             <div className="grid gap-x-4 sm:grid-cols-2 lg:grid-cols-4">
               <FormInput
                 label="Contact Name"
@@ -324,13 +335,19 @@ const VendorForm = () => {
             <Form.Item label="Status" name="isActive" valuePropName="checked" className="!mb-0">
               <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
             </Form.Item>
-          </SectionCard>
+            </div>
 
-          <SectionCard
-            icon={Boxes}
-            title="What they supply"
-            subtitle="Headings rather than a product list — this is what answers 'who do we call for this'"
-          >
+            {/* --- Section 2: What they supply --- */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
+                <div className="bg-primary/10 p-2 rounded-lg text-primary">
+                  <Boxes className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-secondary-900 leading-tight">What they supply</h3>
+                  <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">Headings rather than a product list — this is what answers 'who do we call for this'</p>
+                </div>
+              </div>
             <div className="grid gap-x-4 sm:grid-cols-2">
               <FormSelect
                 label="Categories"
@@ -365,13 +382,19 @@ const VendorForm = () => {
                 }))}
               />
             </div>
-          </SectionCard>
+            </div>
 
-          <SectionCard
-            icon={Handshake}
-            title="Terms"
-            subtitle="What we promised them, and what they promised us — kept apart so a dispute has an answer"
-          >
+            {/* --- Section 3: Terms --- */}
+            <div className="mb-8">
+              <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
+                <div className="bg-primary/10 p-2 rounded-lg text-primary">
+                  <Handshake className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-secondary-900 leading-tight">Terms</h3>
+                  <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">What we promised them, and what they promised us — kept apart so a dispute has an answer</p>
+                </div>
+              </div>
             <Form.List name="paymentTerms">
               {(fields, { add, remove }) => (
                 <div className="flex flex-col gap-3">
@@ -424,13 +447,19 @@ const VendorForm = () => {
                 </div>
               )}
             </Form.List>
-          </SectionCard>
+            </div>
 
-          <SectionCard
-            icon={Banknote}
-            title="How they get paid"
-            subtitle="Written down once instead of asked for every time"
-          >
+            {/* --- Section 4: How they get paid --- */}
+            <div className="mb-4">
+              <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
+                <div className="bg-primary/10 p-2 rounded-lg text-primary">
+                  <Banknote className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-semibold text-secondary-900 leading-tight">How they get paid</h3>
+                  <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">Written down once instead of asked for every time</p>
+                </div>
+              </div>
             <Form.List name="paymentMethods">
               {(fields, { add, remove }) => (
                 <div className="flex flex-col gap-4">
@@ -651,6 +680,7 @@ const VendorForm = () => {
                 </div>
               )}
             </Form.List>
+            </div>
           </SectionCard>
 
           <div className="sticky bottom-0 z-30 -mx-3 -mb-3 mt-auto flex h-[70px] items-center justify-end gap-3 border-t border-primary/20 bg-white/80 px-3 backdrop-blur-lg sm:-mx-4 sm:-mb-4 sm:px-6">
