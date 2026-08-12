@@ -101,8 +101,8 @@ const AdminMenu = () => {
                       : "text-secondary-600 hover:bg-primary-50 hover:text-primary hover:shadow-sm"
                   } flex items-center transition-all duration-300 transform rounded-[7px] font-display cursor-pointer group ${
                     isCollapsed 
-                      ? "justify-center px-3 py-2.5" 
-                      : "justify-between px-4 py-2.5"
+                      ? `justify-center px-3 ${isParentActive(route.submenus) || isOpen(route.label) ? "py-2.5" : "py-1.5"}` 
+                      : `justify-between px-4 ${isParentActive(route.submenus) || isOpen(route.label) ? "py-2.5" : "py-1.5"}`
                   }`}
                 >
                   <div

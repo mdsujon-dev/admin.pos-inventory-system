@@ -588,7 +588,10 @@ const PurchaseForm = () => {
             </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <Field label="Bill discount">
+          <Field
+            label="Bill discount"
+            tooltip="Flat discount applied to the entire bill by the vendor"
+          >
             <InputNumber
               min={0}
               value={discount || null}
@@ -597,7 +600,10 @@ const PurchaseForm = () => {
               className="w-full"
             />
           </Field>
-          <Field label="Shipping / freight">
+          <Field
+            label="Shipping / freight"
+            tooltip="Transportation or delivery cost to bring the products from the vendor"
+          >
             <InputNumber
               min={0}
               value={shippingCost || null}
@@ -659,7 +665,7 @@ const PurchaseForm = () => {
               </Field>
               <Field
                 label="Paid now"
-                hint="Leave blank to pay the bill in full"
+                tooltip="Leave blank to pay the bill in full"
               >
                 <InputNumber
                   min={0}
@@ -674,8 +680,17 @@ const PurchaseForm = () => {
               </Field>
             </>
           ) : (
-            <div className="sm:col-span-2 flex items-center">
-              <p className="m-0 rounded-lg bg-danger/5 px-3 py-2 text-[13px] text-danger">
+            <div className="sm:col-span-2">
+              {/* A blank label, so this lines up with the control beside it —
+                  without one the message starts where the other fields' labels
+                  are and sits a row too high. */}
+              <label
+                aria-hidden
+                className="mb-1 block select-none text-[13px] font-medium text-transparent"
+              >
+                &nbsp;
+              </label>
+              <p className="m-0 flex min-h-[32px] items-center rounded-lg bg-danger/5 px-3 text-[13px] leading-snug text-danger">
                 The whole bill stays owing to {vendorName || "this vendor"}. Pay
                 it later from the bill or their page.
               </p>
@@ -684,10 +699,12 @@ const PurchaseForm = () => {
 
           <div className="sm:col-span-2">
             <Field label="Note">
-              <Input
+              <Input.TextArea
                 value={note}
                 onChange={(event) => setNote(event.target.value)}
                 placeholder="Optional"
+                className="w-full"
+                autoSize={{ minRows: 2, maxRows: 5 }}
               />
             </Field>
           </div>
@@ -788,15 +805,22 @@ const PurchaseForm = () => {
 const Field = ({
   label,
   hint,
+  tooltip,
   children,
 }: {
   label: string;
   hint?: string;
+  tooltip?: string;
   children: React.ReactNode;
 }) => (
   <div className="min-w-0">
-    <label className="mb-1 block text-[13px] font-medium text-secondary-700">
+    <label className="mb-1 flex items-center gap-1.5 text-[13px] font-medium text-secondary-700">
       {label}
+      {tooltip && (
+        <Tooltip title={tooltip}>
+          <Info className="h-3.5 w-3.5 text-secondary-400" />
+        </Tooltip>
+      )}
     </label>
     {children}
     {hint && (

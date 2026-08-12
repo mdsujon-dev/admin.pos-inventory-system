@@ -24,10 +24,10 @@ export const SubMenuItem: FC<SubMenuItemProps> = ({
       end={exactMatch}
       onClick={onClick}
       className={({ isActive }) =>
-        `relative flex items-center gap-2.5 font-display py-2.5 px-3 rounded-[7px] transition-all duration-300 group min-w-0 ${
+        `relative flex items-center gap-2.5 font-display px-3 rounded-[7px] transition-all duration-300 group min-w-0 ${
           isActive
-            ? "bg-primary-50 text-primary font-semibold"
-            : "text-secondary-500 hover:text-primary hover:bg-primary-50/50"
+            ? "bg-primary-50 text-primary font-semibold py-2.5"
+            : "text-secondary-500 hover:text-primary hover:bg-primary-50/50 py-1.5"
         }`
       }
     >
