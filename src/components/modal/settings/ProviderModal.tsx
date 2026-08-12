@@ -93,7 +93,7 @@ const ProviderModal = ({
         label="Provider Type"
         name="type"
         rules={[{ required: true, message: "Type is required" }]}
-        help="Decides which fields a vendor's payment method asks for"
+        tooltip="Decides which fields a vendor's payment method asks for"
         options={[
           { label: "Bank", value: "Bank" },
           { label: "Mobile Banking", value: "Mobile Banking" },

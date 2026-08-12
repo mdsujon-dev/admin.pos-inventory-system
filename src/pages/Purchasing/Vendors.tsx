@@ -8,7 +8,6 @@ import { toast } from "react-toastify";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import PermissionGate from "../../components/Common/PermissionGate";
-import VendorModal from "../../components/modal/purchasing/VendorModal";
 import Money from "../../components/shared/Money";
 import DataTable from "../../components/Table/DataTable";
 import {
@@ -26,8 +25,6 @@ const Vendors = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [searchText, setSearchText] = useState("");
-  const [isOpenModal, setIsOpenModal] = useState(false);
-  const [selected, setSelected] = useState<IVendor | null>(null);
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
   const { data, isFetching } = useGetVendorsQuery([
@@ -212,10 +209,7 @@ const Vendors = () => {
             <Tooltip title="Edit">
               <Button
                 icon={<Edit className="h-4 w-4" />}
-                onClick={() => {
-                  setSelected(record);
-                  setIsOpenModal(true);
-                }}
+                onClick={() => navigate(`/vendors/${record._id}/edit`)}
               />
             </Tooltip>
           </PermissionGate>
@@ -253,10 +247,7 @@ const Vendors = () => {
             <Button
               type="primary"
               icon={<Plus className="h-4 w-4" />}
-              onClick={() => {
-                setSelected(null);
-                setIsOpenModal(true);
-              }}
+              onClick={() => navigate("/vendors/new")}
               className="!border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 shadow-primary"
             >
               Add Vendor

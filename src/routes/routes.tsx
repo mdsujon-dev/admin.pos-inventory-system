@@ -44,6 +44,7 @@ import PurchaseForm from "../pages/Purchasing/PurchaseForm.tsx";
 import VendorPayments from "../pages/Purchasing/VendorPayments.tsx";
 import Purchases from "../pages/Purchasing/Purchases.tsx";
 import PurchaseView from "../pages/Purchasing/PurchaseView.tsx";
+import VendorForm from "../pages/Purchasing/VendorForm.tsx";
 import VendorProfile from "../pages/Purchasing/VendorProfile.tsx";
 import Vendors from "../pages/Purchasing/Vendors.tsx";
 import InvoiceView from "../pages/Sales/InvoiceView.tsx";
@@ -123,6 +124,9 @@ const routes = [
         path: "vendors",
         children: [
           { path: "", element: <Vendors /> },
+          // Before ":id", or "new" is read as a vendor id.
+          { path: "new", element: <VendorForm /> },
+          { path: ":id/edit", element: <VendorForm /> },
           { path: ":id", element: <VendorProfile /> },
         ],
       },

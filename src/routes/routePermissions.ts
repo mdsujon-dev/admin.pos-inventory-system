@@ -72,6 +72,8 @@ export const routePermissions: Record<string, RoutePermission> = {
 
   // Buying
   "/vendors": { module: "Vendors", action: "View" },
+  "/vendors/new": { module: "Vendors", action: "Create" },
+  "/vendors/:id/edit": { module: "Vendors", action: "Update" },
   "/vendors/:id": { module: "Vendors", action: "View" },
   "/purchases": { module: "Purchases", action: "View" },
   "/purchases/new": { module: "Purchases", action: "Create" },

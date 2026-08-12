@@ -7,6 +7,14 @@ import { ISubCategory } from "../inventory/subCategoryApi";
 /** Populated on a read, sent back as plain ids on a write. */
 type Ref<T> = T | string;
 
+export type TermSide = "ours" | "vendor";
+
+/** One agreed condition, and whose promise it is. */
+export interface ITradeTerm {
+  side: TermSide;
+  text: string;
+}
+
 export interface IPaymentMethod {
   methodType: string;
   provider?: string;
@@ -39,8 +47,8 @@ export interface IVendor {
   subCategories: Ref<Pick<ISubCategory, "_id" | "name">>[];
 
   /** How they get paid, written down once instead of asked for every time. */
-  paymentTerms?: string;
-  creditDays?: number;
+  /** What each side has agreed to — ours and theirs, kept apart. */
+  paymentTerms: ITradeTerm[];
   paymentMethods?: IPaymentMethod[];
 
   /** Written by purchases, never by the edit form. */

@@ -83,7 +83,7 @@ const InventoryFormModal = ({
           position: "relative",
           overflow: "hidden",
           margin: "-20px -24px 0",
-          padding: "8px 24px",
+          padding: "16px 24px 12px",
           borderRadius: "8px 8px 0 0",
           background:
             "linear-gradient(100deg, #017527 0%, #019532 48%, #09ae40 100%)",
