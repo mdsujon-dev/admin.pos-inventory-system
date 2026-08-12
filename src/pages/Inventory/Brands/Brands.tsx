@@ -1,6 +1,6 @@
 import { Button, Image, Input, Modal, Space, Switch, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { Edit, Plus, Search, Trash2 } from "lucide-react";
+import { Edit, Image as ImageIcon, Plus, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import ExportMenu from "../../../components/Common/ExportMenu";
@@ -105,7 +105,9 @@ const Brands = () => {
             style={{ objectFit: "contain", borderRadius: 6 }}
           />
         ) : (
-          <div className="h-[42px] w-[42px] shrink-0 rounded-md bg-secondary-100" />
+          <div className="flex h-[42px] w-[42px] shrink-0 items-center justify-center rounded-md bg-secondary-100 text-secondary-400">
+            <ImageIcon className="h-5 w-5" />
+          </div>
         ),
     },
     {

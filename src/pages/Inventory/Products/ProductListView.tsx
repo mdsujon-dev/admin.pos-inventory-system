@@ -1,7 +1,7 @@
 import { Button, Image, Input, Modal, Select, Space, Switch, Tag, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
-import { Edit, Search, Trash2 } from "lucide-react";
+import { Edit, Image as ImageIcon, Search, Trash2 } from "lucide-react";
 import { ReactNode, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -147,7 +147,9 @@ const ProductListView = ({
                 style={{ objectFit: "cover", borderRadius: 6 }}
               />
             ) : (
-              <div className="w-[42px] h-[42px] rounded-md bg-secondary-100 shrink-0" />
+              <div className="flex w-[42px] h-[42px] shrink-0 items-center justify-center rounded-md bg-secondary-100 text-secondary-400">
+                <ImageIcon className="h-5 w-5" />
+              </div>
             )}
             <div className="min-w-0">
               <p className="font-semibold text-secondary-800 m-0 truncate">
