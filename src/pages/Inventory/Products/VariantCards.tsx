@@ -73,7 +73,7 @@ const MultiImageSlot = ({
         {values.map((val, idx) => {
           const src = val.startsWith("http") ? val : `${config.image_access_url}${val}`;
           return (
-            <div key={idx} className="relative h-[86px] w-[86px] overflow-hidden rounded-lg border border-secondary-200">
+            <div key={idx} className="relative h-[120px] w-[120px] overflow-hidden rounded-lg border border-secondary-200">
               <img src={src} alt="variant" className="h-full w-full object-cover" />
               <button
                 type="button"
@@ -83,17 +83,17 @@ const MultiImageSlot = ({
                 }}
                 className="absolute right-1 top-1 rounded bg-white/90 p-1 text-danger shadow-sm hover:bg-red-50"
               >
-                <Trash2 className="h-3.5 w-3.5" />
+                <Trash2 className="h-4 w-4" />
               </button>
             </div>
           );
         })}
         <div
           onClick={() => setOpen(true)}
-          className="flex h-[86px] w-[86px] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-secondary-300 bg-secondary-50 text-secondary-400 transition-colors hover:border-primary hover:bg-primary-50/40 hover:text-primary"
+          className="flex h-32 w-32 cursor-pointer flex-col items-center justify-center gap-2 rounded-lg border border-dashed border-secondary-300 bg-secondary-50 text-secondary-500 transition-colors hover:border-primary-400 hover:text-primary"
         >
-          <Plus className="h-5 w-5" />
-          <span className="text-[11px] font-medium">Upload</span>
+          <Plus className="h-6 w-6 text-secondary-400" />
+          <span className="text-sm">Upload</span>
         </div>
       </div>
 
@@ -372,14 +372,13 @@ const VariantCards = ({
                 hint="What sets this variant apart from the others"
               >
                 <Input.TextArea
-                  rows={3}
+                  rows={4}
                   value={variant.description ?? ""}
                   onChange={(e) =>
                     onChange(variant.key, { description: e.target.value })
                   }
                   placeholder="Optional — e.g. 500g glass jar, screw cap"
                   maxLength={2000}
-                  showCount
                 />
               </Field>
 

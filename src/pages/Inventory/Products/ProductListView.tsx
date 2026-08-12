@@ -23,6 +23,13 @@ import {
 
 const { confirm } = Modal;
 
+/** "today" / "1 day ago" / "12 days ago" — compared by calendar day. */
+const daysSince = (date: string) => {
+  const days = dayjs().startOf("day").diff(dayjs(date).startOf("day"), "day");
+  if (days <= 0) return "today";
+  return days === 1 ? "1 day ago" : `${days} days ago`;
+};
+
 /** Any of the three product query hooks — they share a request/response shape. */
 type ProductQueryHook = (args: { name: string; value: any }[]) => {
   data?: any;
@@ -220,7 +227,6 @@ const ProductListView = ({
       key: "stock",
       width: 120,
       render: (_, record) => {
-        const unit = refName(record.unit);
         return (
           <div className="flex items-center gap-2">
             <span
@@ -232,7 +238,6 @@ const ProductListView = ({
             >
               {record.totalQuantity}
             </span>
-            {unit && <span className="text-xs text-secondary-400">{unit}</span>}
           </div>
         );
       },
@@ -242,21 +247,87 @@ const ProductListView = ({
           {
             title: "Expired On",
             key: "nearestExpiryDate",
-            width: 150,
-            render: (_: unknown, record: IProduct) =>
-              record.nearestExpiryDate ? (
-                <div>
-                  <p className="m-0 text-danger font-medium">
-                    {dayjs(record.nearestExpiryDate).format("DD MMM YYYY")}
-                  </p>
-                  <span className="text-xs text-secondary-400">
-                    {dayjs().diff(dayjs(record.nearestExpiryDate), "day")} days
-                    ago
-                  </span>
+            width: 330,
+            render: (_: unknown, record: IProduct) => {
+              if (!record.nearestExpiryDate) {
+                return <span className="text-secondary-400">—</span>;
+              }
+
+              // On a variable product the date above is only the earliest of
+              // its variants, which on its own does not say what to pull off
+              // the shelf. The rows that actually expired are named here.
+              const expired = (record.variants ?? [])
+                .filter(
+                  (variant) =>
+                    variant.expiryDate &&
+                    dayjs(variant.expiryDate).isBefore(dayjs())
+                )
+                .sort(
+                  (a, b) =>
+                    dayjs(a.expiryDate!).valueOf() -
+                    dayjs(b.expiryDate!).valueOf()
+                );
+
+              const label = (variant: (typeof expired)[number]) =>
+                `${variant.name || variant.sku} — ${dayjs(
+                  variant.expiryDate!
+                ).format("DD MMM YYYY")}`;
+
+              const isVariable =
+                record.type === "variable" && expired.length > 0;
+
+              // Date on the left, the variants that caused it alongside — one
+              // stacked under the other doubled the height of every row on the
+              // screen for two short tags.
+              return (
+                <div className="flex items-center gap-3">
+                  <div className="shrink-0">
+                    <p className="m-0 font-medium leading-tight text-danger">
+                      {dayjs(record.nearestExpiryDate).format("DD MMM YYYY")}
+                    </p>
+                    <span className="text-xs text-secondary-400">
+                      {daysSince(record.nearestExpiryDate)}
+                      {isVariable &&
+                        ` · ${expired.length} of ${
+                          record.variants?.length ?? 0
+                        } expired`}
+                    </span>
+                  </div>
+
+                  {isVariable && (
+                    <div className="flex min-w-0 flex-wrap items-center gap-1">
+                      {expired.slice(0, 2).map((variant) => (
+                        <Tooltip
+                          key={variant._id ?? variant.sku}
+                          title={label(variant)}
+                        >
+                          <Tag className="!m-0 !max-w-[110px] !truncate !border-danger/30 !bg-danger/10 !px-1.5 !text-[11px] !text-danger">
+                            {variant.name || variant.sku}
+                          </Tag>
+                        </Tooltip>
+                      ))}
+                      {expired.length > 2 && (
+                        <Tooltip
+                          title={
+                            <div className="space-y-0.5">
+                              {expired.slice(2).map((variant) => (
+                                <div key={variant._id ?? variant.sku}>
+                                  {label(variant)}
+                                </div>
+                              ))}
+                            </div>
+                          }
+                        >
+                          <Tag className="!m-0 !px-1.5 !text-[11px]">
+                            +{expired.length - 2}
+                          </Tag>
+                        </Tooltip>
+                      )}
+                    </div>
+                  )}
                 </div>
-              ) : (
-                <span className="text-secondary-400">—</span>
-              ),
+              );
+            },
           },
         ] as ColumnsType<IProduct>)
       : []),

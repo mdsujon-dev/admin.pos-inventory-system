@@ -9,7 +9,7 @@ import {
   setRole,
 } from "../redux/features/auth/authSlice";
 import { useMyProfileQuery } from "../redux/features/user/userApi";
-import { hasPermission, isSuperAdmin } from "../utils/permission";
+import { hasPermission } from "../utils/permission";
 import { getRoutePermission } from "./routePermissions";
 
 interface ProtectedRouteProps {

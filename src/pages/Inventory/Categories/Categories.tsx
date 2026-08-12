@@ -106,7 +106,7 @@ const Categories = () => {
             style={{ objectFit: "cover", borderRadius: 6 }}
           />
         ) : (
-          <span className="text-secondary-400">—</span>
+          <div className="h-[42px] w-[42px] shrink-0 rounded-md bg-secondary-100" />
         ),
     },
     {

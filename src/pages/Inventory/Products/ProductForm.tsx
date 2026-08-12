@@ -11,7 +11,6 @@ import {
 import dayjs from "dayjs";
 import {
   Boxes,
-  ImageIcon,
   Layers,
   Package,
   Percent,
@@ -35,7 +34,10 @@ import SubCategoryModal from "../../../components/modal/inventory/SubCategoryMod
 import UnitModal from "../../../components/modal/inventory/UnitModal";
 import { Loading } from "../../../components/shared/Loading";
 import UploadImage from "../../../components/shared/UploadImage";
-import { IBrand, useGetBrandsQuery } from "../../../redux/features/inventory/brandApi";
+import {
+  IBrand,
+  useGetBrandsQuery,
+} from "../../../redux/features/inventory/brandApi";
 import {
   ICategory,
   useGetCategoriesQuery,
@@ -52,14 +54,16 @@ import {
   ISubCategory,
   useGetSubCategoriesQuery,
 } from "../../../redux/features/inventory/subCategoryApi";
-import { IUnit, useGetUnitsQuery } from "../../../redux/features/inventory/unitApi";
+import {
+  IUnit,
+  useGetUnitsQuery,
+} from "../../../redux/features/inventory/unitApi";
 import {
   IVariantAttribute,
   useGetVariantAttributesQuery,
 } from "../../../redux/features/inventory/variantAttributeApi";
 import Money from "../../../components/shared/Money";
 import {
-  FormHero,
   SectionCard,
   StatTile,
   TypePicker,
@@ -148,7 +152,7 @@ const ProductForm = () => {
   // fallback would be a new array each render and re-filter every time.
   const subCategories: ISubCategory[] = useMemo(
     () => subCategoryData?.data?.data || [],
-    [subCategoryData]
+    [subCategoryData],
   );
   const brands: IBrand[] = brandData?.data?.data || [];
   const units: IUnit[] = unitData?.data?.data || [];
@@ -161,10 +165,8 @@ const ProductForm = () => {
   const purchasePrice = Form.useWatch("purchasePrice", form) ?? 0;
   const extraCost = Form.useWatch("cost", form) ?? 0;
   const sellingPrice = Form.useWatch("sellingPrice", form) ?? 0;
-  // Watched for the banner and the pricing read-outs rather than for the
-  // fields themselves, which AntD already owns.
-  const nameValue = Form.useWatch("name", form) ?? "";
-  const unitValue = Form.useWatch("unit", form);
+  // Watched for the pricing read-outs rather than for the fields themselves,
+  // which AntD already owns.
   const discountPrice = Form.useWatch("discountPrice", form);
   const quantity = Form.useWatch("quantity", form) ?? 0;
   const isActive = Form.useWatch("isActive", form) ?? true;
@@ -177,9 +179,9 @@ const ProductForm = () => {
   const availableSubCategories = useMemo(
     () =>
       subCategories.filter(
-        (subCategory) => categoryOf(subCategory)?._id === selectedCategory
+        (subCategory) => categoryOf(subCategory)?._id === selectedCategory,
       ),
-    [subCategories, selectedCategory]
+    [subCategories, selectedCategory],
   );
 
   const initialValues = useMemo(() => {
@@ -285,11 +287,11 @@ const ProductForm = () => {
       const badDiscount = variants.find(
         (variant) =>
           variant.discountPrice != null &&
-          variant.discountPrice > variant.sellingPrice
+          variant.discountPrice > variant.sellingPrice,
       );
       if (badDiscount) {
         toast.error(
-          `"${badDiscount.name}" has a discount price above its selling price`
+          `"${badDiscount.name}" has a discount price above its selling price`,
         );
         return;
       }
@@ -372,7 +374,7 @@ const ProductForm = () => {
     } catch (error: any) {
       toast.error(
         error?.data?.message ||
-          `Failed to ${isEditing ? "update" : "create"} product`
+          `Failed to ${isEditing ? "update" : "create"} product`,
       );
     }
   };
@@ -390,23 +392,6 @@ const ProductForm = () => {
   const profit = effectivePrice - totalCost;
   const margin = effectivePrice > 0 ? (profit / effectivePrice) * 100 : 0;
   const stockValue = totalCost * (Number(quantity) || 0);
-
-  /** What the save button is still waiting on, shown in the banner. */
-  const requirements = [
-    { label: "Name", done: Boolean(String(nameValue).trim()) },
-    { label: "Category", done: Boolean(selectedCategory) },
-    { label: "Unit", done: Boolean(unitValue) },
-    productType === "single"
-      ? { label: "Selling price", done: listPrice > 0 }
-      : {
-          label: "Variants",
-          done:
-            variants.length > 0 &&
-            variants.every(
-              (variant) => variant.name?.trim() && variant.sku?.trim()
-            ),
-        },
-  ];
 
   return (
     /* Tall enough to reach the bottom of the scroll area even when the form is
@@ -446,13 +431,6 @@ const ProductForm = () => {
         className="flex flex-1 flex-col"
       >
         <div className="flex flex-1 flex-col gap-4">
-          <FormHero
-            title={String(nameValue).trim()}
-            sku={String(skuValue).trim().toUpperCase()}
-            typeLabel={productType === "single" ? "Single" : "Variable"}
-            requirements={requirements}
-          />
-
           <SectionCard
             icon={Boxes}
             title="Product Details"
@@ -547,7 +525,12 @@ const ProductForm = () => {
                 <DatePicker className="w-full" placeholder="Optional" />
               </Form.Item>
               <Form.Item label="Weight" name="weight">
-                <InputNumber type="number" min={0} className="w-full" placeholder="Optional" />
+                <InputNumber
+                  type="number"
+                  min={0}
+                  className="w-full"
+                  placeholder="Optional"
+                />
               </Form.Item>
             </div>
 
@@ -558,14 +541,12 @@ const ProductForm = () => {
             >
               <Input.TextArea rows={4} placeholder="Optional description" />
             </Form.Item>
-          </SectionCard>
 
-          <SectionCard
-            icon={ImageIcon}
-            title="Product Image"
-            subtitle="The first one is what lists and receipts show"
-          >
-            <Form.Item name="images" className="!mb-0">
+            <Form.Item 
+              label="Product Images" 
+              name="images" 
+              tooltip="The first one is what lists and receipts show"
+            >
               <UploadImage form={form} fieldPath="images" mode="multiple" />
             </Form.Item>
           </SectionCard>
@@ -590,7 +571,12 @@ const ProductForm = () => {
                 <Form.Item label="Total Cost" tooltip="Purchase Price + Cost">
                   {/* Read-only: the server derives this, so an editable field
                       here would just be a second answer to the same sum. */}
-                  <InputNumber type="number" value={totalCost} disabled className="w-full" />
+                  <InputNumber
+                    type="number"
+                    value={totalCost}
+                    disabled
+                    className="w-full"
+                  />
                 </Form.Item>
                 <Form.Item
                   label="Selling Price"
@@ -613,15 +599,25 @@ const ProductForm = () => {
                         value == null || value <= (Number(sellingPrice) || 0)
                           ? Promise.resolve()
                           : Promise.reject(
-                              "Cannot be higher than the selling price"
+                              "Cannot be higher than the selling price",
                             ),
                     },
                   ]}
                 >
-                  <InputNumber type="number" min={0} className="w-full" placeholder="Optional" />
+                  <InputNumber
+                    type="number"
+                    min={0}
+                    className="w-full"
+                    placeholder="Optional"
+                  />
                 </Form.Item>
                 <Form.Item label="Current Stock" name="quantity">
-                  <InputNumber type="number" min={0} precision={0} className="w-full" />
+                  <InputNumber
+                    type="number"
+                    min={0}
+                    precision={0}
+                    className="w-full"
+                  />
                 </Form.Item>
 
                 <FormInput
@@ -637,8 +633,8 @@ const ProductForm = () => {
                           "barcode",
                           generateBarcode(
                             String(skuValue),
-                            String(form.getFieldValue("name") ?? "")
-                          )
+                            String(form.getFieldValue("name") ?? ""),
+                          ),
                         )
                       }
                       className="font-medium text-primary transition-colors hover:text-primary-700"
@@ -709,8 +705,6 @@ const ProductForm = () => {
                 </Button>
               }
             >
-
-
               {attributes.length > 0 && (
                 <>
                   {/* Tinted so the builder reads as a tool sitting above the
@@ -763,51 +757,28 @@ const ProductForm = () => {
             </SectionCard>
           )}
 
-          <SectionCard
-            icon={Power}
-            title="Status"
-            subtitle="Whether the till can sell this"
-          >
-            {/* The panel takes the colour of the state it is in, so the answer
-                is readable from across the room rather than off a switch. */}
-            <div
-              className={`flex flex-wrap items-center justify-between gap-4 rounded-xl border p-3 transition-colors duration-300 ${
-                isActive
-                  ? "border-primary-200 bg-primary-50"
-                  : "border-secondary-200 bg-secondary-50"
+          {/* One line rather than a card: the whole control is a switch, and a
+              heading plus a panel around it was three times the height of the
+              thing it was labelling. The icon carries the state. */}
+          <div className="flex items-center gap-2.5 rounded-xl border border-secondary-100 bg-white px-4 py-3 shadow-card">
+            <Power
+              className={`h-4 w-4 transition-colors ${
+                isActive ? "text-primary" : "text-secondary-400"
               }`}
-            >
-              <div className="flex min-w-0 items-center gap-3">
-                <span
-                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-primary text-white"
-                      : "bg-secondary-200 text-secondary-600"
-                  }`}
-                >
-                  <Power className="h-4 w-4" />
-                </span>
-                <div className="min-w-0">
-                  <p
-                    className={`text-sm font-semibold ${
-                      isActive ? "text-primary-700" : "text-secondary-700"
-                    }`}
-                  >
-                    {isActive
-                      ? "Active — on sale at the till"
-                      : "Inactive — not sellable"}
-                  </p>
-                  <p className="text-xs text-secondary-500">
-                    An inactive product stays in the catalog and keeps its
-                    stock; it just cannot be rung up.
-                  </p>
-                </div>
-              </div>
-              <Form.Item name="isActive" valuePropName="checked" className="!mb-0">
+            />
+            <span className="text-sm font-medium text-secondary-700">
+              Status
+            </span>
+            <div className="ml-auto flex items-center">
+              <Form.Item
+                name="isActive"
+                valuePropName="checked"
+                noStyle
+              >
                 <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
               </Form.Item>
             </div>
-          </SectionCard>
+          </div>
 
           {/* The header's twin at the other end of the screen: same glass,
               pinned the same way, a touch shorter than the 70px top band.
