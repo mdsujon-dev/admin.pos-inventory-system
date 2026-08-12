@@ -1,57 +1,112 @@
-import { DatePicker, Table } from "antd";
+import { DatePicker, Tabs } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { ArrowDownLeft, ArrowUpRight, Wallet, Landmark } from "lucide-react";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import Money from "../../components/shared/Money";
+import DataTable from "../../components/Table/DataTable";
 import { useGetCashFlowQuery } from "../../redux/features/accounts/reportApi";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
-import { SectionCard } from "../Inventory/Products/ProductFormUI";
 import { MetricCard } from "../../components/Common/MetricCard";
 
 const { RangePicker } = DatePicker;
 
-const MethodTable = ({
-  rows,
-  loading,
+interface MethodGroup {
+  _id: string | null;
+  amount: number;
+  count: number;
+}
+
+interface FlowRow {
+  key: string;
+  source: string;
+  method: string;
+  count: number;
+  amount: number;
+}
+
+/**
+ * Flattens the report's separate buckets into one list.
+ *
+ * Sales and other income are two questions on the way in, suppliers and
+ * running costs two on the way out — but they are all the same shape, and a
+ * reader comparing them wants one table to scan, not two stacked ones with
+ * their own headers.
+ */
+const toRows = (groups: { label: string; rows?: MethodGroup[] }[]): FlowRow[] =>
+  groups.flatMap(({ label, rows }) =>
+    (rows ?? []).map((row) => ({
+      key: `${label}-${row._id ?? "unspecified"}`,
+      source: label,
+      method: row._id
+        ? PAYMENT_METHOD_LABELS[row._id] ?? row._id
+        : "Not recorded",
+      count: row.count,
+      amount: row.amount,
+    }))
+  );
+
+const columns = [
+  {
+    title: "Source",
+    key: "source",
+    render: (_: unknown, row: FlowRow) => (
+      <span className="font-medium text-secondary-800">{row.source}</span>
+    ),
+  },
+  {
+    title: "Method",
+    key: "method",
+    render: (_: unknown, row: FlowRow) => (
+      <span className="text-secondary-600">{row.method}</span>
+    ),
+  },
+  {
+    title: "Entries",
+    key: "count",
+    width: 100,
+    render: (_: unknown, row: FlowRow) => row.count,
+  },
+  {
+    title: "Amount",
+    key: "amount",
+    width: 150,
+    align: "right" as const,
+    render: (_: unknown, row: FlowRow) => (
+      <span className="font-semibold text-secondary-800">
+        <Money value={row.amount} />
+      </span>
+    ),
+  },
+];
+
+/** The tab label: what it is, and what it came to. */
+const TabLabel = ({
+  icon: Icon,
+  title,
+  total,
+  accent,
 }: {
-  rows: { _id: string | null; amount: number; count: number }[];
-  loading?: boolean;
+  icon: React.ElementType;
+  title: string;
+  total: number;
+  accent: string;
 }) => (
-  <Table
-    dataSource={rows}
-    rowKey={(row) => String(row._id ?? "unspecified")}
-    loading={loading}
-    size="small"
-    pagination={false}
-    columns={[
-      {
-        title: "Method",
-        key: "method",
-        render: (_: unknown, row) =>
-          row._id
-            ? PAYMENT_METHOD_LABELS[row._id] ?? row._id
-            : "Not recorded",
-      },
-      {
-        title: "Entries",
-        key: "count",
-        width: 90,
-        render: (_: unknown, row) => row.count,
-      },
-      {
-        title: "Amount",
-        key: "amount",
-        width: 130,
-        render: (_: unknown, row) => (
-          <span className="font-semibold text-secondary-800">
-            <Money value={row.amount} />
-          </span>
-        ),
-      },
-    ]}
-  />
+  <span className="flex items-center gap-2 px-1 py-0.5">
+    <span
+      className="grid h-7 w-7 place-items-center rounded-lg text-white"
+      style={{ background: accent }}
+    >
+      <Icon className="h-[15px] w-[15px]" />
+    </span>
+    <span className="flex flex-col items-start leading-tight">
+      <span className="text-[13px] font-semibold">{title}</span>
+      <span className="text-[11px] font-normal text-secondary-400">
+        <Money value={total} />
+      </span>
+    </span>
+  </span>
 );
 
 /**
@@ -74,6 +129,24 @@ const CashFlow = () => {
   ]);
 
   const cash = data?.data;
+
+  const moneyIn = useMemo(
+    () =>
+      toRows([
+        { label: "Sales", rows: cash?.salesReceipts?.byMethod },
+        { label: "Other income", rows: cash?.otherIncome?.byMethod },
+      ]),
+    [cash]
+  );
+
+  const moneyOut = useMemo(
+    () =>
+      toRows([
+        { label: "Suppliers", rows: cash?.supplierPayments?.byMethod },
+        { label: "Running costs", rows: cash?.expensePayments?.byMethod },
+      ]),
+    [cash]
+  );
 
   return (
     <div>
@@ -136,47 +209,51 @@ const CashFlow = () => {
         />
       </div>
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <SectionCard
-          icon={ArrowDownLeft}
-          title="In"
-          subtitle="Sales receipts and anything typed into the ledger as income"
-        >
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-secondary-500">
-            Sales · <Money value={cash?.salesReceipts?.total ?? 0} />
-          </p>
-          <MethodTable
-            rows={cash?.salesReceipts?.byMethod ?? []}
-            loading={isFetching}
-          />
-          {(cash?.otherIncome?.total ?? 0) > 0 && (
-            <>
-              <p className="mb-2 mt-4 text-xs font-semibold uppercase tracking-wide text-secondary-500">
-                Other income · <Money value={cash?.otherIncome?.total ?? 0} />
-              </p>
-              <MethodTable rows={cash?.otherIncome?.byMethod ?? []} />
-            </>
-          )}
-        </SectionCard>
-
-        <SectionCard
-          icon={ArrowUpRight}
-          title="Out"
-          subtitle="Paid to suppliers, and the running costs of the shop"
-        >
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-secondary-500">
-            Suppliers · <Money value={cash?.supplierPayments?.total ?? 0} />
-          </p>
-          <MethodTable
-            rows={cash?.supplierPayments?.byMethod ?? []}
-            loading={isFetching}
-          />
-          <p className="mb-2 mt-4 text-xs font-semibold uppercase tracking-wide text-secondary-500">
-            Running costs · <Money value={cash?.expensePayments?.total ?? 0} />
-          </p>
-          <MethodTable rows={cash?.expensePayments?.byMethod ?? []} />
-        </SectionCard>
-      </div>
+      <Tabs
+        defaultActiveKey="in"
+        items={[
+          {
+            key: "in",
+            label: (
+              <TabLabel
+                icon={ArrowDownLeft}
+                title="In"
+                total={cash?.inflow ?? 0}
+                accent="#10b981"
+              />
+            ),
+            children: (
+              <DataTable
+                data={moneyIn}
+                columns={columns}
+                rowKey="key"
+                loading={isFetching}
+                emptyText="Nothing came in during this period"
+              />
+            ),
+          },
+          {
+            key: "out",
+            label: (
+              <TabLabel
+                icon={ArrowUpRight}
+                title="Out"
+                total={cash?.outflow ?? 0}
+                accent="#f43f5e"
+              />
+            ),
+            children: (
+              <DataTable
+                data={moneyOut}
+                columns={columns}
+                rowKey="key"
+                loading={isFetching}
+                emptyText="Nothing went out during this period"
+              />
+            ),
+          },
+        ]}
+      />
     </div>
   );
 };
