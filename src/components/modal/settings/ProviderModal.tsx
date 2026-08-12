@@ -7,7 +7,7 @@ import {
 } from "../../../redux/features/settings/paymentProviderApi";
 import { FormInput } from "../../Form/FormInput";
 import { FormSelect } from "../../Form/FormSelect";
-import InventoryFormModal from "../inventory/InventoryFormModal";
+import AppFormModal from "../inventory/AppFormModal";
 
 /**
  * The banks and wallets a vendor can be paid through.
@@ -66,7 +66,7 @@ const ProviderModal = ({
   };
 
   return (
-    <InventoryFormModal
+    <AppFormModal
       open={open}
       setOpen={setOpen}
       entity="Payment Provider"
@@ -97,13 +97,18 @@ const ProviderModal = ({
         options={[
           { label: "Bank", value: "Bank" },
           { label: "Mobile Banking", value: "Mobile Banking" },
+          { label: "Card", value: "Card" },
+          { label: "Payment Gateway", value: "Payment Gateway" },
+          { label: "Digital Wallet", value: "Digital Wallet" },
+          { label: "Cash", value: "Cash" },
+          { label: "Check", value: "Check" },
           { label: "Other", value: "Other" },
         ]}
       />
       <Form.Item label="Status" name="isActive" valuePropName="checked">
         <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
       </Form.Item>
-    </InventoryFormModal>
+    </AppFormModal>
   );
 };
 

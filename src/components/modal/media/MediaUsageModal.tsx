@@ -1,4 +1,4 @@
-﻿import React from "react";
+import React from "react";
 import { Modal, Table, Tag, Spin } from "antd";
 import { Link } from "react-router-dom";
 import { useGetMediaUsageQuery } from "../../../redux/features/media-library/media-libraryApi";

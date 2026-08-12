@@ -288,13 +288,6 @@ const Vendors = () => {
         }
       />
 
-      {isOpenModal && (
-        <VendorModal
-          open={isOpenModal}
-          setOpen={setIsOpenModal}
-          data={selected}
-        />
-      )}
     </div>
   );
 };

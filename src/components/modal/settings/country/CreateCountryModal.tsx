@@ -1,4 +1,4 @@
-﻿import { Button, ColorPicker, Form } from "antd";
+import { Button, ColorPicker, Form } from "antd";
 import { toast } from "react-toastify";
 import {
   ICountry,
@@ -95,7 +95,7 @@ const CreateCountryModal = ({
             name="code"
             rules={[
               { required: true, message: "Code is required" },
-              { min: 2, max: 5, message: "Code must be 2–5 characters" },
+              { min: 2, max: 5, message: "Code must be 2�5 characters" },
             ]}
             placeholder="e.g. BD"
           />

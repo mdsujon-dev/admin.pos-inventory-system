@@ -11,14 +11,13 @@ import {
   Wallet,
   Warehouse,
   X,
+  Settings,
 } from "lucide-react";
 import { ReactNode } from "react";
 import AntModal from "../../shared/AntModal";
 
 /**
- * One icon per inventory entity, so the six modals are told apart at a glance
- * rather than by reading the heading. Keyed on the `entity` label the callers
- * already pass, which keeps them unchanged.
+ * Icons mapped to entity names for convenience.
  */
 const ENTITY_ICONS: Record<string, LucideIcon> = {
   Brand: Tag,
@@ -31,6 +30,11 @@ const ENTITY_ICONS: Record<string, LucideIcon> = {
   Customer: Contact,
   "Expense Category": Landmark,
   "Payment Provider": Landmark,
+  Role: Settings,
+  User: Contact,
+  Designation: Settings,
+  Country: Landmark,
+  Transaction: Wallet,
 };
 
 interface AppFormModalProps {
@@ -45,16 +49,15 @@ interface AppFormModalProps {
   onSubmit: (values: any) => void;
   width?: number;
   children: ReactNode;
+  icon?: LucideIcon;
+  /** Optional custom title text to override "Create Entity" / "Edit Entity" */
+  title?: string;
+  /** Optional custom subtitle text to override default subtitle */
+  subtitle?: string;
 }
 
 /**
- * The shell every inventory form sits in: heading, footer buttons, and the
- * Form instance wiring.
- *
- * One component covers both create and edit because the two differ only in the
- * verb and whether `initialValues` is populated — the panel's older modules
- * carry a near-identical pair of files per entity, and six more pairs would be
- * six more places to keep in sync.
+ * The shell every form sits in: heading, footer buttons, and the Form instance wiring.
  */
 const AppFormModal = ({
   open,
@@ -67,8 +70,11 @@ const AppFormModal = ({
   onSubmit,
   width = 640,
   children,
+  icon,
+  title,
+  subtitle,
 }: AppFormModalProps) => {
-  const Icon = ENTITY_ICONS[entity] ?? Package;
+  const Icon = icon ?? ENTITY_ICONS[entity] ?? Package;
 
   return (
     <AntModal
@@ -108,16 +114,16 @@ const AppFormModal = ({
             <span className="min-w-0">
               <span className="flex items-center gap-2">
                 <span className="truncate text-[19px] font-semibold leading-tight text-white">
-                  {isEditing ? `Edit ${entity}` : `Create ${entity}`}
+                  {title ? title : (isEditing ? `Edit ${entity}` : `Create ${entity}`)}
                 </span>
                 <span className="shrink-0 rounded-full bg-white/20 px-2 py-px text-[10px] font-semibold uppercase tracking-wider text-white">
                   {isEditing ? "Editing" : "New"}
                 </span>
               </span>
               <span className="block truncate text-[13px] font-normal leading-tight text-white/80">
-                {isEditing
+                {subtitle ? subtitle : (isEditing
                   ? `Update this ${entity.toLowerCase()}'s details`
-                  : `Add a new ${entity.toLowerCase()} to the catalog`}
+                  : `Add a new ${entity.toLowerCase()} to the catalog`)}
               </span>
             </span>
           </div>

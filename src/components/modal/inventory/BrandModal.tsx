@@ -7,7 +7,7 @@ import {
 } from "../../../redux/features/inventory/brandApi";
 import { FormInput } from "../../Form/FormInput";
 import UploadImage from "../../shared/UploadImage";
-import InventoryFormModal from "./InventoryFormModal";
+import AppFormModal from "./AppFormModal";
 
 const BrandModal = ({
   open,
@@ -56,7 +56,7 @@ const BrandModal = ({
   };
 
   return (
-    <InventoryFormModal
+    <AppFormModal
       open={open}
       setOpen={setOpen}
       entity="Brand"
@@ -96,7 +96,7 @@ const BrandModal = ({
       <Form.Item label="Status" name="isActive" valuePropName="checked">
         <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
       </Form.Item>
-    </InventoryFormModal>
+    </AppFormModal>
   );
 };
 

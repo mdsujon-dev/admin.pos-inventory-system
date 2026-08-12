@@ -6,7 +6,7 @@ import {
   useUpdateVariantAttributeMutation,
 } from "../../../redux/features/inventory/variantAttributeApi";
 import { FormInput } from "../../Form/FormInput";
-import InventoryFormModal from "./InventoryFormModal";
+import AppFormModal from "./AppFormModal";
 
 const VariantAttributeModal = ({
   open,
@@ -56,7 +56,7 @@ const VariantAttributeModal = ({
   };
 
   return (
-    <InventoryFormModal
+    <AppFormModal
       open={open}
       setOpen={setOpen}
       entity="Variant Attribute"
@@ -114,7 +114,7 @@ const VariantAttributeModal = ({
       <Form.Item label="Status" name="isActive" valuePropName="checked">
         <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
       </Form.Item>
-    </InventoryFormModal>
+    </AppFormModal>
   );
 };
 

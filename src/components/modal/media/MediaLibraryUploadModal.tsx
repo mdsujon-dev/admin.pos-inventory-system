@@ -1,4 +1,4 @@
-﻿import { DeleteOutlined, FileOutlined, InboxOutlined } from "@ant-design/icons";
+import { DeleteOutlined, FileOutlined, InboxOutlined } from "@ant-design/icons";
 import { Card, Image, Input, message, Modal, Upload } from "antd";
 import type { RcFile } from "antd/es/upload/interface";
 import { useEffect, useState } from "react";

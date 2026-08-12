@@ -47,16 +47,6 @@ const activeOnly = [
 const idsOf = (rows?: (string | { _id: string })[]) =>
   (rows ?? []).map((row) => (typeof row === "string" ? row : row._id));
 
-/**
- * Only digits get through.
- *
- * `type="number"` would be the obvious answer and is the wrong one: it strips
- * the leading zero every Bangladeshi mobile number starts with, and hangs a
- * spinner off a field nobody wants to increment.
- */
-const digitsOnly = (event: { target: { value: string } }) =>
-  event.target.value.replace(/\D/g, "");
-
 const METHOD_TYPES = ["Bank", "Mobile Banking", "Cash", "Other"];
 
 /**
@@ -240,8 +230,7 @@ const VendorForm = () => {
                 name="phone"
                 rules={[{ required: true, message: "A phone number is required" }]}
                 placeholder="e.g. 01711223344"
-                inputMode="numeric"
-                getValueFromEvent={digitsOnly}
+                digitsOnly
               />
               <FormInput label="Email" name="email" placeholder="Optional" />
             </div>
@@ -466,8 +455,7 @@ const VendorForm = () => {
                                       label="Mobile Number"
                                       name={[name, "accountNumber"]}
                                       placeholder="e.g. 01711223344"
-                                      inputMode="numeric"
-                                      getValueFromEvent={digitsOnly}
+                                      digitsOnly
                                     />
                                     <FormSelect
                                       {...restField}

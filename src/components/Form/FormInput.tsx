@@ -17,6 +17,14 @@ interface FormInputProps extends InputProps {
   help?: React.ReactNode;
   /** When true, digits are stripped as the user types (text-only field). */
   textOnly?: boolean;
+  /**
+   * The mirror of `textOnly`: everything but digits is stripped.
+   *
+   * For phone and account numbers. Deliberately not `type="number"`, which
+   * drops the leading zero every Bangladeshi mobile number starts with and
+   * hangs a spinner off a field nobody wants to increment.
+   */
+  digitsOnly?: boolean;
   tooltip?: React.ReactNode;
 }
 
@@ -34,6 +42,7 @@ export const FormInput = ({
   isListField,
   help,
   textOnly,
+  digitsOnly,
   tooltip,
   ...rest
 }: FormInputProps) => {
@@ -54,6 +63,8 @@ export const FormInput = ({
       getValueFromEvent={
         textOnly
           ? (e) => (e?.target?.value ?? "").replace(/[0-9]/g, "")
+          : digitsOnly
+          ? (e) => (e?.target?.value ?? "").replace(/\D/g, "")
           : undefined
       }
     >

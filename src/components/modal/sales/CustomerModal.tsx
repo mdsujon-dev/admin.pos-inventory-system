@@ -6,7 +6,7 @@ import {
   useUpdateCustomerMutation,
 } from "../../../redux/features/sales/customerApi";
 import { FormInput } from "../../Form/FormInput";
-import InventoryFormModal from "../inventory/InventoryFormModal";
+import AppFormModal from "../inventory/AppFormModal";
 
 const CustomerModal = ({
   open,
@@ -55,7 +55,7 @@ const CustomerModal = ({
   };
 
   return (
-    <InventoryFormModal
+    <AppFormModal
       open={open}
       setOpen={setOpen}
       entity="Customer"
@@ -104,7 +104,7 @@ const CustomerModal = ({
       <Form.Item label="Status" name="isActive" valuePropName="checked">
         <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
       </Form.Item>
-    </InventoryFormModal>
+    </AppFormModal>
   );
 };
 

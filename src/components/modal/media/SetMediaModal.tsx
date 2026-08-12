@@ -1,4 +1,4 @@
-﻿import {
+import {
   CopyOutlined,
   DeleteOutlined,
   FileOutlined,
@@ -55,7 +55,7 @@ function filterItemsForSetMedia<
       );
     });
   }
-  // Syllabus sheets, brochures, forms — anything handed over as a file rather
+  // Syllabus sheets, brochures, forms � anything handed over as a file rather
   // than shown on screen.
   if (kind === "document") {
     return items.filter((item) => {
@@ -96,11 +96,11 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // ── Folder navigation with breadcrumb ──────────────────────────────────
+  // -- Folder navigation with breadcrumb ----------------------------------
   const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
   const [breadcrumb, setBreadcrumb] = useState<{ id: string; name: string }[]>([]);
 
-  // ── Folder create / rename modal ────────────────────────────────────────
+  // -- Folder create / rename modal ----------------------------------------
   const [folderModal, setFolderModal] = useState<{
     open: boolean;
     mode: "create" | "rename";
@@ -111,7 +111,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
   const [openMediaLibraryUploadModal, setOpenMediaLibraryUploadModal] = useState(false);
   const debouncedSearch = useDebounced({ searchQuery: searchText, delay: 500 });
 
-  // ── Drag to move ────────────────────────────────────────────────────────
+  // -- Drag to move --------------------------------------------------------
   const dragKeyRef = useRef<string | null>(null);
   const [moveMedia] = useMoveMediaLibraryMutation();
   const [createFolder, { isLoading: savingFolder }] = useCreateFolderMutation();
@@ -244,7 +244,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
     setBreadcrumb([]);
   };
 
-  // ── Folder navigation ───────────────────────────────────────────────────
+  // -- Folder navigation ---------------------------------------------------
   const openFolder = (folder: any) => {
     setBreadcrumb((prev) => [...prev, { id: folder._id, name: folder.name }]);
     setCurrentFolderId(folder._id);
@@ -262,7 +262,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
     setPage(1);
   };
 
-  // ── Folder CRUD ─────────────────────────────────────────────────────────
+  // -- Folder CRUD ---------------------------------------------------------
   const submitFolder = async () => {
     const name = folderModal.name.trim();
     if (!name) return;
@@ -291,7 +291,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
     }
   };
 
-  // ── Drag & drop move ────────────────────────────────────────────────────
+  // -- Drag & drop move ----------------------------------------------------
   const handleDropOnFolder = async (folderId: string | null) => {
     const key = dragKeyRef.current;
     dragKeyRef.current = null;
@@ -305,7 +305,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
     }
   };
 
-  // ── Context-menu style "Move here" button while dragging ────────────────
+  // -- Context-menu style "Move here" button while dragging ----------------
   const [draggingKey, setDraggingKey] = useState<string | null>(null);
 
   // One word for whatever this picker is currently picking, so every label
@@ -313,7 +313,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
   const noun = isVideoMode ? "Video" : isDocMode ? "File" : "Image";
   const nounLower = noun.toLowerCase();
 
-  const modalTitle = `📁 Select a${
+  const modalTitle = `?? Select a${
     noun === "Image" ? "n" : ""
   } ${noun} from Media`;
 
@@ -341,7 +341,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
         title={modalTitle}
       >
         <div className="flex flex-col h-[65vh]">
-          {/* ── Top bar ──────────────────────────────────────────────────── */}
+          {/* -- Top bar ---------------------------------------------------- */}
           <div className="flex gap-2 mb-3">
             <Input
               placeholder="Search media by name..."
@@ -400,7 +400,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
             )}
           </div>
 
-          {/* ── Breadcrumb navigation ─────────────────────────────────── */}
+          {/* -- Breadcrumb navigation ----------------------------------- */}
           <div className="flex items-center gap-1 text-sm flex-wrap mb-2 px-1">
             <button
               onClick={() => goToCrumb(-1)}
@@ -451,10 +451,10 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
             ))}
           </div>
 
-          {/* ── Filter/delete controls ────────────────────────────────── */}
+          {/* -- Filter/delete controls ---------------------------------- */}
           <div className="mb-2">{searchAndDeleteControls}</div>
 
-          {/* ── Grid ──────────────────────────────────────────────────── */}
+          {/* -- Grid ---------------------------------------------------- */}
           <div className="flex-1 overflow-hidden">
             {isFetching || isFolderFetching ? (
               <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 h-full overflow-y-auto">
@@ -477,7 +477,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                 <div className="flex-1 overflow-y-auto">
                   <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-7 gap-2 sm:gap-3 p-1">
 
-                    {/* ── Folders first ───────────────────────────────── */}
+                    {/* -- Folders first --------------------------------- */}
                     {!searchText &&
                       folders.map((f: any) => (
                         <div
@@ -507,7 +507,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                             handleDropOnFolder(f._id);
                           }}
                           className="group relative rounded-lg border border-secondary-200 hover:border-primary cursor-pointer overflow-hidden transition-all duration-200 flex flex-col items-center justify-center p-3 bg-secondary-50 hover:bg-primary-50/30 h-[140px]"
-                          title={`Double-click to open • Drag media here to move`}
+                          title={`Double-click to open � Drag media here to move`}
                         >
                           {/* Open button */}
                           <button
@@ -570,7 +570,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
                         </div>
                       ))}
 
-                    {/* ── Media items ──────────────────────────────────── */}
+                    {/* -- Media items ------------------------------------ */}
                     {displayItems?.map((img: any) => {
                       const isSelected =
                         selectionMode === "single"
@@ -722,7 +722,7 @@ const SetMediaModal: React.FC<SetMediaModalProps> = ({
         )}
       </Modal>
 
-      {/* ── Create / Rename Folder Modal ─────────────────────────────────── */}
+      {/* -- Create / Rename Folder Modal ----------------------------------- */}
       <Modal
         title={folderModal.mode === "create" ? "New Folder" : "Rename Folder"}
         open={folderModal.open}

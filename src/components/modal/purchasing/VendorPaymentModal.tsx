@@ -6,7 +6,7 @@ import { IVendor } from "../../../redux/features/purchasing/vendorApi";
 import { useCreateVendorPaymentMutation } from "../../../redux/features/purchasing/vendorPaymentApi";
 import { PAYMENT_METHOD_LABELS, round2 } from "../../../utils/money";
 import Money from "../../shared/Money";
-import InventoryFormModal from "../inventory/InventoryFormModal";
+import AppFormModal from "../inventory/AppFormModal";
 
 interface OpenBill {
   _id: string;
@@ -82,7 +82,7 @@ const VendorPaymentModal = ({
   const overpaying = (amount ?? 0) > (vendor.totalDue ?? 0);
 
   return (
-    <InventoryFormModal
+    <AppFormModal
       open={open}
       setOpen={setOpen}
       entity="Vendor Payment"
@@ -207,7 +207,7 @@ const VendorPaymentModal = ({
       <Form.Item label="Note" name="note" className="!mt-4">
         <Input.TextArea rows={2} placeholder="Optional" />
       </Form.Item>
-    </InventoryFormModal>
+    </AppFormModal>
   );
 };
 

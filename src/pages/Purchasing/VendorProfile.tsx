@@ -16,7 +16,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import PermissionGate from "../../components/Common/PermissionGate";
-import VendorModal from "../../components/modal/purchasing/VendorModal";
 import VendorPaymentModal from "../../components/modal/purchasing/VendorPaymentModal";
 import { Loading } from "../../components/shared/Loading";
 import Money from "../../components/shared/Money";
@@ -39,7 +38,6 @@ const nameOf = (row: unknown) =>
 const VendorProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [editing, setEditing] = useState(false);
   const [paying, setPaying] = useState(false);
 
   const { data, isFetching } = useGetVendorLedgerQuery(
@@ -74,10 +72,12 @@ const VendorProfile = () => {
    * payment's "who signs for it" are not the same kind of fact, and reading
    * them off one column makes both harder to find.
    */
-  const terms = [
-    ["Terms", vendor.paymentTerms],
-    ["Credit days", vendor.creditDays ? `${vendor.creditDays} days` : ""],
-  ].filter(([, value]) => value) as [string, string][];
+  const terms = (vendor.paymentTerms ?? []) as {
+    side: "ours" | "vendor";
+    text: string;
+  }[];
+  const ourTerms = terms.filter((row) => row.side === "ours");
+  const theirTerms = terms.filter((row) => row.side === "vendor");
 
   const methodRows = (method: any): [string, string][] =>
     (
@@ -124,7 +124,7 @@ const VendorProfile = () => {
             <PermissionGate module="Vendors" action="Update">
               <Button
                 icon={<Edit className="h-4 w-4" />}
-                onClick={() => setEditing(true)}
+                onClick={() => navigate(`/vendors/${id}/edit`)}
               >
                 Edit
               </Button>
@@ -212,18 +212,12 @@ const VendorProfile = () => {
             </p>
           ) : (
             <div className="space-y-3">
+              {/* Two columns, because whose promise it was is the first thing
+                  anyone needs to know when a term is being argued about. */}
               {terms.length > 0 && (
-                <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
-                  {terms.map(([label, value]) => (
-                    <div key={label}>
-                      <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-400">
-                        {label}
-                      </p>
-                      <p className="m-0 text-sm font-medium text-secondary-800">
-                        {value}
-                      </p>
-                    </div>
-                  ))}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <TermList title="Our terms" rows={ourTerms} tone="brand" />
+                  <TermList title="Their terms" rows={theirTerms} />
                 </div>
               )}
 
@@ -467,9 +461,6 @@ const VendorProfile = () => {
         </SectionCard>
       </div>
 
-      {editing && (
-        <VendorModal open setOpen={() => setEditing(false)} data={vendor} />
-      )}
       {paying && (
         <VendorPaymentModal
           open
@@ -481,5 +472,37 @@ const VendorProfile = () => {
     </div>
   );
 };
+
+/** One side's promises. Empty is stated rather than left blank. */
+const TermList = ({
+  title,
+  rows,
+  tone,
+}: {
+  title: string;
+  rows: { text: string }[];
+  tone?: "brand";
+}) => (
+  <div>
+    <p
+      className={`m-0 mb-1.5 text-[11px] font-semibold uppercase tracking-wide ${
+        tone === "brand" ? "text-primary-700" : "text-secondary-400"
+      }`}
+    >
+      {title}
+    </p>
+    {rows.length === 0 ? (
+      <p className="m-0 text-xs text-secondary-400">None recorded</p>
+    ) : (
+      <ul className="m-0 list-disc space-y-1 pl-4">
+        {rows.map((row, index) => (
+          <li key={index} className="text-sm text-secondary-700">
+            {row.text}
+          </li>
+        ))}
+      </ul>
+    )}
+  </div>
+);
 
 export default VendorProfile;

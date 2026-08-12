@@ -22,7 +22,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
-import VendorModal from "../../components/modal/purchasing/VendorModal";
+import QuickVendorModal from "../../components/modal/purchasing/QuickVendorModal";
 import Money from "../../components/shared/Money";
 import {
   IProduct,
@@ -570,7 +570,7 @@ const PurchaseForm = () => {
       </div>
 
       {addingVendor && (
-        <VendorModal
+        <QuickVendorModal
           open
           setOpen={() => setAddingVendor(false)}
           onCreated={(created) => {

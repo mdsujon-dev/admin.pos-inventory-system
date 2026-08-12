@@ -6,7 +6,7 @@ import {
   useUpdateUnitMutation,
 } from "../../../redux/features/inventory/unitApi";
 import { FormInput } from "../../Form/FormInput";
-import InventoryFormModal from "./InventoryFormModal";
+import AppFormModal from "./AppFormModal";
 
 const UnitModal = ({
   open,
@@ -54,7 +54,7 @@ const UnitModal = ({
   };
 
   return (
-    <InventoryFormModal
+    <AppFormModal
       open={open}
       setOpen={setOpen}
       entity="Unit"
@@ -101,7 +101,7 @@ const UnitModal = ({
       <Form.Item label="Status" name="isActive" valuePropName="checked">
         <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
       </Form.Item>
-    </InventoryFormModal>
+    </AppFormModal>
   );
 };
 

@@ -4,7 +4,7 @@ import { buildQueryParams, QueryArg } from "../../api/queryArgs";
 export interface IPaymentProvider {
   _id: string;
   name: string;
-  type: "Bank" | "Mobile Banking" | "Other";
+  type: "Bank" | "Mobile Banking" | "Card" | "Payment Gateway" | "Digital Wallet" | "Cash" | "Check" | "Other";
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

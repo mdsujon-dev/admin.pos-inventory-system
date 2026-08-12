@@ -13,7 +13,7 @@ import {
 import { FormInput } from "../../Form/FormInput";
 import { FormSelect } from "../../Form/FormSelect";
 import UploadImage from "../../shared/UploadImage";
-import InventoryFormModal from "./InventoryFormModal";
+import AppFormModal from "./AppFormModal";
 
 const SubCategoryModal = ({
   open,
@@ -77,7 +77,7 @@ const SubCategoryModal = ({
   };
 
   return (
-    <InventoryFormModal
+    <AppFormModal
       open={open}
       setOpen={setOpen}
       entity="Sub Category"
@@ -135,7 +135,7 @@ const SubCategoryModal = ({
       <Form.Item label="Status" name="isActive" valuePropName="checked">
         <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
       </Form.Item>
-    </InventoryFormModal>
+    </AppFormModal>
   );
 };
 

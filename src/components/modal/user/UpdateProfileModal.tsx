@@ -1,4 +1,4 @@
-﻿import { Avatar, Button, Form, Modal, Upload, message } from "antd";
+import { Avatar, Button, Form, Modal, Upload, message } from "antd";
 import type { RcFile, UploadChangeParam } from "antd/es/upload";
 import { Camera, ImagePlus } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -136,7 +136,7 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
         <div className="flex-1 min-w-0">
           <div className="font-semibold text-secondary-900">Profile photo</div>
           <div className="text-xs text-secondary-500 mt-0.5">
-            JPG, PNG, WEBP or GIF · max {MAX_IMAGE_MB}MB
+            JPG, PNG, WEBP or GIF � max {MAX_IMAGE_MB}MB
           </div>
           <Upload
             accept="image/*"
