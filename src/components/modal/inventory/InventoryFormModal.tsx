@@ -8,6 +8,7 @@ import {
   Package,
   Ruler,
   Tag,
+  Wallet,
   Warehouse,
   X,
 } from "lucide-react";
@@ -26,6 +27,7 @@ const ENTITY_ICONS: Record<string, LucideIcon> = {
   Unit: Ruler,
   "Variant Attribute": Layers,
   Vendor: Warehouse,
+  "Vendor Payment": Wallet,
   Customer: Contact,
   "Expense Category": Landmark,
 };

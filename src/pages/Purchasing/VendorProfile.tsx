@@ -1,32 +1,46 @@
-import { Button, Table, Tag } from "antd";
+import { Button, Empty, Table, Tag } from "antd";
 import dayjs from "dayjs";
 import {
   ArrowLeft,
+  Banknote,
+  Boxes,
+  Edit,
   Package,
   Phone,
   Receipt,
   TrendingUp,
   Wallet,
 } from "lucide-react";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
+import PermissionGate from "../../components/Common/PermissionGate";
+import VendorModal from "../../components/modal/purchasing/VendorModal";
+import VendorPaymentModal from "../../components/modal/purchasing/VendorPaymentModal";
 import { Loading } from "../../components/shared/Loading";
 import Money from "../../components/shared/Money";
 import { useGetVendorLedgerQuery } from "../../redux/features/purchasing/purchaseApi";
+import { PAYMENT_METHOD_LABELS } from "../../utils/money";
 import { SectionCard, StatTile } from "../Inventory/Products/ProductFormUI";
 
+/** Name off a reference that may be populated or a bare id. */
+const nameOf = (row: unknown) =>
+  row && typeof row === "object" ? (row as { name?: string }).name : null;
+
 /**
- * One supplier's account.
+ * One supplier's account, whole.
  *
- * Three questions, answered in the order anyone asks them: what do we owe,
- * what have we bought, and what did each thing cost last time. The third is
- * the one that takes five minutes without a screen like this, because the
- * answer is spread across every bill they ever sent.
+ * Four questions in the order anyone asks them: what do we owe, what do they
+ * supply, what have we bought, and when did we last pay. The last two are the
+ * ones that take five minutes without a screen like this, because the answers
+ * are spread across every bill they ever sent.
  */
 const VendorProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [editing, setEditing] = useState(false);
+  const [paying, setPaying] = useState(false);
 
   const { data, isFetching } = useGetVendorLedgerQuery(
     { vendorId: id as string },
@@ -38,18 +52,47 @@ const VendorProfile = () => {
   const ledger = data?.data;
   if (!ledger) return null;
 
-  const { vendor, purchases, totals, byProduct } = ledger;
+  const { vendor, purchases, payments, totals, byProduct } = ledger;
+  const openBills = (purchases ?? []).filter((row: any) => row.due > 0);
+
+  const supplies = [
+    ...(vendor.categories ?? []).map((row: unknown) => ({
+      label: nameOf(row),
+      kind: "category" as const,
+    })),
+    ...(vendor.subCategories ?? []).map((row: unknown) => ({
+      label: nameOf(row),
+      kind: "sub" as const,
+    })),
+  ].filter((row) => row.label);
+
+  const payInfo = [
+    ["Terms", vendor.paymentTerms],
+    ["Credit days", vendor.creditDays ? `${vendor.creditDays} days` : ""],
+  ];
+
+  (vendor.paymentMethods || []).forEach((method: any) => {
+    if (method.methodType === "Bank") {
+      payInfo.push([`Bank (${method.provider || "N/A"})`, method.accountNumber || method.accountName || "N/A"]);
+    } else if (method.methodType === "Mobile Banking") {
+      payInfo.push([method.provider || "Mobile", method.accountNumber || "N/A"]);
+    } else {
+      payInfo.push([method.methodType, method.details || "N/A"]);
+    }
+  });
+
+  const finalPayInfo = payInfo.filter(([, value]) => value);
 
   return (
     <div>
       <PageMeta
         title={`${vendor.name} - Vendor - POS & Inventory`}
-        description="Vendor ledger and purchase history"
+        description="Vendor ledger, purchase history and payments"
         noindex
       />
       <PageHeader
         title={vendor.name}
-        subtitle={vendor.company || "Supplier account and purchase history"}
+        subtitle={vendor.company || "Supplier account and history"}
         breadcrumbs={[
           { title: "Dashboard", path: "/" },
           { title: "Purchasing" },
@@ -57,12 +100,32 @@ const VendorProfile = () => {
           { title: vendor.name },
         ]}
         extra={
-          <Button
-            icon={<ArrowLeft className="h-4 w-4" />}
-            onClick={() => navigate("/vendors")}
-          >
-            All vendors
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button
+              icon={<ArrowLeft className="h-4 w-4" />}
+              onClick={() => navigate("/vendors")}
+            >
+              All vendors
+            </Button>
+            <PermissionGate module="Vendors" action="Update">
+              <Button
+                icon={<Edit className="h-4 w-4" />}
+                onClick={() => setEditing(true)}
+              >
+                Edit
+              </Button>
+            </PermissionGate>
+            <PermissionGate module="Vendor Payments" action="Create">
+              <Button
+                type="primary"
+                icon={<Wallet className="h-4 w-4" />}
+                onClick={() => setPaying(true)}
+                className="!border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 shadow-primary"
+              >
+                Record Payment
+              </Button>
+            </PermissionGate>
+          </div>
         }
       />
 
@@ -86,6 +149,70 @@ const VendorProfile = () => {
         </StatTile>
       </div>
 
+      {/* Who they are, and what they carry */}
+      <div className="mb-4 grid gap-4 lg:grid-cols-2">
+        <SectionCard
+          icon={Boxes}
+          title="What they supply"
+          subtitle="The headings to reach for when something runs out"
+        >
+          {supplies.length === 0 ? (
+            <p className="m-0 text-sm text-secondary-500">
+              Nothing recorded yet — edit the vendor and tick what they carry.
+            </p>
+          ) : (
+            <div className="flex flex-wrap gap-1.5">
+              {supplies.map((row, index) => (
+                <Tag
+                  key={`${row.label}-${index}`}
+                  className={
+                    row.kind === "category"
+                      ? "!m-0 !border-primary-200 !bg-primary-50 !text-primary-700"
+                      : "!m-0 !text-[12px]"
+                  }
+                >
+                  {row.label}
+                </Tag>
+              ))}
+            </div>
+          )}
+
+          <div className="mt-4 space-y-1 border-t border-secondary-100 pt-3 text-xs text-secondary-500">
+            <p className="m-0">Phone: {vendor.phone}</p>
+            {vendor.email && <p className="m-0">Email: {vendor.email}</p>}
+            {vendor.address && <p className="m-0">{vendor.address}</p>}
+            {vendor.note && (
+              <p className="m-0 pt-1 text-secondary-600">{vendor.note}</p>
+            )}
+          </div>
+        </SectionCard>
+
+        <SectionCard
+          icon={Banknote}
+          title="How they get paid"
+          subtitle="Written down once instead of asked for every time"
+        >
+          {finalPayInfo.length === 0 ? (
+            <p className="m-0 text-sm text-secondary-500">
+              No payment details saved yet.
+            </p>
+          ) : (
+            <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
+              {finalPayInfo.map(([label, value]) => (
+                <div key={String(label)}>
+                  <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-400">
+                    {label}
+                  </p>
+                  <p className="m-0 text-sm font-medium text-secondary-800">
+                    {value}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </SectionCard>
+      </div>
+
       <div className="grid gap-4 xl:grid-cols-2">
         <SectionCard
           icon={Receipt}
@@ -96,7 +223,8 @@ const VendorProfile = () => {
             dataSource={purchases}
             rowKey="_id"
             size="small"
-            pagination={{ pageSize: 10, hideOnSinglePage: true }}
+            pagination={{ pageSize: 8, hideOnSinglePage: true }}
+            locale={{ emptyText: "Nothing bought from them yet" }}
             columns={[
               {
                 title: "Bill",
@@ -116,6 +244,7 @@ const VendorProfile = () => {
               {
                 title: "Total",
                 key: "grandTotal",
+                width: 110,
                 render: (_: unknown, row: any) => (
                   <Money value={row.grandTotal} />
                 ),
@@ -123,6 +252,7 @@ const VendorProfile = () => {
               {
                 title: "Due",
                 key: "due",
+                width: 110,
                 render: (_: unknown, row: any) =>
                   row.due > 0 ? (
                     <span className="font-medium text-danger">
@@ -152,6 +282,73 @@ const VendorProfile = () => {
         </SectionCard>
 
         <SectionCard
+          icon={Wallet}
+          title="Payments"
+          subtitle="Every taka handed over, and what it settled"
+        >
+          {(payments ?? []).length === 0 ? (
+            <Empty description="No payments recorded yet" />
+          ) : (
+            <Table
+              dataSource={payments}
+              rowKey="_id"
+              size="small"
+              pagination={{ pageSize: 8, hideOnSinglePage: true }}
+              columns={[
+                {
+                  title: "Payment",
+                  key: "paymentNo",
+                  render: (_: unknown, row: any) => (
+                    <div>
+                      <p className="m-0 font-mono text-xs font-semibold">
+                        {row.paymentNo}
+                      </p>
+                      <span className="text-[11px] text-secondary-400">
+                        {dayjs(row.paidAt).format("DD MMM YYYY")} ·{" "}
+                        {PAYMENT_METHOD_LABELS[row.method] ?? row.method}
+                      </span>
+                    </div>
+                  ),
+                },
+                {
+                  title: "Settled",
+                  key: "allocations",
+                  render: (_: unknown, row: any) =>
+                    row.allocations?.length ? (
+                      <div className="flex flex-wrap gap-1">
+                        {row.allocations.slice(0, 2).map((a: any) => (
+                          <Tag key={a.purchaseNo} className="!m-0 !text-[10px]">
+                            {a.purchaseNo}
+                          </Tag>
+                        ))}
+                        {row.allocations.length > 2 && (
+                          <Tag className="!m-0 !text-[10px]">
+                            +{row.allocations.length - 2}
+                          </Tag>
+                        )}
+                      </div>
+                    ) : (
+                      <Tag className="!m-0 !text-[10px]">Advance</Tag>
+                    ),
+                },
+                {
+                  title: "Amount",
+                  key: "amount",
+                  width: 110,
+                  render: (_: unknown, row: any) => (
+                    <span className="font-semibold text-secondary-800">
+                      <Money value={row.amount} />
+                    </span>
+                  ),
+                },
+              ]}
+            />
+          )}
+        </SectionCard>
+      </div>
+
+      <div className="mt-4">
+        <SectionCard
           icon={Package}
           title="What we buy from them"
           subtitle="With the last price paid — no need to open five bills"
@@ -163,6 +360,7 @@ const VendorProfile = () => {
             }
             size="small"
             pagination={{ pageSize: 10, hideOnSinglePage: true }}
+            locale={{ emptyText: "Nothing bought from them yet" }}
             columns={[
               {
                 title: "Item",
@@ -182,13 +380,13 @@ const VendorProfile = () => {
               {
                 title: "Qty",
                 key: "quantity",
-                width: 70,
+                width: 80,
                 render: (_: unknown, row: any) => row.quantity,
               },
               {
                 title: "Last cost",
                 key: "lastUnitCost",
-                width: 110,
+                width: 130,
                 render: (_: unknown, row: any) => (
                   <div>
                     <Money value={row.lastUnitCost} />
@@ -201,13 +399,25 @@ const VendorProfile = () => {
               {
                 title: "Spent",
                 key: "spent",
-                width: 110,
+                width: 120,
                 render: (_: unknown, row: any) => <Money value={row.spent} />,
               },
             ]}
           />
         </SectionCard>
       </div>
+
+      {editing && (
+        <VendorModal open setOpen={() => setEditing(false)} data={vendor} />
+      )}
+      {paying && (
+        <VendorPaymentModal
+          open
+          setOpen={() => setPaying(false)}
+          vendor={vendor}
+          bills={openBills}
+        />
+      )}
     </div>
   );
 };

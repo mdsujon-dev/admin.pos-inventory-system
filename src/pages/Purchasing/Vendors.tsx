@@ -1,4 +1,4 @@
-import { Button, Input, Modal, Space, Switch, Tooltip } from "antd";
+import { Button, Input, Modal, Space, Switch, Tag, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import { BookOpen, Edit, Plus, Search, Trash2 } from "lucide-react";
@@ -96,6 +96,39 @@ const Vendors = () => {
       render: (_, record) => (
         <span className="font-mono text-sm">{record.phone}</span>
       ),
+    },
+    {
+      title: "Supplies",
+      key: "categories",
+      width: 220,
+      render: (_, record) => {
+        const names = (record.categories ?? [])
+          .map((row) =>
+            typeof row === "string" ? null : (row as { name?: string }).name
+          )
+          .filter(Boolean) as string[];
+
+        if (names.length === 0) {
+          return <span className="text-secondary-400">—</span>;
+        }
+        return (
+          <div className="flex flex-wrap items-center gap-1">
+            {names.slice(0, 2).map((name) => (
+              <Tag
+                key={name}
+                className="!m-0 !max-w-[100px] !truncate !border-primary-200 !bg-primary-50 !text-[11px] !text-primary-700"
+              >
+                {name}
+              </Tag>
+            ))}
+            {names.length > 2 && (
+              <Tooltip title={names.slice(2).join(", ")}>
+                <Tag className="!m-0 !text-[11px]">+{names.length - 2}</Tag>
+              </Tooltip>
+            )}
+          </div>
+        );
+      },
     },
     {
       title: "Purchased",

@@ -40,6 +40,7 @@ import DormantCustomers from "../pages/Customers/DormantCustomers.tsx";
 import FollowUps from "../pages/Customers/FollowUps.tsx";
 import StockLots from "../pages/Inventory/StockLots.tsx";
 import PurchaseForm from "../pages/Purchasing/PurchaseForm.tsx";
+import VendorPayments from "../pages/Purchasing/VendorPayments.tsx";
 import Purchases from "../pages/Purchasing/Purchases.tsx";
 import PurchaseView from "../pages/Purchasing/PurchaseView.tsx";
 import VendorProfile from "../pages/Purchasing/VendorProfile.tsx";
@@ -131,6 +132,7 @@ const routes = [
           // Before ":id", or these words are read as bill ids.
           { path: "new", element: <PurchaseForm /> },
           { path: "payables", element: <Receivables mode="payable" /> },
+          { path: "payments", element: <VendorPayments /> },
           { path: ":id", element: <PurchaseView /> },
         ],
       },

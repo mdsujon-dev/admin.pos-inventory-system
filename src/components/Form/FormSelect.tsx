@@ -12,6 +12,8 @@ interface FormSelectProps extends SelectProps<any> {
   placeholder?: string;
   fieldError?: Record<string, string>;
   setFieldError?: React.Dispatch<React.SetStateAction<Record<string, string>>>;
+  /** Hint under the field, the way `FormInput` already offers one. */
+  help?: ReactNode;
 }
 
 export const FormSelect = ({
@@ -23,10 +25,11 @@ export const FormSelect = ({
   size = "middle",
   fieldError = {},
   setFieldError = () => {},
+  help,
   ...rest
 }: FormSelectProps) => {
   return (
-    <Form.Item name={name} label={label} rules={rules}>
+    <Form.Item name={name} label={label} rules={rules} help={help}>
       <Select
         size={size}
         placeholder={placeholder}

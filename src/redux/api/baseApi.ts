@@ -165,6 +165,7 @@ export const baseApi = createApi({
     "products",
     // Buying
     "vendors",
+    "vendor-payments",
     "purchases",
     "stock-lots",
     // Selling

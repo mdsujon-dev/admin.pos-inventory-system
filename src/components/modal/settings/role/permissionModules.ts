@@ -23,6 +23,8 @@ export const PERMISSION_GROUP_ORDER: string[] = [
   "Dashboard",
   "Media Library",
   "Inventory",
+  "Purchasing",
+  "Sales",
   "Employee Management",
   "Accounts",
   "Logs",
@@ -56,6 +58,13 @@ export const PERMISSION_MODULES: PermissionModule[] = [
     permissions: ["View", "Create", "Update"],
     group: "Accounts",
   },
+  /**
+   * The books: profit and loss, stock valuation, cash flow, what is owed both
+   * ways, and the expense headings behind them. One module rather than one per
+   * report — they answer the same question from different angles, and a role
+   * that may see the profit may see how it was arrived at.
+   */
+  { module: "Accounts", permissions: CRUD, group: "Accounts" },
 
   // Media Library
   {
@@ -75,16 +84,31 @@ export const PERMISSION_MODULES: PermissionModule[] = [
   { module: "Brands", permissions: CRUD, group: "Inventory" },
   { module: "Units", permissions: CRUD, group: "Inventory" },
   { module: "Variant Attributes", permissions: CRUD, group: "Inventory" },
+  // Labels produce paper rather than records, so View + Print rather than CRUD.
   {
-    module: "Print Barcode",
+    module: "Print Labels",
     permissions: ["View", "Print"],
     group: "Inventory",
   },
+  // The FIFO batches behind a stock count. Read-only on purpose: batches are
+  // opened by a purchase and consumed by a sale, never edited by hand.
+  { module: "Stock Batches", permissions: ["View"], group: "Inventory" },
+
+  // Buying — where stock comes from, and who is owed for it.
+  { module: "Vendors", permissions: CRUD, group: "Purchasing" },
+  { module: "Purchases", permissions: ["View", "Create", "Update"], group: "Purchasing" },
+  // Payments cannot be edited or deleted — a correction is a second entry.
   {
-    module: "Print QR Code",
-    permissions: ["View", "Print"],
-    group: "Inventory",
+    module: "Vendor Payments",
+    permissions: ["View", "Create"],
+    group: "Purchasing",
   },
+
+  // Selling. "Create" on Sales is what opens the till, so a cashier gets that
+  // and a bookkeeper gets View — the two jobs are genuinely different.
+  { module: "Sales", permissions: ["View", "Create", "Update"], group: "Sales" },
+  { module: "Customers", permissions: CRUD, group: "Sales" },
+  { module: "CRM", permissions: CRUD, group: "Sales" },
 
   // Employee Management
   {

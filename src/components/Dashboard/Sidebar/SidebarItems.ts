@@ -1,4 +1,5 @@
 import {
+  Banknote,
   Boxes,
   CalendarClock,
   ClipboardList,
@@ -194,6 +195,12 @@ const sidebarMenuRoutes: RouteItem[] = [
         icon: Receipt,
         module: "Purchases",
         exactMatch: true,
+      },
+      {
+        label: "Vendor Payments",
+        address: "/purchases/payments",
+        icon: Banknote,
+        module: "Vendor Payments",
       },
       {
         label: "Vendor Dues",
