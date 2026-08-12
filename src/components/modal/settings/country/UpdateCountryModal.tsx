@@ -1,4 +1,4 @@
-import { Button, ColorPicker, Form } from "antd";
+﻿import { Button, ColorPicker, Form } from "antd";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import {
@@ -6,7 +6,7 @@ import {
   useUpdateCountryMutation,
 } from "../../../../redux/features/country/countryApi";
 import { FormInput } from "../../../Form/FormInput";
-import AntModal from "../../../shared/AntModal";
+import AppFormModal from "../../shared/AppFormModal";
 import UploadImage from "../../../shared/UploadImage";
 
 const HEX_COLOR = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
