@@ -134,7 +134,7 @@ const VendorForm = () => {
       company: vendor.company ?? "",
       phone: vendor.phone,
       email: vendor.email ?? "",
-      address: vendor.address ?? "",
+      address: vendor.address ?? {},
       note: vendor.note ?? "",
       categories: idsOf(vendor.categories),
       subCategories: idsOf(vendor.subCategories),
