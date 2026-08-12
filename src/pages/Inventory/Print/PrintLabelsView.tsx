@@ -1,10 +1,22 @@
-import { Button, Card, Checkbox, Empty, Input, InputNumber, Table, Tag } from "antd";
+import {
+  Button,
+  Card,
+  Checkbox,
+  Empty,
+  Input,
+  InputNumber,
+  Segmented,
+  Table,
+  Tag,
+} from "antd";
 import { ColumnsType } from "antd/es/table";
 import { Printer, Search } from "lucide-react";
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import PageHeader from "../../../components/Common/PageHeader";
 import PageMeta from "../../../components/Common/PageMeta";
+import Barcode from "../../../components/shared/Barcode";
+import QRCodeImage from "../../../components/shared/QRCodeImage";
 import {
   IProduct,
   useGetProductsQuery,
@@ -17,6 +29,12 @@ export interface LabelItem {
   /** "Red / S" for a variant, empty for a single product. */
   variantLabel: string;
   code: string;
+  /**
+   * Where the code came from. A label printed from the SKU still scans, but
+   * it means nobody has given that item a barcode of its own — worth seeing
+   * before a hundred of them go on the shelf.
+   */
+  codeSource: "barcode" | "sku";
   price: number;
 }
 
@@ -30,7 +48,8 @@ export interface LabelItem {
 const toLabelItems = (products: IProduct[]): LabelItem[] =>
   products.flatMap((product) => {
     if (product.type === "single") {
-      const code = product.barcode?.trim() || product.sku;
+      const own = product.barcode?.trim();
+      const code = own || product.sku;
       return code
         ? [
             {
@@ -38,6 +57,7 @@ const toLabelItems = (products: IProduct[]): LabelItem[] =>
               productName: product.name,
               variantLabel: "",
               code,
+              codeSource: own ? ("barcode" as const) : ("sku" as const),
               price: product.sellingPrice,
             },
           ]
@@ -46,43 +66,66 @@ const toLabelItems = (products: IProduct[]): LabelItem[] =>
 
     return (product.variants ?? [])
       .map((variant) => {
-        const code = variant.barcode?.trim() || variant.sku;
+        const own = variant.barcode?.trim();
+        const code = own || variant.sku;
         if (!code) return null;
         return {
           key: `${product._id}-${variant._id ?? variant.sku}`,
           productName: product.name,
-          variantLabel: variant.options
-            .map((option) => option.value)
-            .join(" / "),
+          variantLabel:
+            variant.options.map((option) => option.value).join(" / ") ||
+            variant.name,
           code,
+          codeSource: own ? ("barcode" as const) : ("sku" as const),
           price: variant.sellingPrice,
         };
       })
       .filter((item): item is LabelItem => item !== null);
   });
 
-interface PrintLabelsViewProps {
-  title: string;
-  subtitle: string;
-  canonicalPath: string;
-  /** Draws the code itself — a barcode or a QR code. */
-  renderCode: (value: string) => ReactNode;
-  /** Width of one printed label; QR labels are squarer than barcode ones. */
-  labelWidth: number;
-}
+type LabelFormat = "barcode" | "qr";
 
 /**
- * Shared engine for the two label screens. Pick items, say how many of each,
- * preview the sheet, print it — identical for barcodes and QR codes apart from
- * what gets drawn in the middle of the label.
+ * How each format is drawn, and how wide its label needs to be. A QR code is
+ * square and a Code 128 barcode is a wide strip, so one width cannot serve
+ * both without wasting half the sheet.
  */
-const PrintLabelsView = ({
-  title,
-  subtitle,
-  canonicalPath,
-  renderCode,
-  labelWidth,
-}: PrintLabelsViewProps) => {
+const FORMATS: Record<
+  LabelFormat,
+  { label: string; width: number; render: (value: string) => ReactNode }
+> = {
+  barcode: {
+    label: "Barcode",
+    width: 200,
+    render: (value) => <Barcode value={value} moduleWidth={1.6} height={48} />,
+  },
+  qr: {
+    label: "QR Code",
+    width: 130,
+    render: (value) => <QRCodeImage value={value} size={96} />,
+  },
+};
+
+/**
+ * Shelf labels, in either format.
+ *
+ * One screen rather than two: picking the items, counting the copies and
+ * laying out the sheet were identical on both of the pages this replaces, and
+ * the only real difference — what gets drawn in the middle of the label — is
+ * now a toggle. Two screens also meant deciding which one to open before
+ * knowing which format the printer had loaded.
+ *
+ * Every variant is its own row, because every variant is its own pack with its
+ * own code; printing the parent would put one barcode on every size.
+ */
+const PrintLabelsView = () => {
+  const [format, setFormat] = useState<LabelFormat>("barcode");
+  const { width: labelWidth, render: renderCode } = FORMATS[format];
+
+  const title = "Print Labels";
+  const subtitle = "Build a sheet of shelf labels — barcode or QR — and print it";
+  const canonicalPath = "/inventory/print-labels";
+
   const [searchText, setSearchText] = useState("");
   const [copies, setCopies] = useState<Record<string, number>>({});
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
@@ -150,11 +193,15 @@ const PrintLabelsView = ({
     },
     {
       title: "Code",
-      dataIndex: "code",
       key: "code",
-      width: 170,
-      render: (code: string) => (
-        <span className="font-mono text-xs">{code}</span>
+      width: 190,
+      render: (_, record) => (
+        <div>
+          <span className="font-mono text-xs">{record.code}</span>
+          {record.codeSource === "sku" && (
+            <Tag className="!ml-1.5 !m-0 !px-1.5 !text-[10px]">from SKU</Tag>
+          )}
+        </div>
       ),
     },
     {
@@ -202,14 +249,25 @@ const PrintLabelsView = ({
           { title },
         ]}
         extra={
-          <Button
-            type="primary"
-            icon={<Printer className="w-4 h-4" />}
-            disabled={sheet.length === 0}
-            onClick={() => handlePrint()}
-          >
-            Print {sheet.length > 0 ? `(${sheet.length})` : ""}
-          </Button>
+          <div className="flex items-center gap-3">
+            <Segmented
+              value={format}
+              onChange={(value) => setFormat(value as LabelFormat)}
+              options={Object.entries(FORMATS).map(([value, row]) => ({
+                value,
+                label: row.label,
+              }))}
+            />
+            <Button
+              type="primary"
+              icon={<Printer className="w-4 h-4" />}
+              disabled={sheet.length === 0}
+              onClick={() => handlePrint()}
+              className="!border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 shadow-primary"
+            >
+              Print {sheet.length > 0 ? `(${sheet.length})` : ""}
+            </Button>
+          </div>
         }
       />
 

@@ -104,7 +104,12 @@ const PurchaseForm = () => {
   ]);
 
   const vendors: IVendor[] = vendorData?.data?.data || [];
-  const products: IProduct[] = productData?.data?.data || [];
+  // Memoised because the option list below depends on it; an inline `|| []`
+  // fallback would be a new array each render and rebuild the whole picker.
+  const products: IProduct[] = useMemo(
+    () => productData?.data?.data || [],
+    [productData]
+  );
   const [createPurchase, { isLoading: saving }] = useCreatePurchaseMutation();
 
   /**

@@ -321,7 +321,10 @@ const VariantCards = ({
                     }
                   />
                 </Field>
-                <Field label="Current Stock">
+                <Field
+                  label="Opening Stock"
+                  hint="What is on the shelf now — later stock arrives through Purchases"
+                >
                   <InputNumber
                     type="number"
                     min={0}

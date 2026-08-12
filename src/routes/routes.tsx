@@ -19,6 +19,7 @@ import NotificationSounds from "../pages/Settings/NotificationSounds/Notificatio
 import Brands from "../pages/Inventory/Brands/Brands.tsx";
 import Categories from "../pages/Inventory/Categories/Categories.tsx";
 import PrintBarcode from "../pages/Inventory/Print/PrintBarcode.tsx";
+import PrintLabelsView from "../pages/Inventory/Print/PrintLabelsView.tsx";
 import PrintQRCode from "../pages/Inventory/Print/PrintQRCode.tsx";
 import ExpiredProducts from "../pages/Inventory/Products/ExpiredProducts.tsx";
 import LowStocks from "../pages/Inventory/Products/LowStocks.tsx";
@@ -28,6 +29,23 @@ import SubCategories from "../pages/Inventory/SubCategories/SubCategories.tsx";
 import Units from "../pages/Inventory/Units/Units.tsx";
 import VariantAttributes from "../pages/Inventory/VariantAttributes/VariantAttributes.tsx";
 import Warranties from "../pages/Inventory/Warranties/Warranties.tsx";
+import AccountsOverview from "../pages/Accounts/AccountsOverview.tsx";
+import CashFlow from "../pages/Accounts/CashFlow.tsx";
+import EmployeeSales from "../pages/Accounts/EmployeeSales.tsx";
+import ExpenseCategories from "../pages/Accounts/ExpenseCategories.tsx";
+import ProfitLoss from "../pages/Accounts/ProfitLoss.tsx";
+import Receivables from "../pages/Accounts/Receivables.tsx";
+import StockValuation from "../pages/Accounts/StockValuation.tsx";
+import CustomerProfile from "../pages/Customers/CustomerProfile.tsx";
+import Customers from "../pages/Customers/Customers.tsx";
+import DormantCustomers from "../pages/Customers/DormantCustomers.tsx";
+import FollowUps from "../pages/Customers/FollowUps.tsx";
+import StockLots from "../pages/Inventory/StockLots.tsx";
+import PurchaseForm from "../pages/Purchasing/PurchaseForm.tsx";
+import Purchases from "../pages/Purchasing/Purchases.tsx";
+import PurchaseView from "../pages/Purchasing/PurchaseView.tsx";
+import VendorProfile from "../pages/Purchasing/VendorProfile.tsx";
+import Vendors from "../pages/Purchasing/Vendors.tsx";
 import InvoiceView from "../pages/Sales/InvoiceView.tsx";
 import PointOfSale from "../pages/Sales/PointOfSale.tsx";
 import SalesList from "../pages/Sales/SalesList.tsx";
@@ -65,8 +83,52 @@ const routes = [
           { path: "units", element: <Units /> },
           { path: "variant-attributes", element: <VariantAttributes /> },
           { path: "warranties", element: <Warranties /> },
+          { path: "print-labels", element: <PrintLabelsView /> },
+          // Old addresses, now redirects — see the note in PrintBarcode.
           { path: "print-barcode", element: <PrintBarcode /> },
           { path: "print-qr-code", element: <PrintQRCode /> },
+          { path: "stock-lots", element: <StockLots /> },
+        ],
+      },
+      // Customers, and the relationship around them.
+      {
+        path: "customers",
+        children: [
+          { path: "", element: <Customers /> },
+          // Before ":id", or these words are read as customer ids.
+          { path: "follow-ups", element: <FollowUps /> },
+          { path: "dormant", element: <DormantCustomers /> },
+          { path: ":id", element: <CustomerProfile /> },
+        ],
+      },
+      // The books.
+      {
+        path: "accounts",
+        children: [
+          { path: "", element: <AccountsOverview /> },
+          { path: "profit-loss", element: <ProfitLoss /> },
+          { path: "stock-valuation", element: <StockValuation /> },
+          { path: "cash-flow", element: <CashFlow /> },
+          { path: "expense-categories", element: <ExpenseCategories /> },
+        ],
+      },
+      { path: "reports/employee-sales", element: <EmployeeSales /> },
+      // Buying — where stock comes from, and who is owed for it.
+      {
+        path: "vendors",
+        children: [
+          { path: "", element: <Vendors /> },
+          { path: ":id", element: <VendorProfile /> },
+        ],
+      },
+      {
+        path: "purchases",
+        children: [
+          { path: "", element: <Purchases /> },
+          // Before ":id", or these words are read as bill ids.
+          { path: "new", element: <PurchaseForm /> },
+          { path: "payables", element: <Receivables mode="payable" /> },
+          { path: ":id", element: <PurchaseView /> },
         ],
       },
       // Selling — the till, and everything it wrote down.
@@ -76,6 +138,7 @@ const routes = [
           { path: "pos", element: <PointOfSale /> },
           { path: "invoices", element: <SalesList /> },
           { path: "invoices/:id", element: <InvoiceView /> },
+          { path: "receivables", element: <Receivables mode="receivable" /> },
         ],
       },
       // Employee Management — primary paths

@@ -611,7 +611,11 @@ const ProductForm = () => {
                     placeholder="Optional"
                   />
                 </Form.Item>
-                <Form.Item label="Current Stock" name="quantity">
+                <Form.Item
+                  label="Opening Stock"
+                  name="quantity"
+                  tooltip="What is on the shelf right now. From here on stock arrives through Purchases, which is what records who supplied it and at what cost — a number typed here is booked at this product's own cost."
+                >
                   <InputNumber
                     type="number"
                     min={0}

@@ -1,14 +1,6 @@
-import QRCodeImage from "../../../components/shared/QRCodeImage";
-import PrintLabelsView from "./PrintLabelsView";
+import { Navigate } from "react-router-dom";
 
-const PrintQRCode = () => (
-  <PrintLabelsView
-    title="Print QR Code"
-    subtitle="Build a sheet of QR labels and print it"
-    canonicalPath="/inventory/print-qr-code"
-    labelWidth={130}
-    renderCode={(value) => <QRCodeImage value={value} size={96} />}
-  />
-);
+/** Merged into Print Labels — see the note in PrintBarcode. */
+const PrintQRCode = () => <Navigate to="/inventory/print-labels" replace />;
 
 export default PrintQRCode;
