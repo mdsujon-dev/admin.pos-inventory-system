@@ -269,30 +269,15 @@ const VendorForm = () => {
             </p>
             <div className="grid gap-x-4 sm:grid-cols-2 lg:grid-cols-4">
               <FormInput
-                label="Division"
-                name={["address", "division"]}
-                placeholder="e.g. Rajshahi"
-              />
-              <FormInput
                 label="District"
                 name={["address", "district"]}
                 placeholder="e.g. Bogura"
               />
               <FormInput
-                label="Upazila"
+                label="Upazila / Thana"
                 name={["address", "upazila"]}
-                tooltip="Rural areas say upazila; cities say thana. Fill in whichever they gave."
+                tooltip="Same tier under two names — rural areas say upazila, cities say thana. Either is fine."
                 placeholder="e.g. Shibganj"
-              />
-              <FormInput
-                label="Thana"
-                name={["address", "thana"]}
-                placeholder="e.g. Kotwali"
-              />
-              <FormInput
-                label="Union / Ward"
-                name={["address", "union"]}
-                placeholder="Optional"
               />
               <FormInput
                 label="Area / Village"
@@ -300,22 +285,19 @@ const VendorForm = () => {
                 placeholder="e.g. Jaleshwaritola"
               />
               <FormInput
-                label="Road"
-                name={["address", "road"]}
-                placeholder="e.g. Sherpur Road"
-              />
-              <FormInput
-                label="House / Holding"
-                name={["address", "houseNo"]}
-                placeholder="e.g. 42/A"
-              />
-              <FormInput
                 label="Post Code"
                 name={["address", "postCode"]}
                 placeholder="e.g. 5800"
                 digitsOnly
               />
-              <div className="sm:col-span-2 lg:col-span-3">
+              <div className="sm:col-span-2">
+                <FormInput
+                  label="Road & House"
+                  name={["address", "road"]}
+                  placeholder="e.g. Sherpur Road, House 42/A"
+                />
+              </div>
+              <div className="sm:col-span-2">
                 <FormInput
                   label="Landmark"
                   name={["address", "landmark"]}
@@ -428,8 +410,12 @@ const VendorForm = () => {
                       >
                         <Input placeholder="e.g. Payment within 30 days of delivery" />
                       </Form.Item>
+                      {/* Flex-centred explicitly: a lucide icon is an inline
+                          SVG and sits on the text baseline otherwise, which
+                          leaves it a pixel or two low inside the button. */}
                       <Button
                         danger
+                        className="!flex !items-center !justify-center"
                         icon={<Trash2 className="h-4 w-4" />}
                         onClick={() => remove(name)}
                       />
@@ -470,7 +456,7 @@ const VendorForm = () => {
                       <Button
                         danger
                         size="small"
-                        className="!absolute !right-2 !top-2"
+                        className="!absolute !right-2 !top-2 !flex !items-center !justify-center"
                         icon={<Trash2 className="h-4 w-4" />}
                         onClick={() => remove(name)}
                       />

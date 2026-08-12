@@ -194,13 +194,24 @@ input[type="number"] {
   border-radius: 8px !important;
 }
 
+.ant-select-single:not(.ant-select-sm):not(.ant-select-lg) {
+  height: 40px !important;
+}
+
 .ant-select-single:not(.ant-select-sm):not(.ant-select-lg) .ant-select-selector {
   height: 40px !important;
   border-radius: 8px !important;
   padding-left: 11px !important;
   padding-right: 11px !important;
-  align-items: center !important;
-  display: flex !important;
+}
+
+.ant-select-single:not(.ant-select-sm):not(.ant-select-lg) .ant-select-selector .ant-select-selection-item,
+.ant-select-single:not(.ant-select-sm):not(.ant-select-lg) .ant-select-selector .ant-select-selection-placeholder {
+  line-height: 38px !important;
+}
+
+.ant-select-single:not(.ant-select-sm):not(.ant-select-lg) .ant-select-selector .ant-select-selection-search-input {
+  height: 38px !important;
 }
 
 .ant-select-multiple:not(.ant-select-sm):not(.ant-select-lg) .ant-select-selector {

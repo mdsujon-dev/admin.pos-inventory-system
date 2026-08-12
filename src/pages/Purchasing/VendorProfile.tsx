@@ -105,14 +105,10 @@ const VendorProfile = () => {
    */
   const address = (vendor.address ?? {}) as Record<string, string>;
   const addressLine = [
-    address.houseNo,
     address.road,
     address.area,
-    address.union,
-    address.thana,
     address.upazila,
     address.district,
-    address.division,
     address.postCode,
   ]
     .map((part) => part?.trim())

@@ -10,19 +10,17 @@ type Ref<T> = T | string;
 /**
  * A Bangladeshi address in the parts people give it in.
  *
- * `thana` and `upazila` are both here on purpose — same tier, different word:
- * cities say thana, rural areas say upazila, and a form offering only one gets
- * the other typed into it.
+ * Kept to the parts worth grouping and searching by — district, upazila and
+ * area — with the rest of the street on one line. Every extra box is one more
+ * thing left blank.
  */
 export interface IAddress {
-  division?: string;
   district?: string;
+  /** Upazila or thana — the same tier under two names, so one field for both. */
   upazila?: string;
-  thana?: string;
-  union?: string;
   area?: string;
+  /** Road and house together; nobody quotes one without the other. */
   road?: string;
-  houseNo?: string;
   postCode?: string;
   landmark?: string;
 }
