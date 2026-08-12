@@ -13,11 +13,14 @@ const CategoryModal = ({
   open,
   setOpen,
   data,
+  onCreated,
 }: {
   open: boolean;
   setOpen: (val: boolean) => void;
   /** Present when editing; absent when creating. */
   data?: ICategory | null;
+  /** Called with the new category so a picker that opened this can select it. */
+  onCreated?: (created: ICategory) => void;
 }) => {
   const [form] = Form.useForm();
   const [createCategory, { isLoading: creating }] = useCreateCategoryMutation();
@@ -39,8 +42,9 @@ const CategoryModal = ({
         await updateCategory({ id: data!._id, data: payload }).unwrap();
         toast.success("Category updated successfully");
       } else {
-        await createCategory(payload).unwrap();
+        const response = await createCategory(payload).unwrap();
         toast.success("Category created successfully");
+        onCreated?.(response?.data);
       }
       setOpen(false);
       form.resetFields();

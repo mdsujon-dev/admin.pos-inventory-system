@@ -96,7 +96,7 @@ const Sidebar = () => {
         <AdminMenu />
 
         <div
-          className={`bg-white w-full sticky bottom-0 mt-auto py-2 border-t border-primary/20 transition-all duration-300 z-50 ${
+          className={`bg-white w-full sticky bottom-0 mt-auto h-[70px] shrink-0 flex items-center border-t border-primary/20 transition-all duration-300 z-50 ${
             isCollapsed ? "px-3" : "px-4"
           }`}
         >

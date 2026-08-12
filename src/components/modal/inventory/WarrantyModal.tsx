@@ -14,10 +14,13 @@ const WarrantyModal = ({
   open,
   setOpen,
   data,
+  onCreated,
 }: {
   open: boolean;
   setOpen: (val: boolean) => void;
   data?: IWarranty | null;
+  /** Called with the new warranty so a picker that opened this can select it. */
+  onCreated?: (created: IWarranty) => void;
 }) => {
   const [form] = Form.useForm();
   const [createWarranty, { isLoading: creating }] = useCreateWarrantyMutation();
@@ -42,8 +45,9 @@ const WarrantyModal = ({
         await updateWarranty({ id: data!._id, data: payload }).unwrap();
         toast.success("Warranty updated successfully");
       } else {
-        await createWarranty(payload).unwrap();
+        const response = await createWarranty(payload).unwrap();
         toast.success("Warranty created successfully");
+        onCreated?.(response?.data);
       }
       setOpen(false);
       form.resetFields();

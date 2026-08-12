@@ -1,24 +1,38 @@
 import {
   Button,
-  Card,
   DatePicker,
   Divider,
   Form,
   Input,
   InputNumber,
-  Radio,
   Select,
   Switch,
 } from "antd";
 import dayjs from "dayjs";
-import { Sparkles } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+  Boxes,
+  ImageIcon,
+  Layers,
+  Package,
+  Percent,
+  Plus,
+  Power,
+  Sparkles,
+  Tags,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
+import { ReactElement, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import PageHeader from "../../../components/Common/PageHeader";
 import PageMeta from "../../../components/Common/PageMeta";
 import { FormInput } from "../../../components/Form/FormInput";
 import { FormSelect } from "../../../components/Form/FormSelect";
+import BrandModal from "../../../components/modal/inventory/BrandModal";
+import CategoryModal from "../../../components/modal/inventory/CategoryModal";
+import SubCategoryModal from "../../../components/modal/inventory/SubCategoryModal";
+import UnitModal from "../../../components/modal/inventory/UnitModal";
 import { Loading } from "../../../components/shared/Loading";
 import UploadImage from "../../../components/shared/UploadImage";
 import { IBrand, useGetBrandsQuery } from "../../../redux/features/inventory/brandApi";
@@ -43,10 +57,14 @@ import {
   IVariantAttribute,
   useGetVariantAttributesQuery,
 } from "../../../redux/features/inventory/variantAttributeApi";
+import Money from "../../../components/shared/Money";
 import {
-  IWarranty,
-  useGetWarrantiesQuery,
-} from "../../../redux/features/inventory/warrantyApi";
+  FormHero,
+  SectionCard,
+  StatTile,
+  TypePicker,
+  type TypeOption,
+} from "./ProductFormUI";
 import { useVariantBuilder } from "./useVariantBuilder";
 import VariantCards from "./VariantCards";
 
@@ -57,6 +75,41 @@ const activeOnly = [
 
 /** Four across on a wide screen, two on a tablet, one on a phone. */
 const ROW = "grid gap-x-4 sm:grid-cols-2 lg:grid-cols-4";
+
+/** The pickers that can also make what they are picking. */
+type Creatable = "brand" | "unit" | "category" | "subCategory";
+
+const TYPE_OPTIONS: TypeOption[] = [
+  {
+    value: "single",
+    icon: Package,
+    title: "Single Product",
+    hint: "One SKU, one price, one stock count",
+  },
+  {
+    value: "variable",
+    icon: Layers,
+    title: "Variable Product",
+    hint: "Sizes or colours, each priced and stocked on its own",
+  },
+];
+
+/**
+ * A barcode you can read off the label and still know what you are holding.
+ *
+ * The SKU's letters and digits, then a short tail from the clock so two
+ * products sharing a root never print the same code. Code 128 is what the
+ * label renderer draws and it carries the whole alphabet, so there is nothing
+ * to gain from falling back to an opaque run of digits.
+ */
+const generateBarcode = (sku: string, name: string) => {
+  const root =
+    (sku || name || "")
+      .toUpperCase()
+      .replace(/[^A-Z0-9]/g, "")
+      .slice(0, 10) || "ITEM";
+  return `${root}-${Date.now().toString().slice(-6)}`;
+};
 
 /**
  * Create and edit in one screen.
@@ -74,6 +127,8 @@ const ProductForm = () => {
   const [attributeSelections, setAttributeSelections] = useState<
     Record<string, string[]>
   >({});
+  // Which "add new" modal a picker has opened, if any.
+  const [addingNew, setAddingNew] = useState<Creatable | null>(null);
 
   const { data: productData, isFetching: loadingProduct } =
     useGetProductByIdQuery(id as string, { skip: !isEditing });
@@ -86,7 +141,6 @@ const ProductForm = () => {
   const { data: subCategoryData } = useGetSubCategoriesQuery(activeOnly);
   const { data: brandData } = useGetBrandsQuery(activeOnly);
   const { data: unitData } = useGetUnitsQuery(activeOnly);
-  const { data: warrantyData } = useGetWarrantiesQuery(activeOnly);
   const { data: attributeData } = useGetVariantAttributesQuery(activeOnly);
 
   const categories: ICategory[] = categoryData?.data?.data || [];
@@ -98,7 +152,6 @@ const ProductForm = () => {
   );
   const brands: IBrand[] = brandData?.data?.data || [];
   const units: IUnit[] = unitData?.data?.data || [];
-  const warranties: IWarranty[] = warrantyData?.data?.data || [];
   const attributes: IVariantAttribute[] = attributeData?.data?.data || [];
 
   const productType = Form.useWatch("type", form) ?? "single";
@@ -108,6 +161,13 @@ const ProductForm = () => {
   const purchasePrice = Form.useWatch("purchasePrice", form) ?? 0;
   const extraCost = Form.useWatch("cost", form) ?? 0;
   const sellingPrice = Form.useWatch("sellingPrice", form) ?? 0;
+  // Watched for the banner and the pricing read-outs rather than for the
+  // fields themselves, which AntD already owns.
+  const nameValue = Form.useWatch("name", form) ?? "";
+  const unitValue = Form.useWatch("unit", form);
+  const discountPrice = Form.useWatch("discountPrice", form);
+  const quantity = Form.useWatch("quantity", form) ?? 0;
+  const isActive = Form.useWatch("isActive", form) ?? true;
 
   const { variants, addVariant, generate, updateVariant, removeVariant } =
     useVariantBuilder({ initial: product?.variants ?? [] });
@@ -145,7 +205,6 @@ const ProductForm = () => {
       subCategory: refId(product.subCategory),
       brand: refId(product.brand),
       unit: refId(product.unit),
-      warranty: refId(product.warranty),
       description: product.description ?? "",
       images: product.images ?? [],
       weight: product.weight ?? null,
@@ -160,6 +219,41 @@ const ProductForm = () => {
       isActive: product.isActive,
     };
   }, [product]);
+
+  /**
+   * Puts an "add new" row under a picker's options.
+   *
+   * Nothing here is worth leaving the half-filled form for: a brand that turns
+   * out to be missing is two fields, and sending someone to Brands and back
+   * costs them everything they had typed.
+   */
+  const withCreate =
+    (entity: Creatable, label: string) => (menu: ReactElement) => (
+      <>
+        {menu}
+        <Divider className="!my-1" />
+        <div className="p-1.5">
+          <button
+            type="button"
+            // The select takes focus on mousedown and closes the popup with it,
+            // which would tear the button out from under the click.
+            onMouseDown={(event) => event.preventDefault()}
+            onClick={() => setAddingNew(entity)}
+            className="flex w-full items-center justify-center gap-2 rounded-[7px] border border-primary px-3 py-1.5 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-white"
+          >
+            <Plus className="h-4 w-4" />
+            {label}
+          </button>
+        </div>
+      </>
+    );
+
+  // Whatever was just created is what the user wanted selected — they opened
+  // the modal from this field.
+  const selectCreated = (field: Creatable) => (created?: { _id: string }) => {
+    if (created?._id) form.setFieldValue(field, created._id);
+    setAddingNew(null);
+  };
 
   const handleGenerate = () => {
     const selections = Object.entries(attributeSelections)
@@ -208,11 +302,13 @@ const ProductForm = () => {
       subCategory: values.subCategory || null,
       brand: values.brand || null,
       unit: values.unit,
-      warranty: values.warranty || null,
       description: values.description?.trim() || "",
       images: values.images || [],
       weight: values.weight === undefined ? null : values.weight,
       lowStockAlert: Number(values.lowStockAlert) || 0,
+      // Both product types carry one: a variable product's variants can expire
+      // on their own dates, but the batch itself still has a shelf life.
+      expiryDate: values.expiryDate ? values.expiryDate.toISOString() : null,
       isActive: values.isActive ?? true,
     };
 
@@ -221,7 +317,11 @@ const ProductForm = () => {
     if (values.sku?.trim()) payload.sku = values.sku.trim().toUpperCase();
 
     if (values.type === "single") {
-      payload.barcode = values.barcode?.trim() || null;
+      // Left blank means "give me one", not "this product has none" — every
+      // single product ends up on a shelf label sooner or later.
+      payload.barcode =
+        values.barcode?.trim() ||
+        generateBarcode(values.sku ?? "", values.name ?? "");
       payload.purchasePrice = Number(values.purchasePrice) || 0;
       payload.cost = Number(values.cost) || 0;
       payload.sellingPrice = Number(values.sellingPrice) || 0;
@@ -230,9 +330,6 @@ const ProductForm = () => {
           ? null
           : Number(values.discountPrice);
       payload.quantity = Number(values.quantity) || 0;
-      payload.expiryDate = values.expiryDate
-        ? values.expiryDate.toISOString()
-        : null;
     } else {
       // Sent as a whole array — a variant the user removed here is simply
       // absent, which is what deletes it on the server.
@@ -242,6 +339,7 @@ const ProductForm = () => {
         options: variant.options ?? [],
         sku: variant.sku.trim().toUpperCase(),
         barcode: variant.barcode?.trim() || null,
+        description: variant.description?.trim() || "",
         weight: variant.weight ?? null,
         purchasePrice: Number(variant.purchasePrice) || 0,
         cost: Number(variant.cost) || 0,
@@ -283,8 +381,40 @@ const ProductForm = () => {
 
   const totalCost = (Number(purchasePrice) || 0) + (Number(extraCost) || 0);
 
+  // What the product actually sells for, and what that leaves. An offer price
+  // is the one being charged, so the margin has to be measured against it —
+  // reading the shelf price would flatter every discounted line on the list.
+  const listPrice = Number(sellingPrice) || 0;
+  const offer = discountPrice == null ? null : Number(discountPrice) || 0;
+  const effectivePrice = offer && offer > 0 ? offer : listPrice;
+  const profit = effectivePrice - totalCost;
+  const margin = effectivePrice > 0 ? (profit / effectivePrice) * 100 : 0;
+  const stockValue = totalCost * (Number(quantity) || 0);
+
+  /** What the save button is still waiting on, shown in the banner. */
+  const requirements = [
+    { label: "Name", done: Boolean(String(nameValue).trim()) },
+    { label: "Category", done: Boolean(selectedCategory) },
+    { label: "Unit", done: Boolean(unitValue) },
+    productType === "single"
+      ? { label: "Selling price", done: listPrice > 0 }
+      : {
+          label: "Variants",
+          done:
+            variants.length > 0 &&
+            variants.every(
+              (variant) => variant.name?.trim() && variant.sku?.trim()
+            ),
+        },
+  ];
+
   return (
-    <div>
+    /* Tall enough to reach the bottom of the scroll area even when the form is
+       short — that is what gives the action bar below something to pin against,
+       so it sits on the bottom edge of the screen in every state instead of
+       drifting up to wherever the content happens to end. 70px of header plus
+       the layout's own page padding. */
+    <div className="flex min-h-[calc(100dvh-94px)] flex-col sm:min-h-[calc(100dvh-102px)]">
       <PageMeta
         title={`${isEditing ? "Edit" : "Create"} Product - POS & Inventory`}
         description="Create and edit products, including variable products with variants"
@@ -313,21 +443,24 @@ const ProductForm = () => {
         // Editing loads asynchronously, so the form is mounted before the
         // values exist; without this the fields stay on the create defaults.
         key={product?._id ?? "create"}
+        className="flex flex-1 flex-col"
       >
-        <div className="space-y-4">
-          <Card title="Product Details">
+        <div className="flex flex-1 flex-col gap-4">
+          <FormHero
+            title={String(nameValue).trim()}
+            sku={String(skuValue).trim().toUpperCase()}
+            typeLabel={productType === "single" ? "Single" : "Variable"}
+            requirements={requirements}
+          />
+
+          <SectionCard
+            icon={Boxes}
+            title="Product Details"
+            subtitle="What it is, where it files, how it is measured"
+          >
             <Form.Item label="Product Type" name="type">
-              <Radio.Group buttonStyle="solid" disabled={isEditing}>
-                <Radio.Button value="single">Single Product</Radio.Button>
-                <Radio.Button value="variable">Variable Product</Radio.Button>
-              </Radio.Group>
+              <TypePicker options={TYPE_OPTIONS} />
             </Form.Item>
-            {isEditing && (
-              <p className="-mt-2 mb-4 text-xs text-secondary-500">
-                Product type cannot be changed after creation — switching it
-                would orphan the stock held against the other shape.
-              </p>
-            )}
 
             <div className={ROW}>
               <FormInput
@@ -351,6 +484,7 @@ const ProductForm = () => {
                 placeholder="Select a brand"
                 showSearch
                 optionFilterProp="label"
+                popupRender={withCreate("brand", "Add new brand")}
                 options={brands.map((brand) => ({
                   label: brand.name,
                   value: brand._id,
@@ -363,6 +497,7 @@ const ProductForm = () => {
                 showSearch
                 optionFilterProp="label"
                 rules={[{ required: true, message: "Unit is required" }]}
+                popupRender={withCreate("unit", "Add new unit")}
                 options={units.map((unit) => ({
                   label: `${unit.name} (${unit.shortName})`,
                   value: unit._id,
@@ -381,6 +516,7 @@ const ProductForm = () => {
                 // Clearing the child keeps the pair coherent — a sub category
                 // from the old parent would no longer belong to this product.
                 onChange={() => form.setFieldValue("subCategory", undefined)}
+                popupRender={withCreate("category", "Add new category")}
                 options={categories.map((category) => ({
                   label: category.name,
                   value: category._id,
@@ -397,24 +533,21 @@ const ProductForm = () => {
                 disabled={!selectedCategory}
                 showSearch
                 optionFilterProp="label"
+                popupRender={withCreate("subCategory", "Add new sub category")}
                 options={availableSubCategories.map((subCategory) => ({
                   label: subCategory.name,
                   value: subCategory._id,
                 }))}
               />
-              <FormSelect
-                label="Warranty"
-                name="warranty"
-                placeholder="Select a warranty"
-                showSearch
-                optionFilterProp="label"
-                options={warranties.map((warranty) => ({
-                  label: `${warranty.name} (${warranty.duration} ${warranty.period})`,
-                  value: warranty._id,
-                }))}
-              />
+              <Form.Item
+                label="Expiry Date"
+                name="expiryDate"
+                tooltip="The product shows on Expired Products past this date"
+              >
+                <DatePicker className="w-full" placeholder="Optional" />
+              </Form.Item>
               <Form.Item label="Weight" name="weight">
-                <InputNumber min={0} className="w-full" placeholder="Optional" />
+                <InputNumber type="number" min={0} className="w-full" placeholder="Optional" />
               </Form.Item>
             </div>
 
@@ -425,32 +558,39 @@ const ProductForm = () => {
             >
               <Input.TextArea rows={4} placeholder="Optional description" />
             </Form.Item>
-          </Card>
+          </SectionCard>
 
-          <Card title="Product Image">
-            <Form.Item name="images">
+          <SectionCard
+            icon={ImageIcon}
+            title="Product Image"
+            subtitle="The first one is what lists and receipts show"
+          >
+            <Form.Item name="images" className="!mb-0">
               <UploadImage form={form} fieldPath="images" mode="multiple" />
             </Form.Item>
-          </Card>
-
+          </SectionCard>
 
           {productType === "single" ? (
-            <Card title="Pricing & Stock">
+            <SectionCard
+              icon={Wallet}
+              title="Pricing & Stock"
+              subtitle="What it costs, what it sells for, how many are on the shelf"
+            >
               <div className={ROW}>
                 <Form.Item label="Purchase Price" name="purchasePrice">
-                  <InputNumber min={0} className="w-full" />
+                  <InputNumber type="number" min={0} className="w-full" />
                 </Form.Item>
                 <Form.Item
                   label="Cost"
                   name="cost"
                   tooltip="Freight, duty, handling — anything on top of the purchase price"
                 >
-                  <InputNumber min={0} className="w-full" />
+                  <InputNumber type="number" min={0} className="w-full" />
                 </Form.Item>
                 <Form.Item label="Total Cost" tooltip="Purchase Price + Cost">
                   {/* Read-only: the server derives this, so an editable field
                       here would just be a second answer to the same sum. */}
-                  <InputNumber value={totalCost} disabled className="w-full" />
+                  <InputNumber type="number" value={totalCost} disabled className="w-full" />
                 </Form.Item>
                 <Form.Item
                   label="Selling Price"
@@ -459,7 +599,7 @@ const ProductForm = () => {
                     { required: true, message: "Selling price is required" },
                   ]}
                 >
-                  <InputNumber min={0} className="w-full" />
+                  <InputNumber type="number" min={0} className="w-full" />
                 </Form.Item>
               </div>
 
@@ -478,34 +618,87 @@ const ProductForm = () => {
                     },
                   ]}
                 >
-                  <InputNumber min={0} className="w-full" placeholder="Optional" />
+                  <InputNumber type="number" min={0} className="w-full" placeholder="Optional" />
                 </Form.Item>
                 <Form.Item label="Current Stock" name="quantity">
-                  <InputNumber min={0} precision={0} className="w-full" />
+                  <InputNumber type="number" min={0} precision={0} className="w-full" />
                 </Form.Item>
-                <Form.Item
-                  label="Low Stock Alert At"
-                  name="lowStockAlert"
-                  tooltip="The product shows on Low Stocks at or below this"
-                >
-                  <InputNumber min={0} precision={0} className="w-full" />
-                </Form.Item>
-                <Form.Item label="Expiry Date" name="expiryDate">
-                  <DatePicker className="w-full" />
-                </Form.Item>
-              </div>
 
-              <div className={ROW}>
                 <FormInput
                   label="Barcode"
                   name="barcode"
-                  placeholder="Optional — scanned at the till"
+                  tooltip="Left blank, one is generated from the SKU on save"
+                  placeholder="Scanned at the till"
+                  suffix={
+                    <button
+                      type="button"
+                      onClick={() =>
+                        form.setFieldValue(
+                          "barcode",
+                          generateBarcode(
+                            String(skuValue),
+                            String(form.getFieldValue("name") ?? "")
+                          )
+                        )
+                      }
+                      className="font-medium text-primary transition-colors hover:text-primary-700"
+                    >
+                      Generate
+                    </button>
+                  }
                 />
               </div>
-            </Card>
+
+              {/* The arithmetic nobody should be doing in their head while
+                  typing prices in. Recomputed as the fields change, so a
+                  discount that eats the margin says so before the save. */}
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <StatTile icon={Wallet} label="Total cost" tone="muted">
+                  <Money value={totalCost} />
+                </StatTile>
+                <StatTile
+                  icon={Tags}
+                  label="Sells at"
+                  tone="brand"
+                  note={
+                    offer && offer > 0 && offer < listPrice
+                      ? `Offer price — list is ৳${listPrice.toLocaleString("en-BD")}`
+                      : undefined
+                  }
+                >
+                  <Money value={effectivePrice} />
+                </StatTile>
+                <StatTile
+                  icon={TrendingUp}
+                  label="Profit / unit"
+                  tone={profit < 0 ? "danger" : "brand"}
+                  note={profit < 0 ? "Selling below cost" : undefined}
+                >
+                  <Money value={profit} />
+                </StatTile>
+                <StatTile
+                  icon={Percent}
+                  label="Margin"
+                  tone={profit < 0 ? "danger" : "brand"}
+                  note={
+                    stockValue > 0
+                      ? `৳${stockValue.toLocaleString("en-BD")} tied up in stock`
+                      : undefined
+                  }
+                >
+                  {effectivePrice > 0 ? `${margin.toFixed(1)}%` : "—"}
+                </StatTile>
+              </div>
+            </SectionCard>
           ) : (
-            <Card
+            <SectionCard
+              icon={Layers}
               title="Product Variants"
+              subtitle={
+                variants.length === 1
+                  ? "1 variant on this product"
+                  : `${variants.length} variants on this product`
+              }
               extra={
                 <Button
                   icon={<Sparkles className="h-4 w-4" />}
@@ -516,48 +709,47 @@ const ProductForm = () => {
                 </Button>
               }
             >
-              <div className={ROW}>
-                <Form.Item
-                  label="Low Stock Alert At"
-                  name="lowStockAlert"
-                  tooltip="Default threshold for variants that don't set their own"
-                >
-                  <InputNumber min={0} precision={0} className="w-full" />
-                </Form.Item>
-              </div>
+
 
               {attributes.length > 0 && (
                 <>
-                  <p className="mb-2 text-[13px] font-medium text-secondary-700">
-                    Build combinations (optional)
-                  </p>
-                  <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                    {attributes.map((attribute) => (
-                      <div key={attribute._id}>
-                        <label className="mb-1 block text-[13px] text-secondary-600">
-                          {attribute.name}
-                        </label>
-                        <Select
-                          mode="multiple"
-                          allowClear
-                          className="w-full"
-                          placeholder={`Select ${attribute.name.toLowerCase()}`}
-                          value={attributeSelections[attribute.name] ?? []}
-                          onChange={(values: string[]) =>
-                            setAttributeSelections((previous) => ({
-                              ...previous,
-                              [attribute.name]: values,
-                            }))
-                          }
-                          options={attribute.values.map((value) => ({
-                            label: value,
-                            value,
-                          }))}
-                        />
-                      </div>
-                    ))}
+                  {/* Tinted so the builder reads as a tool sitting above the
+                      list, not as another row of the variant being edited. */}
+                  <div className="mb-4 rounded-xl border border-primary-100 bg-primary-50/50 p-3">
+                    <p className="mb-2 flex items-center gap-1.5 text-[13px] font-semibold text-primary-700">
+                      <Sparkles className="h-4 w-4" />
+                      Build combinations
+                      <span className="font-normal text-secondary-500">
+                        — pick values, then generate the grid
+                      </span>
+                    </p>
+                    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                      {attributes.map((attribute) => (
+                        <div key={attribute._id}>
+                          <label className="mb-1 block text-[13px] font-medium text-secondary-700">
+                            {attribute.name}
+                          </label>
+                          <Select
+                            mode="multiple"
+                            allowClear
+                            className="w-full"
+                            placeholder={`Select ${attribute.name.toLowerCase()}`}
+                            value={attributeSelections[attribute.name] ?? []}
+                            onChange={(values: string[]) =>
+                              setAttributeSelections((previous) => ({
+                                ...previous,
+                                [attribute.name]: values,
+                              }))
+                            }
+                            options={attribute.values.map((value) => ({
+                              label: value,
+                              value,
+                            }))}
+                          />
+                        </div>
+                      ))}
+                    </div>
                   </div>
-                  <Divider />
                 </>
               )}
 
@@ -568,24 +760,61 @@ const ProductForm = () => {
                 onAdd={addVariant}
                 fallbackLowStock={Number(lowStockAlert) || 0}
               />
-            </Card>
+            </SectionCard>
           )}
 
-          <div className="flex justify-start mb-6">
-            <Form.Item
-              name="isActive"
-              valuePropName="checked"
-              className="mb-0"
+          <SectionCard
+            icon={Power}
+            title="Status"
+            subtitle="Whether the till can sell this"
+          >
+            {/* The panel takes the colour of the state it is in, so the answer
+                is readable from across the room rather than off a switch. */}
+            <div
+              className={`flex flex-wrap items-center justify-between gap-4 rounded-xl border p-3 transition-colors duration-300 ${
+                isActive
+                  ? "border-primary-200 bg-primary-50"
+                  : "border-secondary-200 bg-secondary-50"
+              }`}
             >
-              <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
-            </Form.Item>
-          </div>
+              <div className="flex min-w-0 items-center gap-3">
+                <span
+                  className={`grid h-9 w-9 shrink-0 place-items-center rounded-lg transition-colors ${
+                    isActive
+                      ? "bg-primary text-white"
+                      : "bg-secondary-200 text-secondary-600"
+                  }`}
+                >
+                  <Power className="h-4 w-4" />
+                </span>
+                <div className="min-w-0">
+                  <p
+                    className={`text-sm font-semibold ${
+                      isActive ? "text-primary-700" : "text-secondary-700"
+                    }`}
+                  >
+                    {isActive
+                      ? "Active — on sale at the till"
+                      : "Inactive — not sellable"}
+                  </p>
+                  <p className="text-xs text-secondary-500">
+                    An inactive product stays in the catalog and keeps its
+                    stock; it just cannot be rung up.
+                  </p>
+                </div>
+              </div>
+              <Form.Item name="isActive" valuePropName="checked" className="!mb-0">
+                <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+              </Form.Item>
+            </div>
+          </SectionCard>
 
           {/* The header's twin at the other end of the screen: same glass,
-              pinned the same way, a touch shorter than the 70px top band. The
-              negative margins cancel the layout's page padding so it spans edge
-              to edge instead of sitting inset like a card. */}
-          <div className="sticky bottom-0 z-30 -mx-3 -mb-3 flex h-[45px] items-center justify-end gap-3 border-t border-primary/20 bg-white/80 px-3 backdrop-blur-lg sm:-mx-4 sm:-mb-4 sm:px-6">
+              pinned the same way, a touch shorter than the 70px top band.
+              `mt-auto` holds it against the bottom of the column so it never
+              rides up with short content, and the negative margins cancel the
+              layout's page padding so it spans edge to edge. */}
+          <div className="sticky bottom-0 z-30 -mx-3 -mb-3 mt-auto flex h-[70px] items-center justify-end gap-3 border-t border-primary/20 bg-white/80 px-3 backdrop-blur-lg sm:-mx-4 sm:-mb-4 sm:px-6">
             <Button
               className="min-w-28"
               onClick={() => navigate("/inventory/products")}
@@ -594,7 +823,7 @@ const ProductForm = () => {
               Cancel
             </Button>
             <Button
-              className="min-w-36"
+              className="min-w-36 !border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 shadow-primary hover:!from-primary-700 hover:!to-primary-600"
               type="primary"
               htmlType="submit"
               loading={creating || updating}
@@ -604,6 +833,40 @@ const ProductForm = () => {
           </div>
         </div>
       </Form>
+
+      {/* Mounted only while open, so each one starts on a clean form — the
+          shared modal shell reads `initialValues` once, on mount. */}
+      {addingNew === "brand" && (
+        <BrandModal
+          open
+          setOpen={() => setAddingNew(null)}
+          onCreated={selectCreated("brand")}
+        />
+      )}
+      {addingNew === "unit" && (
+        <UnitModal
+          open
+          setOpen={() => setAddingNew(null)}
+          onCreated={selectCreated("unit")}
+        />
+      )}
+      {addingNew === "category" && (
+        <CategoryModal
+          open
+          setOpen={() => setAddingNew(null)}
+          onCreated={selectCreated("category")}
+        />
+      )}
+      {addingNew === "subCategory" && (
+        <SubCategoryModal
+          open
+          setOpen={() => setAddingNew(null)}
+          // The picker is only reachable once a category is chosen, and that
+          // is the parent the new one belongs under.
+          defaultCategory={selectedCategory}
+          onCreated={selectCreated("subCategory")}
+        />
+      )}
     </div>
   );
 };

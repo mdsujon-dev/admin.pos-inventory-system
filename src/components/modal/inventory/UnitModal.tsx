@@ -12,10 +12,13 @@ const UnitModal = ({
   open,
   setOpen,
   data,
+  onCreated,
 }: {
   open: boolean;
   setOpen: (val: boolean) => void;
   data?: IUnit | null;
+  /** Called with the new unit so a picker that opened this can select it. */
+  onCreated?: (created: IUnit) => void;
 }) => {
   const [form] = Form.useForm();
   const [createUnit, { isLoading: creating }] = useCreateUnitMutation();
@@ -37,8 +40,9 @@ const UnitModal = ({
         await updateUnit({ id: data!._id, data: payload }).unwrap();
         toast.success("Unit updated successfully");
       } else {
-        await createUnit(payload).unwrap();
+        const response = await createUnit(payload).unwrap();
         toast.success("Unit created successfully");
+        onCreated?.(response?.data);
       }
       setOpen(false);
       form.resetFields();

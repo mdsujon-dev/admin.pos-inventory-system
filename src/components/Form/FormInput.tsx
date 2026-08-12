@@ -17,6 +17,7 @@ interface FormInputProps extends InputProps {
   help?: React.ReactNode;
   /** When true, digits are stripped as the user types (text-only field). */
   textOnly?: boolean;
+  tooltip?: React.ReactNode;
 }
 
 export const FormInput = ({
@@ -33,6 +34,7 @@ export const FormInput = ({
   isListField,
   help,
   textOnly,
+  tooltip,
   ...rest
 }: FormInputProps) => {
   const errorMessage = fieldError?.[name as string];
@@ -48,6 +50,7 @@ export const FormInput = ({
       isListField={isListField}
       validateStatus={errorMessage ? 'error' : undefined}
       help={errorMessage || help}
+      tooltip={tooltip}
       getValueFromEvent={
         textOnly
           ? (e) => (e?.target?.value ?? "").replace(/[0-9]/g, "")

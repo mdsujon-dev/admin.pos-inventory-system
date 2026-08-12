@@ -33,6 +33,8 @@ export interface IProductVariant extends IPricing {
   options: IProductVariantOption[];
   sku: string;
   barcode?: string | null;
+  /** What sets this variant apart, separate from the product's description. */
+  description?: string;
   weight?: number | null;
   quantity: number;
   lowStockAlert?: number | null;

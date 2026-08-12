@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 import {
   IProductVariant,
   IProductVariantOption,
@@ -56,6 +56,7 @@ const emptyVariant = (key: string, name = ""): DraftVariant => ({
   options: [],
   sku: "",
   barcode: "",
+  description: "",
   weight: null,
   purchasePrice: 0,
   cost: 0,
@@ -89,6 +90,20 @@ export const useVariantBuilder = ({ initial = [] }: BuilderOptions = {}) => {
       key: variant._id ?? `existing-${index}`,
     }))
   );
+
+  const initialized = useRef(initial.length > 0);
+
+  useEffect(() => {
+    if (!initialized.current && initial.length > 0) {
+      setVariants(
+        initial.map((variant, index) => ({
+          ...variant,
+          key: variant._id ?? `existing-${index}`,
+        }))
+      );
+      initialized.current = true;
+    }
+  }, [initial]);
 
   /** Adds one blank row for the user to fill in by hand. */
   const addVariant = useCallback(() => {

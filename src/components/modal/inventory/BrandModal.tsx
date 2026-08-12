@@ -13,10 +13,13 @@ const BrandModal = ({
   open,
   setOpen,
   data,
+  onCreated,
 }: {
   open: boolean;
   setOpen: (val: boolean) => void;
   data?: IBrand | null;
+  /** Called with the new brand so a picker that opened this can select it. */
+  onCreated?: (created: IBrand) => void;
 }) => {
   const [form] = Form.useForm();
   const [createBrand, { isLoading: creating }] = useCreateBrandMutation();
@@ -38,8 +41,9 @@ const BrandModal = ({
         await updateBrand({ id: data!._id, data: payload }).unwrap();
         toast.success("Brand updated successfully");
       } else {
-        await createBrand(payload).unwrap();
+        const response = await createBrand(payload).unwrap();
         toast.success("Brand created successfully");
+        onCreated?.(response?.data);
       }
       setOpen(false);
       form.resetFields();

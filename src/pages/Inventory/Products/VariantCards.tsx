@@ -10,10 +10,10 @@ import {
   Tooltip,
 } from "antd";
 import dayjs from "dayjs";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, HelpCircle } from "lucide-react";
 import { config } from "../../../config";
 import SetMediaModal from "../../../components/modal/media/SetMediaModal";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { DraftVariant } from "./useVariantBuilder";
 
 interface VariantCardsProps {
@@ -38,70 +38,75 @@ const Field = ({
   hint?: string;
 }) => (
   <div className="min-w-0">
-    <label className="mb-1 block text-[13px] font-medium text-secondary-700">
-      {label}
-      {required && <span className="ml-0.5 text-danger">*</span>}
+    <label className="mb-1 flex items-center gap-1.5 text-[13px] font-medium text-secondary-700">
+      <span>
+        {label}
+        {required && <span className="ml-0.5 text-danger">*</span>}
+      </span>
+      {hint && (
+        <Tooltip title={hint} placement="top">
+          <HelpCircle className="h-3.5 w-3.5 cursor-help text-secondary-400 outline-none hover:text-primary" />
+        </Tooltip>
+      )}
     </label>
     {children}
-    {hint && <p className="mt-1 mb-0 text-[11px] text-secondary-400">{hint}</p>}
   </div>
 );
 
-/** Single-image slot backed by the Media Library picker. */
-const ImageSlot = ({
+const MultiImageSlot = ({
   label,
-  value,
+  values = [],
   onSelect,
 }: {
   label: string;
-  value?: string | null;
-  onSelect: (url: string | null) => void;
+  values?: string[];
+  onSelect: (urls: string[]) => void;
 }) => {
   const [open, setOpen] = useState(false);
-  const src = value
-    ? value.startsWith("http")
-      ? value
-      : `${config.image_access_url}${value}`
-    : null;
 
   return (
-    <div>
+    <div className="col-span-full sm:col-span-2 lg:col-span-3">
       <label className="mb-1 block text-[13px] font-medium text-secondary-700">
         {label}
       </label>
-      <div
-        onClick={() => setOpen(true)}
-        className="relative flex h-[86px] w-full cursor-pointer items-center justify-center overflow-hidden rounded-lg border border-dashed border-secondary-300 bg-secondary-50 transition-colors hover:border-primary hover:bg-primary-50/40"
-      >
-        {src ? (
-          <>
-            <img src={src} alt={label} className="h-full w-full object-cover" />
-            <button
-              type="button"
-              onClick={(event) => {
-                // Without this the click also opens the picker underneath.
-                event.stopPropagation();
-                onSelect(null);
-              }}
-              className="absolute right-1 top-1 rounded bg-white/90 p-1 text-danger shadow-sm"
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </>
-        ) : (
-          <span className="text-xs text-secondary-400">Upload</span>
-        )}
+      <div className="flex flex-wrap gap-2">
+        {values.map((val, idx) => {
+          const src = val.startsWith("http") ? val : `${config.image_access_url}${val}`;
+          return (
+            <div key={idx} className="relative h-[86px] w-[86px] overflow-hidden rounded-lg border border-secondary-200">
+              <img src={src} alt="variant" className="h-full w-full object-cover" />
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onSelect(values.filter((_, i) => i !== idx));
+                }}
+                className="absolute right-1 top-1 rounded bg-white/90 p-1 text-danger shadow-sm hover:bg-red-50"
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          );
+        })}
+        <div
+          onClick={() => setOpen(true)}
+          className="flex h-[86px] w-[86px] cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-dashed border-secondary-300 bg-secondary-50 text-secondary-400 transition-colors hover:border-primary hover:bg-primary-50/40 hover:text-primary"
+        >
+          <Plus className="h-5 w-5" />
+          <span className="text-[11px] font-medium">Upload</span>
+        </div>
       </div>
 
       {open && (
         <SetMediaModal
           open={open}
           setOpen={setOpen}
-          selectionMode="single"
+          selectionMode="multiple"
           type="image"
-          onSelectImage={(selected) =>
-            onSelect(Array.isArray(selected) ? selected[0] : selected)
-          }
+          onSelectImage={(selected) => {
+            const arr = Array.isArray(selected) ? selected : [selected];
+            onSelect([...values, ...arr]);
+          }}
         />
       )}
     </div>
@@ -123,6 +128,26 @@ const VariantCards = ({
   onAdd,
   fallbackLowStock,
 }: VariantCardsProps) => {
+  const [activeKeys, setActiveKeys] = useState<string | string[]>(
+    variants.map((variant) => variant.key)
+  );
+
+  const prevVariants = useRef(variants);
+  useEffect(() => {
+    if (variants.length > prevVariants.current.length) {
+      // Find the keys that were just added
+      const newKeys = variants
+        .map((v) => v.key)
+        .filter((k) => !prevVariants.current.find((pv) => pv.key === k));
+
+      setActiveKeys((prev) => {
+        const prevArray = Array.isArray(prev) ? prev : [prev];
+        return [...prevArray, ...newKeys];
+      });
+    }
+    prevVariants.current = variants;
+  }, [variants]);
+
   if (variants.length === 0) {
     return (
       <div className="rounded-lg border border-dashed border-secondary-300 py-8">
@@ -139,7 +164,8 @@ const VariantCards = ({
   return (
     <div className="space-y-3">
       <Collapse
-        defaultActiveKey={variants.map((variant) => variant.key)}
+        activeKey={activeKeys}
+        onChange={setActiveKeys}
         items={variants.map((variant, index) => ({
           key: variant.key,
           label: (
@@ -206,6 +232,7 @@ const VariantCards = ({
                 </Field>
                 <Field label="Weight">
                   <InputNumber
+                    type="number"
                     min={0}
                     value={variant.weight ?? undefined}
                     onChange={(value) =>
@@ -222,8 +249,10 @@ const VariantCards = ({
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <Field label="Purchase Price">
                   <InputNumber
+                    type="number"
                     min={0}
-                    value={variant.purchasePrice}
+                    value={variant.purchasePrice || null}
+                    placeholder="0"
                     onChange={(value) =>
                       onChange(variant.key, {
                         purchasePrice: Number(value) || 0,
@@ -234,8 +263,10 @@ const VariantCards = ({
                 </Field>
                 <Field label="Cost" hint="Freight, duty, handling">
                   <InputNumber
+                    type="number"
                     min={0}
-                    value={variant.cost}
+                    value={variant.cost || null}
+                    placeholder="0"
                     onChange={(value) =>
                       onChange(variant.key, { cost: Number(value) || 0 })
                     }
@@ -244,18 +275,22 @@ const VariantCards = ({
                 </Field>
                 <Field label="Total Cost" hint="Purchase + Cost">
                   <InputNumber
+                    type="number"
                     value={
-                      (Number(variant.purchasePrice) || 0) +
-                      (Number(variant.cost) || 0)
+                      ((Number(variant.purchasePrice) || 0) +
+                      (Number(variant.cost) || 0)) || null
                     }
+                    placeholder="0"
                     disabled
                     className="w-full"
                   />
                 </Field>
                 <Field label="Selling Price" required>
                   <InputNumber
+                    type="number"
                     min={0}
-                    value={variant.sellingPrice}
+                    value={variant.sellingPrice || null}
+                    placeholder="0"
                     onChange={(value) =>
                       onChange(variant.key, { sellingPrice: Number(value) || 0 })
                     }
@@ -268,6 +303,7 @@ const VariantCards = ({
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
                 <Field label="Discount / Offer Price" hint="Must not exceed selling price">
                   <InputNumber
+                    type="number"
                     min={0}
                     value={variant.discountPrice ?? undefined}
                     onChange={(value) =>
@@ -287,9 +323,11 @@ const VariantCards = ({
                 </Field>
                 <Field label="Current Stock">
                   <InputNumber
+                    type="number"
                     min={0}
                     precision={0}
-                    value={variant.quantity}
+                    value={variant.quantity || null}
+                    placeholder="0"
                     onChange={(value) =>
                       onChange(variant.key, { quantity: Number(value) || 0 })
                     }
@@ -301,6 +339,7 @@ const VariantCards = ({
                   hint={`Blank uses the product's ${fallbackLowStock}`}
                 >
                   <InputNumber
+                    type="number"
                     min={0}
                     precision={0}
                     value={variant.lowStockAlert ?? undefined}
@@ -326,18 +365,29 @@ const VariantCards = ({
                 </Field>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-                <ImageSlot
-                  label="Variant Image"
-                  value={variant.image}
-                  onSelect={(url) => onChange(variant.key, { image: url })}
-                />
-                <ImageSlot
-                  label="Extra Image"
-                  value={variant.images?.[0]}
-                  onSelect={(url) =>
-                    onChange(variant.key, { images: url ? [url] : [] })
+              {/* Full width rather than a fifth column: this is prose, and a
+                  quarter-width box would show two words at a time. */}
+              <Field
+                label="Description"
+                hint="What sets this variant apart from the others"
+              >
+                <Input.TextArea
+                  rows={3}
+                  value={variant.description ?? ""}
+                  onChange={(e) =>
+                    onChange(variant.key, { description: e.target.value })
                   }
+                  placeholder="Optional — e.g. 500g glass jar, screw cap"
+                  maxLength={2000}
+                  showCount
+                />
+              </Field>
+
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <MultiImageSlot
+                  label="Variant Images"
+                  values={variant.images || []}
+                  onSelect={(urls) => onChange(variant.key, { images: urls })}
                 />
                 <Field label="Status">
                   <Switch

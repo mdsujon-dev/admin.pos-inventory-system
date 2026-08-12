@@ -19,10 +19,16 @@ const SubCategoryModal = ({
   open,
   setOpen,
   data,
+  defaultCategory,
+  onCreated,
 }: {
   open: boolean;
   setOpen: (val: boolean) => void;
   data?: ISubCategory | null;
+  /** Pre-picks the parent when opened from somewhere that already knows it. */
+  defaultCategory?: string;
+  /** Called with the new sub category so a picker can select it. */
+  onCreated?: (created: ISubCategory) => void;
 }) => {
   const [form] = Form.useForm();
   const [createSubCategory, { isLoading: creating }] =
@@ -56,8 +62,9 @@ const SubCategoryModal = ({
         await updateSubCategory({ id: data!._id, data: payload }).unwrap();
         toast.success("Sub category updated successfully");
       } else {
-        await createSubCategory(payload).unwrap();
+        const response = await createSubCategory(payload).unwrap();
         toast.success("Sub category created successfully");
+        onCreated?.(response?.data);
       }
       setOpen(false);
       form.resetFields();
@@ -81,7 +88,9 @@ const SubCategoryModal = ({
       initialValues={{
         name: data?.name ?? "",
         // The list read populates `category`; the form needs the plain id.
-        category: data ? categoryOf(data)?._id ?? data.category : undefined,
+        category: data
+          ? categoryOf(data)?._id ?? data.category
+          : defaultCategory,
         image: data?.image ?? null,
         description: data?.description ?? "",
         isActive: data?.isActive ?? true,
