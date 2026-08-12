@@ -519,3 +519,9 @@ button,
 .ant-btn-primary {
   box-shadow: none !important;
 }
+
+/* Globally apply rounded-lg to InputNumber */
+.ant-input-number,
+.ant-input-number-affix-wrapper {
+  border-radius: 0.5rem !important;
+}

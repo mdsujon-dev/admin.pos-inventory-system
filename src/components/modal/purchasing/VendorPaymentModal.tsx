@@ -116,8 +116,9 @@ const VendorPaymentModal = ({
           rules={[{ required: true, message: "Enter an amount" }]}
         >
           <InputNumber
+            type="number"
             min={0}
-            className="w-full"
+            className="w-full !rounded-lg"
             onChange={(value) => setAmount(value == null ? null : Number(value))}
           />
         </Form.Item>
