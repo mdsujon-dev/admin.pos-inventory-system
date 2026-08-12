@@ -5,12 +5,13 @@ import {
   Input,
   InputNumber,
   Select,
-  Table,
   Tag,
+  Tooltip,
 } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import {
   ClipboardList,
+  Info,
   Package,
   Plus,
   Trash2,
@@ -23,6 +24,7 @@ import { toast } from "react-toastify";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import QuickVendorModal from "../../components/modal/purchasing/QuickVendorModal";
+import DataTable from "../../components/Table/DataTable";
 import Money from "../../components/shared/Money";
 import {
   IProduct,
@@ -148,29 +150,29 @@ const PurchaseForm = () => {
     [products]
   );
 
-  const addLine = (value: string) => {
-    const option = options.find((row) => row.value === value);
-    if (!option) return;
-    if (lines.some((line) => line.key === value)) {
-      toast.info("That item is already on this bill — change its quantity");
-      return;
-    }
+  const handleItemsChange = (values: string[]) => {
+    setLines((previous) => {
+      const keptLines = previous.filter((line) => values.includes(line.key));
+      const existingKeys = keptLines.map((line) => line.key);
+      const newKeys = values.filter((v) => !existingKeys.includes(v));
 
-    setLines((previous) => [
-      ...previous,
-      {
-        key: value,
-        product: option.product,
-        variantId: option.variantId,
-        name: option.name,
-        variantName: option.variantName,
-        sku: option.sku,
-        quantity: 1,
-        // Seeded from what it cost last time, because it usually still does.
-        unitCost: option.lastCost || 0,
-        expiryDate: null,
-      },
-    ]);
+      const newLines = newKeys.map((key) => {
+        const option = options.find((row) => row.value === key);
+        return {
+          key,
+          product: option!.product,
+          variantId: option!.variantId,
+          name: option!.name,
+          variantName: option!.variantName,
+          sku: option!.sku,
+          quantity: 1,
+          unitCost: option!.lastCost || 0,
+          expiryDate: null,
+        };
+      });
+
+      return [...keptLines, ...newLines];
+    });
   };
 
   const patchLine = (key: string, patch: Partial<DraftLine>) =>
@@ -257,11 +259,22 @@ const PurchaseForm = () => {
       />
 
       <SectionCard
-        icon={Truck}
-        title="Supplier & Bill"
-        subtitle="Whose bill this is, and when the goods arrived"
+        icon={ClipboardList}
+        title="Purchase Information"
+        subtitle="Complete the purchase by filling in the details below"
       >
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* --- Section 1: Supplier & Bill --- */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
+            <div className="bg-primary/10 p-2 rounded-lg text-primary">
+              <Truck className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-semibold text-secondary-900 leading-tight">Supplier & Bill</h3>
+              <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">Whose bill this is, and when the goods arrived</p>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div>
             <label className="mb-1 block text-[13px] font-medium text-secondary-700">
               Vendor <span className="text-danger">*</span>
@@ -296,8 +309,11 @@ const PurchaseForm = () => {
             />
           </div>
           <div>
-            <label className="mb-1 block text-[13px] font-medium text-secondary-700">
+            <label className="mb-1 flex items-center gap-1.5 text-[13px] font-medium text-secondary-700">
               Their bill number
+              <Tooltip title="The invoice or memo number provided by the supplier. Crucial for reconciliation and tracking.">
+                <Info className="h-[14px] w-[14px] text-secondary-400" />
+              </Tooltip>
             </label>
             <Input
               value={billNo}
@@ -321,8 +337,9 @@ const PurchaseForm = () => {
               Add item
             </label>
             <Select
-              value={null}
-              onChange={addLine}
+              mode="multiple"
+              value={lines.map((line) => line.key)}
+              onChange={handleItemsChange}
               showSearch
               optionFilterProp="label"
               placeholder="Search a product or variant"
@@ -332,24 +349,28 @@ const PurchaseForm = () => {
                 value: row.value,
               }))}
             />
-          </div>
+            </div>
         </div>
-      </SectionCard>
+        </div>
 
-      <SectionCard
-        icon={Package}
-        title="Items"
-        subtitle={
-          totals.units === 1
-            ? "1 unit on this bill"
-            : `${totals.units} units on this bill`
-        }
-      >
+        {/* --- Section 2: Items --- */}
+        <div className="mb-8">
+          <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
+            <div className="bg-primary/10 p-2 rounded-lg text-primary">
+              <Package className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-semibold text-secondary-900 leading-tight">Items</h3>
+              <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">
+                {totals.units === 1 ? "1 unit on this bill" : `${totals.units} units on this bill`}
+              </p>
+            </div>
+          </div>
         {lines.length === 0 ? (
           <Empty description="Nothing added yet. Use the picker above." />
         ) : (
-          <Table
-            dataSource={lines}
+          <DataTable
+            data={lines}
             rowKey="key"
             pagination={false}
             size="small"
@@ -447,14 +468,20 @@ const PurchaseForm = () => {
             ]}
           />
         )}
-      </SectionCard>
+        </div>
 
-      <SectionCard
-        icon={Wallet}
-        title="Charges & Payment"
-        subtitle="Freight is shared across the lines, so each batch carries what it truly cost"
-      >
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* --- Section 3: Charges & Payment --- */}
+        <div>
+          <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
+            <div className="bg-primary/10 p-2 rounded-lg text-primary">
+              <Wallet className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-semibold text-secondary-900 leading-tight">Charges & Payment</h3>
+              <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">Freight is shared across the lines, so each batch carries what it truly cost</p>
+            </div>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <Field label="Bill discount">
             <InputNumber
               min={0}
@@ -552,9 +579,10 @@ const PurchaseForm = () => {
             </div>
           )}
         </div>
+        </div>
       </SectionCard>
 
-      <div className="sticky bottom-0 z-30 -mx-3 -mb-3 mt-auto flex h-[60px] items-center justify-end gap-3 border-t border-primary/20 bg-white/80 px-3 backdrop-blur-lg sm:-mx-4 sm:-mb-4 sm:px-6">
+      <div className="sticky bottom-0 z-30 -mx-3 -mb-3 mt-auto flex h-[70px] items-center justify-end gap-3 border-t border-primary/20 bg-white/80 px-3 backdrop-blur-lg sm:-mx-4 sm:-mb-4 sm:px-6">
         <Button onClick={() => navigate("/purchases")} disabled={saving}>
           Cancel
         </Button>
