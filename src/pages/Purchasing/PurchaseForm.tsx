@@ -5,6 +5,7 @@ import {
   Empty,
   Input,
   InputNumber,
+  Segmented,
   Select,
   Tag,
   Tooltip,
@@ -44,6 +45,8 @@ import {
 } from "../../redux/features/purchasing/vendorApi";
 import { PAYMENT_METHOD_LABELS, round2 } from "../../utils/money";
 import { SectionCard } from "../Inventory/Products/ProductFormUI";
+
+type PayMode = "now" | "credit";
 
 interface DraftLine {
   key: string;
@@ -102,6 +105,8 @@ const PurchaseForm = () => {
   const [vatPercent, setVatPercent] = useState(0);
   const [paid, setPaid] = useState<number | null>(null);
   const [paymentMethod, setPaymentMethod] = useState("cash");
+  /** Paying at the counter, or taking the goods and settling later. */
+  const [payMode, setPayMode] = useState<PayMode>("now");
   const [note, setNote] = useState("");
   const [addingVendor, setAddingVendor] = useState(false);
 
@@ -222,8 +227,19 @@ const PurchaseForm = () => {
     };
   }, [lines, discount, shippingCost, otherCost, vatPercent]);
 
-  const settled = paid == null ? totals.grandTotal : Math.min(paid, totals.grandTotal);
+  /**
+   * On credit nothing is handed over, so the whole bill is owing. Paying now
+   * with the field left blank means paying it off in full.
+   */
+  const settled =
+    payMode === "credit"
+      ? 0
+      : paid == null
+      ? totals.grandTotal
+      : Math.min(paid, totals.grandTotal);
   const due = round2(Math.max(0, totals.grandTotal - settled));
+
+  const vendorName = vendors.find((row) => row._id === vendor)?.name ?? "";
 
   /**
    * Fills the form from the bill being edited.
@@ -242,6 +258,8 @@ const PurchaseForm = () => {
     setVatPercent(bill.vatPercent ?? 0);
     setPaid(bill.paid ?? null);
     setPaymentMethod(bill.paymentMethod ?? "cash");
+    // Nothing paid on a saved bill means it was taken on credit.
+    setPayMode((bill.paid ?? 0) > 0 ? "now" : "credit");
     setNote(bill.note ?? "");
     setLines(
       (bill.items ?? []).map((item: any) => ({
@@ -262,7 +280,13 @@ const PurchaseForm = () => {
 
   const save = async () => {
     if (!vendor) {
-      toast.error("Pick a vendor first");
+      // On credit the vendor is the only record of who is owed, so the wording
+      // says why rather than just refusing.
+      toast.error(
+        payMode === "credit"
+          ? "Pick a vendor — a bill left owing needs somebody to owe it to"
+          : "Pick a vendor first"
+      );
       return;
     }
     if (lines.length === 0) {
@@ -288,7 +312,7 @@ const PurchaseForm = () => {
       shippingCost,
       otherCost,
       vatPercent,
-      paid: paid ?? totals.grandTotal,
+      paid: settled,
       paymentMethod,
       purchaseDate: purchaseDate.toISOString(),
       note,
@@ -601,25 +625,63 @@ const PurchaseForm = () => {
               className="w-full"
             />
           </Field>
-          <Field label="Payment method">
-            <Select
-              value={paymentMethod}
-              onChange={setPaymentMethod}
-              className="w-full"
-              options={Object.entries(PAYMENT_METHOD_LABELS).map(
-                ([value, label]) => ({ value, label })
-              )}
+          {/*
+            Paying now and buying on credit are two different acts, not one
+            field with a zero in it. Choosing credit closes the payment fields
+            rather than greying them, because there is nothing to say: no
+            method was used and no money moved. The vendor becomes the only
+            record of who is owed, which is why the bill cannot be saved
+            without one.
+          */}
+          <Field label="How is this bill settled?">
+            <Segmented
+              block
+              value={payMode}
+              onChange={(value) => setPayMode(value as PayMode)}
+              options={[
+                { label: "Paying now", value: "now" },
+                { label: "On credit", value: "credit" },
+              ]}
             />
           </Field>
-          <Field label="Paid now">
-            <InputNumber
-              min={0}
-              value={paid}
-              placeholder={String(totals.grandTotal)}
-              onChange={(value) => setPaid(value == null ? null : Number(value))}
-              className="w-full"
-            />
-          </Field>
+
+          {payMode === "now" ? (
+            <>
+              <Field label="Payment method">
+                <Select
+                  value={paymentMethod}
+                  onChange={setPaymentMethod}
+                  className="w-full"
+                  options={Object.entries(PAYMENT_METHOD_LABELS).map(
+                    ([value, label]) => ({ value, label })
+                  )}
+                />
+              </Field>
+              <Field
+                label="Paid now"
+                hint="Leave blank to pay the bill in full"
+              >
+                <InputNumber
+                  min={0}
+                  max={totals.grandTotal}
+                  value={paid}
+                  placeholder={String(totals.grandTotal)}
+                  onChange={(value) =>
+                    setPaid(value == null ? null : Number(value))
+                  }
+                  className="w-full"
+                />
+              </Field>
+            </>
+          ) : (
+            <div className="sm:col-span-2 flex items-center">
+              <p className="m-0 rounded-lg bg-danger/5 px-3 py-2 text-[13px] text-danger">
+                The whole bill stays owing to {vendorName || "this vendor"}. Pay
+                it later from the bill or their page.
+              </p>
+            </div>
+          )}
+
           <div className="sm:col-span-2">
             <Field label="Note">
               <Input
@@ -650,16 +712,46 @@ const PurchaseForm = () => {
               <Money value={totals.grandTotal} />
             </p>
           </div>
-          {due > 0 && (
-            <div className="text-right">
-              <p className="m-0 text-xs uppercase tracking-wide text-secondary-500">
-                Owing
-              </p>
-              <p className="m-0 text-lg font-bold text-danger">
-                <Money value={due} />
-              </p>
-            </div>
-          )}
+
+          {/*
+            Paid and owing are always on show, not only once a balance exists.
+            Buying on credit is the normal way a shop stocks up, and a figure
+            that appears only when it is non-zero is one nobody looks for —
+            which is how a bill gets saved as fully paid by accident.
+          */}
+          <div className="text-right">
+            <p className="m-0 text-xs uppercase tracking-wide text-secondary-500">
+              Paying now
+            </p>
+            <p className="m-0 text-lg font-semibold text-secondary-800">
+              <Money value={settled} />
+            </p>
+          </div>
+          <div className="text-right">
+            <p className="m-0 text-xs uppercase tracking-wide text-secondary-500">
+              Owing
+            </p>
+            <p
+              className={`m-0 text-lg font-bold ${
+                due > 0 ? "text-danger" : "text-secondary-400"
+              }`}
+            >
+              <Money value={due} />
+            </p>
+          </div>
+          <Tag
+            className={`!m-0 ${
+              due > 0
+                ? "!border-danger/30 !bg-danger/10 !text-danger"
+                : "!border-primary-200 !bg-primary-50 !text-primary-700"
+            }`}
+          >
+            {due <= 0
+              ? "Settled"
+              : settled > 0
+              ? "Partly paid"
+              : "Fully on credit"}
+          </Tag>
         </div>
         </div>
       </SectionCard>
@@ -695,9 +787,11 @@ const PurchaseForm = () => {
 
 const Field = ({
   label,
+  hint,
   children,
 }: {
   label: string;
+  hint?: string;
   children: React.ReactNode;
 }) => (
   <div className="min-w-0">
@@ -705,6 +799,11 @@ const Field = ({
       {label}
     </label>
     {children}
+    {hint && (
+      <p className="m-0 mt-1 text-[11px] leading-tight text-secondary-400">
+        {hint}
+      </p>
+    )}
   </div>
 );
 

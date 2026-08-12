@@ -512,4 +512,10 @@ input[type="number"] {
   transition: transform 0.25s ease;
 }
 
-
+/* Force disable all shadows on buttons and the shadow-primary class */
+.shadow-primary,
+button,
+.ant-btn,
+.ant-btn-primary {
+  box-shadow: none !important;
+}

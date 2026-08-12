@@ -7,7 +7,7 @@ export default {
     extend: {
       boxShadow: {
         // rgb(1, 149, 50) is the brand #019532.
-        primary: "0 4px 6px -1px rgba(1, 149, 50, 0.5)",
+        primary: "none",
         // Soft, layered elevation for cards — subtle at rest, richer on hover.
         card: "0 1px 2px rgba(16, 24, 40, 0.04), 0 4px 16px -2px rgba(16, 24, 40, 0.08)",
         "card-hover": "0 2px 4px rgba(16, 24, 40, 0.05), 0 12px 28px -4px rgba(1, 149, 50, 0.18)",

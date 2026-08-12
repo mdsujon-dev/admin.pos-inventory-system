@@ -2,6 +2,7 @@ import {
   Banknote,
   Boxes,
   CalendarClock,
+  ClipboardList,
   Contact,
   FileText,
   HeartHandshake,
@@ -186,9 +187,9 @@ const sidebarMenuRoutes: RouteItem[] = [
       // the button on the Purchase Bills list, so listing it here would be a
       // second door to the same form. Same reasoning as Create Product.
       {
-        label: "Purchase Bills",
+        label: "Purchase List",
         address: "/purchases",
-        icon: Receipt,
+        icon: ClipboardList,
         module: "Purchases",
         exactMatch: true,
       },
@@ -251,6 +252,12 @@ const sidebarMenuRoutes: RouteItem[] = [
         icon: LayoutGrid,
         module: "Accounts",
       },
+      {
+        label: "Income & Expense",
+        address: "/income-expense",
+        icon: Wallet,
+        module: "Income & Expense",
+      },
     ],
   },
   {
@@ -279,13 +286,6 @@ const sidebarMenuRoutes: RouteItem[] = [
         module: "Designations",
       },
     ],
-  },
-  {
-    label: "Income & Expense",
-    icon: Wallet,
-    address: "/income-expense",
-    module: "Income & Expense",
-    section: "System",
   },
   {
     label: "Logs",
