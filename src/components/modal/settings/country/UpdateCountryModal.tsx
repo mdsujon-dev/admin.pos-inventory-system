@@ -1,4 +1,4 @@
-﻿import { Button, ColorPicker, Form } from "antd";
+import { Button, ColorPicker, Form } from "antd";
 import { useEffect } from "react";
 import { toast } from "react-toastify";
 import {
@@ -70,33 +70,16 @@ const UpdateCountryModal = ({
   };
 
   return (
-    <AntModal
+    <AppFormModal
+      entity="Country"
+      isEditing={true}
       open={open}
       setOpen={setOpen}
-      title="Update Country"
       width={1000}
-      footer={
-        <div className="flex justify-end gap-2 pt-4 sticky bottom-0 bg-white border-t p-4">
-          <Button disabled={isLoading} onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            loading={isLoading}
-            disabled={isLoading}
-            type="primary"
-            onClick={() => form.submit()}
-          >
-            Update
-          </Button>
-        </div>
-      }
+      form={form}
+      onSubmit={handleSubmit}
+      loading={isLoading}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        className="space-y-4"
-      >
         <Form.Item
           label="Flag"
           name="flag"
@@ -175,8 +158,7 @@ const UpdateCountryModal = ({
         >
           <ColorPicker showText format="hex" />
         </Form.Item>
-      </Form>
-    </AntModal>
+    </AppFormModal>
   );
 };
 

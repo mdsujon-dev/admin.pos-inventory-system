@@ -1,4 +1,4 @@
-﻿import { Button, ColorPicker, Form } from "antd";
+import { Button, ColorPicker, Form } from "antd";
 import { toast } from "react-toastify";
 import {
   ICountry,
@@ -46,34 +46,18 @@ const CreateCountryModal = ({
   };
 
   return (
-    <AntModal
+    <AppFormModal
+      entity="Country"
+      isEditing={false}
       open={open}
       setOpen={setOpen}
-      title="Create Country"
       width={1000}
-      footer={
-        <div className="flex justify-end gap-2 pt-4 sticky bottom-0 bg-white border-t p-4">
-          <Button disabled={isLoading} onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            loading={isLoading}
-            disabled={isLoading}
-            type="primary"
-            onClick={() => form.submit()}
-          >
-            Create
-          </Button>
-        </div>
-      }
+      form={form}
+      onSubmit={handleSubmit}
+      loading={isLoading}
+      initialValues={{ accentSolid: "#019532", isActive: true }}
     >
-      <Form
-        form={form}
-        layout="vertical"
-        onFinish={handleSubmit}
-        className="space-y-4"
-        initialValues={{ accentSolid: "#019532", isActive: true }}
-      >
+      <div className="flex gap-8">
         <Form.Item
           label="Flag"
           name="flag"
@@ -157,8 +141,7 @@ const CreateCountryModal = ({
         >
           <ColorPicker showText format="hex" />
         </Form.Item>
-      </Form>
-    </AntModal>
+    </AppFormModal>
   );
 };
 
