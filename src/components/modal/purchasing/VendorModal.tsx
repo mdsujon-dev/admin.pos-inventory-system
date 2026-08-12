@@ -274,72 +274,114 @@ const VendorModal = ({
                           "methodType",
                         ]);
 
-                        if (methodType === "Bank") {
-                          return (
-                            <>
-                              <FormSelect
-                                {...restField}
-                                label="Bank Name"
-                                name={[name, "provider"]}
-                                showSearch
-                                options={bankOptions}
-                                placeholder="Select or type..."
-                              />
-                              <FormInput
-                                {...restField}
-                                label="Account Name"
-                                name={[name, "accountName"]}
-                                placeholder="e.g. Acme Corp"
-                              />
-                              <FormInput
-                                {...restField}
-                                label="Account Number"
-                                name={[name, "accountNumber"]}
-                                placeholder="e.g. 102XXXXX"
-                              />
-                              <FormInput
-                                {...restField}
-                                label="Routing Number"
-                                name={[name, "routingNumber"]}
-                                placeholder="Optional"
-                              />
-                            </>
-                          );
-                        }
+                        return (
+                          <>
+                            {methodType === "Bank" && (
+                              <>
+                                <FormSelect
+                                  {...restField}
+                                  label="Bank Name"
+                                  name={[name, "provider"]}
+                                  showSearch
+                                  options={bankOptions}
+                                  placeholder="Select or type..."
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Account Name"
+                                  name={[name, "accountName"]}
+                                  placeholder="e.g. Acme Corp"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Account Number"
+                                  name={[name, "accountNumber"]}
+                                  placeholder="e.g. 102XXXXX"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Routing Number"
+                                  name={[name, "routingNumber"]}
+                                  placeholder="Optional"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Branch Name"
+                                  name={[name, "branch"]}
+                                  placeholder="e.g. Gulshan Branch"
+                                />
+                              </>
+                            )}
 
-                        if (methodType === "Mobile Banking") {
-                          return (
-                            <>
-                              <FormSelect
-                                {...restField}
-                                label="Provider"
-                                name={[name, "provider"]}
-                                showSearch
-                                options={mobileOptions}
-                                placeholder="Select Provider"
-                              />
-                              <FormInput
-                                {...restField}
-                                label="Mobile Number"
-                                name={[name, "accountNumber"]}
-                                placeholder="e.g. 01711223344"
-                              />
-                            </>
-                          );
-                        }
+                            {methodType === "Mobile Banking" && (
+                              <>
+                                <FormSelect
+                                  {...restField}
+                                  label="Provider"
+                                  name={[name, "provider"]}
+                                  showSearch
+                                  options={mobileOptions}
+                                  placeholder="Select Provider"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Mobile Number"
+                                  name={[name, "accountNumber"]}
+                                  placeholder="e.g. 01711223344"
+                                />
+                                <FormSelect
+                                  {...restField}
+                                  label="Account Type"
+                                  name={[name, "accountType"]}
+                                  options={[
+                                    { label: "Personal", value: "Personal" },
+                                    { label: "Agent", value: "Agent" },
+                                    { label: "Merchant", value: "Merchant" },
+                                  ]}
+                                />
+                              </>
+                            )}
 
-                        if (methodType === "Other") {
-                          return (
-                            <FormInput
-                              {...restField}
-                              label="Details"
-                              name={[name, "details"]}
-                              placeholder="e.g. Paid via check"
-                            />
-                          );
-                        }
+                            {methodType === "Cash" && (
+                              <>
+                                <FormInput
+                                  {...restField}
+                                  label="Cash Given To (Person Info)"
+                                  name={[name, "receiverName"]}
+                                  placeholder="e.g. John Doe"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Voucher Handed To"
+                                  name={[name, "voucherReceiver"]}
+                                  placeholder="e.g. Jane Doe"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Confirmed By"
+                                  name={[name, "confirmedBy"]}
+                                  placeholder="e.g. Manager Smith"
+                                />
+                              </>
+                            )}
 
-                        return null;
+                            {methodType && (
+                              <div className="col-span-1 sm:col-span-2">
+                                <Form.Item
+                                  {...restField}
+                                  label="Description & Info"
+                                  name={[name, "details"]}
+                                  className="mb-0 mt-2"
+                                >
+                                  <Input.TextArea
+                                    rows={methodType === "Cash" || methodType === "Other" ? 2 : 1}
+                                    placeholder="Any additional details..."
+                                  />
+                                </Form.Item>
+                              </div>
+                            )}
+                          </>
+                        );
                       }}
                     </Form.Item>
                   </div>

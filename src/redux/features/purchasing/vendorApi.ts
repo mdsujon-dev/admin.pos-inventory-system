@@ -15,6 +15,9 @@ export interface IPaymentMethod {
   routingNumber?: string;
   branch?: string;
   accountType?: string;
+  receiverName?: string;
+  voucherReceiver?: string;
+  confirmedBy?: string;
   details?: string;
 }
 
