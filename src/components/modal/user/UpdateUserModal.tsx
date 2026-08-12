@@ -1,4 +1,4 @@
-import { Button, Form, Modal } from "antd";
+import { Form } from "antd";
 import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { FormInput } from "../../../components/Form/FormInput";
@@ -6,6 +6,7 @@ import { FormSelect } from "../../../components/Form/FormSelect";
 import { useGetDesignationsQuery } from "../../../redux/features/designation/designationApi";
 import { useGetRolesQuery } from "../../../redux/features/role/roleApi";
 import { useUpdateUserMutation } from "../../../redux/features/user/userApi";
+import AppFormModal from "../shared/AppFormModal";
 
 interface UpdateUserModalProps {
   open: boolean;
@@ -60,14 +61,16 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
   };
 
   return (
-    <Modal
-      title="Update User"
+    <AppFormModal
+      entity="User"
+      isEditing={true}
       open={open}
-      onCancel={() => setOpen(false)}
+      setOpen={setOpen}
       width={600}
-      footer={null}
+      form={form}
+      onSubmit={handleSubmit}
+      loading={isLoading}
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <div className="grid lg:grid-cols-2 gap-4 mb-4">
           <FormInput
             label="Name"
@@ -117,25 +120,7 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
             placeholder="Enter phone number (optional)"
           />
         </div>
-        <div className="flex justify-end gap-2">
-          <Button
-            type="primary"
-            onClick={() => form.submit()}
-            loading={isLoading}
-            className="w-fit"
-          >
-            Update
-          </Button>
-          <Button
-            onClick={() => setOpen(false)}
-            className="w-fit"
-            type="default"
-          >
-            Cancel
-          </Button>
-        </div>
-      </Form>
-    </Modal>
+    </AppFormModal>
   );
 };
 

@@ -1,5 +1,4 @@
-import { Button, Form, Input, Modal } from "antd";
-import { Save } from "lucide-react";
+import { Form, Input } from "antd";
 import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,6 +8,7 @@ import {
   selectCurrentUser,
   setUser,
 } from "../../../redux/features/auth/authSlice";
+import AppFormModal from "../shared/AppFormModal";
 
 interface ChangePasswordModalProps {
   open: boolean;
@@ -76,14 +76,17 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
   const loading = self ? isSelfLoading : isLoading;
 
   return (
-    <Modal
+    <AppFormModal
       title={`Change Password${userName ? ` - ${userName}` : ""}`}
+      entity="User"
+      isEditing={true}
       open={open}
-      onCancel={() => setOpen(false)}
+      setOpen={setOpen}
       width={600}
-      footer={null}
+      form={form}
+      onSubmit={handleSubmit}
+      loading={loading}
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
         {self && (
           <Form.Item
             label="Current Password"
@@ -126,28 +129,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({
           <Input.Password placeholder="Re-enter new password" />
         </Form.Item>
 
-        <Form.Item>
-          <div className="flex justify-end gap-2">
-            <Button
-              type="primary"
-              icon={<Save className="w-4 h-4" />}
-              onClick={() => form.submit()}
-              loading={loading}
-              className="w-fit"
-            >
-              Change Password
-            </Button>
-            <Button
-              onClick={() => setOpen(false)}
-              className="w-fit"
-              type="default"
-            >
-              Cancel
-            </Button>
-          </div>
-        </Form.Item>
-      </Form>
-    </Modal>
+    </AppFormModal>
   );
 };
 

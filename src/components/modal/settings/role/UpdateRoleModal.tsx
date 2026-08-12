@@ -1,8 +1,8 @@
-import { Button, Form, Input, Modal, Switch } from "antd";
-import { Save } from "lucide-react";
+import { Form, Input, Switch } from "antd";
 import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { useUpdateRoleMutation } from "../../../../redux/features/role/roleApi";
+import AppFormModal from "../../shared/AppFormModal";
 
 interface UpdateRoleModalProps {
   open: boolean;
@@ -54,14 +54,16 @@ const UpdateRoleModal: React.FC<UpdateRoleModalProps> = ({
   };
 
   return (
-    <Modal
-      title="Update Role"
+    <AppFormModal
+      entity="Role"
+      isEditing={true}
       open={open}
-      onCancel={() => setOpen(false)}
+      setOpen={setOpen}
       width={600}
-      footer={null}
+      form={form}
+      onSubmit={handleSubmit}
+      loading={isLoading}
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
           label="Role Name"
           name="role"
@@ -78,19 +80,7 @@ const UpdateRoleModal: React.FC<UpdateRoleModalProps> = ({
           <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
         </Form.Item>
 
-        <Form.Item>
-          <Button
-            type="primary"
-            icon={<Save className="w-4 h-4" />}
-            onClick={() => form.submit()}
-            loading={isLoading}
-            block
-          >
-            Save Changes
-          </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
+    </AppFormModal>
   );
 };
 

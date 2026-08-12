@@ -1,4 +1,4 @@
-import { Button, Form, Input, Modal } from "antd";
+import { Form, Input } from "antd";
 import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { FormInput } from "../../../components/Form/FormInput";
@@ -6,6 +6,7 @@ import { FormSelect } from "../../../components/Form/FormSelect";
 import { useGetDesignationsQuery } from "../../../redux/features/designation/designationApi";
 import { useGetRolesQuery } from "../../../redux/features/role/roleApi";
 import { useCreateUserMutation } from "../../../redux/features/user/userApi";
+import AppFormModal from "../shared/AppFormModal";
 
 interface CreateUserModalProps {
   open: boolean;
@@ -64,14 +65,16 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ open, setOpen }) => {
   };
 
   return (
-    <Modal
-      title="Create User"
+    <AppFormModal
+      entity="User"
+      isEditing={false}
       open={open}
-      onCancel={() => setOpen(false)}
+      setOpen={setOpen}
       width={800}
-      footer={null}
+      form={form}
+      onSubmit={handleSubmit}
+      loading={isLoading}
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <div className="grid lg:grid-cols-2 gap-4 mb-2">
           <FormInput
             label="Name"
@@ -155,25 +158,7 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ open, setOpen }) => {
             <Input.Password placeholder="Re-enter password" />
           </Form.Item>
         </div>
-        <div className="flex justify-end gap-2">
-          <Button
-            type="primary"
-            onClick={() => form.submit()}
-            loading={isLoading}
-            className="w-fit"
-          >
-            Create
-          </Button>
-          <Button
-            onClick={() => setOpen(false)}
-            className="w-fit"
-            type="default"
-          >
-            Cancel
-          </Button>
-        </div>
-      </Form>
-    </Modal>
+    </AppFormModal>
   );
 };
 
