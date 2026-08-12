@@ -4,7 +4,6 @@ import { IBrand } from "./brandApi";
 import { ICategory } from "./categoryApi";
 import { ISubCategory } from "./subCategoryApi";
 import { IUnit } from "./unitApi";
-import { IWarranty } from "./warrantyApi";
 
 export type ProductType = "single" | "variable";
 
@@ -58,7 +57,6 @@ export interface IProduct extends IPricing {
   subCategory?: Ref<Pick<ISubCategory, "_id" | "name" | "slug">>;
   brand?: Ref<Pick<IBrand, "_id" | "name" | "slug">>;
   unit: Ref<Pick<IUnit, "_id" | "name" | "shortName">>;
-  warranty?: Ref<Pick<IWarranty, "_id" | "name" | "duration" | "period">>;
 
   description?: string;
   images: string[];

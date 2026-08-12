@@ -162,7 +162,6 @@ export const baseApi = createApi({
     "brands",
     "units",
     "variant-attributes",
-    "warranties",
     "products",
     // Buying
     "vendors",

@@ -26,7 +26,8 @@ import { makeSheet } from "../../../utils/tableExport";
 
 const { confirm } = Modal;
 
-const SubCategories = () => {
+/** @param embedded See the note on `Categories` — same reason. */
+const SubCategories = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [searchText, setSearchText] = useState("");
@@ -212,25 +213,8 @@ const SubCategories = () => {
     },
   ];
 
-  return (
-    <div>
-      <PageMeta
-        title="Sub Categories - POS & Inventory Admin Panel"
-        description="Manage product sub categories"
-        canonicalUrl={`${window.location.origin}/inventory/sub-categories`}
-        noindex={true}
-      />
-      <PageHeader
-        title="Sub Category"
-        subtitle="Break each category down into finer groups"
-        breadcrumbs={[
-          { title: "Dashboard", path: "/" },
-          { title: "Inventory" },
-          { title: "Sub Category" },
-        ]}
-        extra={
-          <div className="flex flex-wrap items-center gap-2">
-            <ExportMenu
+  const exportMenu = (
+    <ExportMenu
               sheet={async () => {
                 const all = await fetchAllSubCategories([
                   { name: "page", value: 1 },
@@ -258,22 +242,48 @@ const SubCategories = () => {
                   ],
                 });
               }}
-              disabled={total === 0}
-            />
-            <PermissionGate module="Sub Categories" action="Create">
-              <Button
-                type="primary"
-                icon={<Plus className="w-4 h-4" />}
-                onClick={openCreate}
-              >
-                Add Sub Category
-              </Button>
-            </PermissionGate>
-          </div>
-        }
-      />
+      disabled={total === 0}
+    />
+  );
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+  return (
+    <div>
+      {!embedded && (
+        <>
+          <PageMeta
+            title="Sub Categories - POS & Inventory Admin Panel"
+            description="Manage product sub categories"
+            canonicalUrl={`${window.location.origin}/inventory/sub-categories`}
+            noindex={true}
+          />
+          <PageHeader
+            title="Sub Category"
+            subtitle="Break each category down into finer groups"
+            breadcrumbs={[
+              { title: "Dashboard", path: "/" },
+              { title: "Inventory" },
+              { title: "Sub Category" },
+            ]}
+            extra={
+              <div className="flex flex-wrap items-center gap-2">
+                {exportMenu}
+                <PermissionGate module="Sub Categories" action="Create">
+                  <Button
+                    type="primary"
+                    icon={<Plus className="w-4 h-4" />}
+                    onClick={openCreate}
+                  >
+                    Add Sub Category
+                  </Button>
+                </PermissionGate>
+              </div>
+            }
+          />
+        </>
+      )}
+
+      <div className="flex flex-col md:flex-row gap-4 mb-6 items-start">
+        {embedded && <div className="order-last ml-auto">{exportMenu}</div>}
         <Input
           placeholder="Search by name or description..."
           prefix={<Search className="w-4 h-4 text-secondary-400" />}

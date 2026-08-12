@@ -75,7 +75,6 @@ export const PERMISSION_MODULES: PermissionModule[] = [
   { module: "Brands", permissions: CRUD, group: "Inventory" },
   { module: "Units", permissions: CRUD, group: "Inventory" },
   { module: "Variant Attributes", permissions: CRUD, group: "Inventory" },
-  { module: "Warranties", permissions: CRUD, group: "Inventory" },
   {
     module: "Print Barcode",
     permissions: ["View", "Print"],

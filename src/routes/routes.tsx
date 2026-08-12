@@ -1,4 +1,4 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter, Navigate } from "react-router-dom";
 import MainLayout from "../layout/MainLayout";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import ErrorPage from "../pages/ErrorPage/ErrorPage";
@@ -17,7 +17,7 @@ import Designation from "../pages/Settings/Desgination/Designation.tsx";
 import MediaBin from "../pages/Settings/MediaBin/MediaBin.tsx";
 import NotificationSounds from "../pages/Settings/NotificationSounds/NotificationSounds.tsx";
 import Brands from "../pages/Inventory/Brands/Brands.tsx";
-import Categories from "../pages/Inventory/Categories/Categories.tsx";
+import CategoryTabs from "../pages/Inventory/Categories/CategoryTabs.tsx";
 import PrintBarcode from "../pages/Inventory/Print/PrintBarcode.tsx";
 import PrintLabelsView from "../pages/Inventory/Print/PrintLabelsView.tsx";
 import PrintQRCode from "../pages/Inventory/Print/PrintQRCode.tsx";
@@ -25,10 +25,8 @@ import ExpiredProducts from "../pages/Inventory/Products/ExpiredProducts.tsx";
 import LowStocks from "../pages/Inventory/Products/LowStocks.tsx";
 import ProductForm from "../pages/Inventory/Products/ProductForm.tsx";
 import Products from "../pages/Inventory/Products/Products.tsx";
-import SubCategories from "../pages/Inventory/SubCategories/SubCategories.tsx";
 import Units from "../pages/Inventory/Units/Units.tsx";
 import VariantAttributes from "../pages/Inventory/VariantAttributes/VariantAttributes.tsx";
-import Warranties from "../pages/Inventory/Warranties/Warranties.tsx";
 import AccountsOverview from "../pages/Accounts/AccountsOverview.tsx";
 import CashFlow from "../pages/Accounts/CashFlow.tsx";
 import EmployeeSales from "../pages/Accounts/EmployeeSales.tsx";
@@ -77,12 +75,17 @@ const routes = [
           { path: "products/edit/:id", element: <ProductForm /> },
           { path: "products/expired", element: <ExpiredProducts /> },
           { path: "products/low-stock", element: <LowStocks /> },
-          { path: "categories", element: <Categories /> },
-          { path: "sub-categories", element: <SubCategories /> },
+          // One screen, two tabs. The old sub-category address still works and
+          // opens on its own tab, so bookmarks and old links land where they
+          // always did.
+          { path: "categories", element: <CategoryTabs /> },
+          {
+            path: "sub-categories",
+            element: <Navigate to="/inventory/categories?tab=sub-categories" replace />,
+          },
           { path: "brands", element: <Brands /> },
           { path: "units", element: <Units /> },
           { path: "variant-attributes", element: <VariantAttributes /> },
-          { path: "warranties", element: <Warranties /> },
           { path: "print-labels", element: <PrintLabelsView /> },
           // Old addresses, now redirects — see the note in PrintBarcode.
           { path: "print-barcode", element: <PrintBarcode /> },

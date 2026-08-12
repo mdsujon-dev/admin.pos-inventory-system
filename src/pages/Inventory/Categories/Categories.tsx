@@ -21,7 +21,12 @@ import { makeSheet } from "../../../utils/tableExport";
 
 const { confirm } = Modal;
 
-const Categories = () => {
+/**
+ * @param embedded Rendered inside the Category screen's tab strip, which owns
+ * the page heading and the create buttons for both tables. Without this the
+ * tab would carry a second title and a second "Add" button for the same thing.
+ */
+const Categories = ({ embedded = false }: { embedded?: boolean } = {}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(20);
   const [searchText, setSearchText] = useState("");
@@ -184,25 +189,8 @@ const Categories = () => {
     },
   ];
 
-  return (
-    <div>
-      <PageMeta
-        title="Categories - POS & Inventory Admin Panel"
-        description="Manage product categories"
-        canonicalUrl={`${window.location.origin}/inventory/categories`}
-        noindex={true}
-      />
-      <PageHeader
-        title="Category"
-        subtitle="Group your products into top-level categories"
-        breadcrumbs={[
-          { title: "Dashboard", path: "/" },
-          { title: "Inventory" },
-          { title: "Category" },
-        ]}
-        extra={
-          <div className="flex flex-wrap items-center gap-2">
-            <ExportMenu
+  const exportMenu = (
+    <ExportMenu
               sheet={async () => {
                 const all = await fetchAllCategories([
                   { name: "page", value: 1 },
@@ -227,22 +215,48 @@ const Categories = () => {
                   ],
                 });
               }}
-              disabled={total === 0}
-            />
-            <PermissionGate module="Categories" action="Create">
-              <Button
-                type="primary"
-                icon={<Plus className="w-4 h-4" />}
-                onClick={openCreate}
-              >
-                Add Category
-              </Button>
-            </PermissionGate>
-          </div>
-        }
-      />
+      disabled={total === 0}
+    />
+  );
 
-      <div className="flex flex-col md:flex-row gap-4 mb-6">
+  return (
+    <div>
+      {!embedded && (
+        <>
+          <PageMeta
+            title="Categories - POS & Inventory Admin Panel"
+            description="Manage product categories"
+            canonicalUrl={`${window.location.origin}/inventory/categories`}
+            noindex={true}
+          />
+          <PageHeader
+            title="Category"
+            subtitle="Group your products into top-level categories"
+            breadcrumbs={[
+              { title: "Dashboard", path: "/" },
+              { title: "Inventory" },
+              { title: "Category" },
+            ]}
+            extra={
+              <div className="flex flex-wrap items-center gap-2">
+                {exportMenu}
+                <PermissionGate module="Categories" action="Create">
+                  <Button
+                    type="primary"
+                    icon={<Plus className="w-4 h-4" />}
+                    onClick={openCreate}
+                  >
+                    Add Category
+                  </Button>
+                </PermissionGate>
+              </div>
+            }
+          />
+        </>
+      )}
+
+      <div className="flex flex-col md:flex-row gap-4 mb-6 items-start">
+        {embedded && <div className="order-last ml-auto">{exportMenu}</div>}
         <Input
           placeholder="Search by name or description..."
           prefix={<Search className="w-4 h-4 text-secondary-400" />}

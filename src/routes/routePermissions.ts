@@ -49,7 +49,6 @@ export const routePermissions: Record<string, RoutePermission> = {
     module: "Variant Attributes",
     action: "View",
   },
-  "/inventory/warranties": { module: "Warranties", action: "View" },
   "/inventory/print-labels": { module: "Print Labels", action: "View" },
   "/inventory/stock-lots": { module: "Stock Batches", action: "View" },
   // The old split screens. Kept so a bookmark still lands somewhere it is

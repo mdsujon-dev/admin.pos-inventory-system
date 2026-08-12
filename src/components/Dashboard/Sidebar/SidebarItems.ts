@@ -1,5 +1,4 @@
 import {
-  BadgeCheck,
   Boxes,
   CalendarClock,
   ClipboardList,
@@ -13,7 +12,6 @@ import {
   PhoneCall,
   PieChart,
   Receipt,
-  Rows3,
   Ruler,
   ScanLine,
   ShieldCheck,
@@ -51,7 +49,7 @@ const sidebarMenuRoutes: RouteItem[] = [
     section: "Main",
   },
   // Inventory — everything that describes what is on the shelf. Catalog data
-  // (categories, brands, units, variant attributes, warranties) lives under
+  // (categories, brands, units, variant attributes) lives under
   // Product rather than beside it: they exist only to define a product, so
   // splitting them into sibling groups would spread one subject over the
   // sidebar.
@@ -84,17 +82,13 @@ const sidebarMenuRoutes: RouteItem[] = [
         icon: TrendingDown,
         module: "Low Stocks",
       },
+      // One entry, two tabs. A sub category has no meaning without its parent,
+      // and filing one almost always means looking at the other.
       {
         label: "Category",
         address: "/inventory/categories",
         icon: LayoutGrid,
         module: "Categories",
-      },
-      {
-        label: "Sub Category",
-        address: "/inventory/sub-categories",
-        icon: Rows3,
-        module: "Sub Categories",
       },
       {
         label: "Brands",
@@ -107,12 +101,6 @@ const sidebarMenuRoutes: RouteItem[] = [
         address: "/inventory/units",
         icon: Ruler,
         module: "Units",
-      },
-      {
-        label: "Warranties",
-        address: "/inventory/warranties",
-        icon: BadgeCheck,
-        module: "Warranties",
       },
       // One screen for both formats. Barcode and QR were two entries printing
       // the same rows off the same picker, differing only in which symbol they
