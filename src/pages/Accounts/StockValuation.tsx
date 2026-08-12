@@ -11,7 +11,6 @@ import {
   useGetPotentialProfitQuery,
   useGetStockValuationQuery,
 } from "../../redux/features/accounts/reportApi";
-import { SectionCard } from "../Inventory/Products/ProductFormUI";
 
 /**
  * What the shelf is worth.
@@ -107,12 +106,7 @@ const StockValuation = () => {
         />
       </div>
 
-      <SectionCard
-        icon={Wallet}
-        title="By item"
-        subtitle="Most valuable first — this is where the money is parked"
-      >
-        <DataTable
+      <DataTable
           data={rows}
           rowKey={(row: any) => `${row.productId}-${row.variantId ?? "none"}`}
           loading={isFetching}
@@ -182,7 +176,6 @@ const StockValuation = () => {
             },
           ]}
         />
-      </SectionCard>
     </div>
   );
 };

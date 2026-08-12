@@ -1,5 +1,5 @@
-import { Button, Form, Input, Modal, Space, Switch, Table, Tag, Tooltip } from "antd";
-import { Edit, Landmark, Plus, Trash2 } from "lucide-react";
+import { Button, Form, Input, Modal, Space, Switch, Tag, Tooltip } from "antd";
+import { Edit, Plus, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
 import PageHeader from "../../components/Common/PageHeader";
@@ -15,7 +15,7 @@ import {
   useToggleExpenseCategoryStatusMutation,
   useUpdateExpenseCategoryMutation,
 } from "../../redux/features/accounts/reportApi";
-import { SectionCard } from "../Inventory/Products/ProductFormUI";
+import DataTable from "../../components/Table/DataTable";
 
 const { confirm } = Modal;
 
@@ -115,19 +115,12 @@ const ExpenseCategories = () => {
         }
       />
 
-      <SectionCard
-        icon={Landmark}
-        title="Headings"
-        subtitle="Recurring ones are what the shop must cover before it has earned anything"
-      >
-        <Table
-          dataSource={categories}
-          rowKey="_id"
-          loading={isFetching}
-          size="small"
-          pagination={false}
-          columns={[
-            {
+      <DataTable
+        data={categories}
+        rowKey="_id"
+        loading={isFetching}
+        columns={[
+          {
               title: "Heading",
               key: "name",
               render: (_: unknown, row) => (
@@ -212,8 +205,6 @@ const ExpenseCategories = () => {
             },
           ]}
         />
-      </SectionCard>
-
       {isOpen && (
         <InventoryFormModal
           open={isOpen}

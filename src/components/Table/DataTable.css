@@ -7,42 +7,55 @@
    long tables read as noise without actually helping anyone follow a row.
    --------------------------------------------------------------------------- */
 
-/* Head — a soft emerald wash with a solid brand rule under it, so the header
-   reads as a lid on the table rather than just another row. */
+/* Head — the brand colour itself, carrying white type.
+   This is the one band of solid colour in the table; the rows stay white so
+   the data, not the chrome, is what the eye lands on. */
 .ant-table-wrapper .ant-table-thead > tr > th {
-  background: linear-gradient(180deg, #f4fdf7 0%, #e9f9ef 100%) !important;
-  color: #015b1f;
+  background: linear-gradient(180deg, #019532 0%, #017527 100%) !important;
+  color: #ffffff;
   font-size: 11.5px;
   font-weight: 700;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
   padding: 13px 16px !important;
-  border-bottom: 2px solid #a8f0c0 !important;
+  border-bottom: none !important;
   border-radius: 0 !important;
 }
 
-/* The hairline AntD draws between header cells. Left at its default grey it
-   cuts through the wash; in the header's own hue it just separates. */
+/* The hairline AntD draws between header cells — its default grey is invisible
+   on green, so it becomes a translucent white notch instead. */
 .ant-table-wrapper .ant-table-thead > tr > th::before {
-  background-color: #c8f0d6 !important;
+  background-color: rgba(255, 255, 255, 0.28) !important;
   height: 1.4em !important;
 }
 
 /* Sort and filter affordances follow the header text, not AntD's blue-grey. */
 .ant-table-wrapper .ant-table-column-sorter,
 .ant-table-wrapper .ant-table-filter-trigger {
-  color: #65a97e;
+  color: rgba(255, 255, 255, 0.55);
 }
 
 .ant-table-wrapper .ant-table-column-sorter-up.active,
 .ant-table-wrapper .ant-table-column-sorter-down.active,
-.ant-table-wrapper .ant-table-filter-trigger.active {
-  color: #019532;
+.ant-table-wrapper .ant-table-filter-trigger.active,
+.ant-table-wrapper .ant-table-filter-trigger:hover {
+  color: #ffffff;
 }
 
 .ant-table-wrapper .ant-table-thead th.ant-table-column-has-sorters:hover {
-  background: linear-gradient(180deg, #edfbf2 0%, #ddf5e6 100%) !important;
+  background: linear-gradient(180deg, #017527 0%, #015b1f 100%) !important;
+}
+
+/* Selection checkboxes sit on green now, so they need a white outline to be
+   seen at all before they are ticked. */
+.ant-table-wrapper
+  .ant-table-thead
+  > tr
+  > th.ant-table-selection-column
+  .ant-checkbox-inner {
+  border-color: rgba(255, 255, 255, 0.7);
+  background-color: transparent;
 }
 
 /* Body — white rows, one hairline between them, room to breathe. */
@@ -110,7 +123,7 @@
 
 .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-left,
 .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-right {
-  background: linear-gradient(180deg, #f4fdf7 0%, #e9f9ef 100%) !important;
+  background: linear-gradient(180deg, #019532 0%, #017527 100%) !important;
 }
 
 /* The shadow AntD casts from a pinned column, softened to match the table. */
@@ -122,8 +135,8 @@
 
 /* Summary rows (totals) belong to the header family, not the body. */
 .ant-table-wrapper .ant-table-summary > tr > td {
-  background-color: #f7fdf9 !important;
-  border-top: 2px solid #a8f0c0 !important;
+  background-color: #f4fdf7 !important;
+  border-top: 2px solid #019532 !important;
   font-weight: 700;
   color: #015b1f;
 }
@@ -158,9 +171,14 @@
   background-color: #fff;
 }
 
-/* Pagination — the current page in brand green, the rest unobtrusive. */
-.ant-table-wrapper .ant-table-pagination.ant-pagination {
-  margin: 14px 16px !important;
+/* Pagination — the current page in brand green, the rest unobtrusive.
+   It lives inside the table's outline, so it needs a rule above it; without
+   one the controls read as floating loose under the last row. */
+.ant-table-wrapper.pos-table .ant-table-pagination.ant-pagination {
+  margin: 0 !important;
+  padding: 12px 16px;
+  border-top: 1px solid #e9f4ec;
+  background-color: #fcfdfc;
 }
 
 .ant-table-wrapper .ant-pagination .ant-pagination-item-active {

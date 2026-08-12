@@ -156,7 +156,7 @@ export default function DataTable(props: any) {
             <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
           ),
         }}
-        className="rounded-xl overflow-hidden border border-primary-100 bg-white shadow-[0_10px_28px_-16px_rgba(1,149,50,.35),0_2px_6px_-2px_rgba(16,24,40,.06)]"
+        className="pos-table rounded-lg overflow-hidden border-[1.5px] border-primary-200 bg-white"
         rowKey={rowKey ? rowKey : "_id"}
         rowSelection={selectRow ? rowSelection : undefined}
         dataSource={data || []}
