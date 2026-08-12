@@ -1,11 +1,11 @@
-import { Button, ColorPicker, Form } from "antd";
+ï»¿import { Button, ColorPicker, Form } from "antd";
 import { toast } from "react-toastify";
 import {
   ICountry,
   useCreateCountryMutation,
 } from "../../../../redux/features/country/countryApi";
 import { FormInput } from "../../../Form/FormInput";
-import AntModal from "../../../shared/AntModal";
+import AppFormModal from "../../shared/AppFormModal";
 import UploadImage from "../../../shared/UploadImage";
 
 const HEX_COLOR = /^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$/;
@@ -95,7 +95,7 @@ const CreateCountryModal = ({
             name="code"
             rules={[
               { required: true, message: "Code is required" },
-              { min: 2, max: 5, message: "Code must be 2–5 characters" },
+              { min: 2, max: 5, message: "Code must be 2ï¿½5 characters" },
             ]}
             placeholder="e.g. BD"
           />

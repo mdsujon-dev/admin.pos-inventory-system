@@ -150,7 +150,6 @@ const VendorForm = () => {
       company: values.company?.trim() || "",
       phone: values.phone?.trim(),
       email: values.email?.trim() || "",
-      address: values.address?.trim() || "",
       note: values.note?.trim() || "",
       categories: values.categories ?? [],
       subCategories: values.subCategories ?? [],
