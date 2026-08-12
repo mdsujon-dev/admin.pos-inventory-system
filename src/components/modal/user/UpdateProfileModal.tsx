@@ -1,4 +1,4 @@
-﻿import { Avatar, Form, Upload, message } from "antd";
+﻿import { Avatar, Button, Form, Modal, Upload, message } from "antd";
 import type { RcFile, UploadChangeParam } from "antd/es/upload";
 import { Camera, ImagePlus } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -8,7 +8,6 @@ import {
   useUpdateUserMutation,
   useUploadProfileImageMutation,
 } from "../../../redux/features/user/userApi";
-import AppFormModal from "../shared/AppFormModal";
 
 interface UpdateProfileModalProps {
   open: boolean;

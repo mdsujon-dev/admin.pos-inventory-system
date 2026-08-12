@@ -12,7 +12,7 @@ import IncomeExpense from "../pages/IncomeExpense/IncomeExpense.tsx";
 import AllMediaLibraryList from "../pages/media-library/AllMediaLibraryList.tsx";
 import AllNotifications from "../pages/Notifications/AllNotifications";
 import Profile from "../pages/Profile/Profile";
-import Countries from "../pages/Settings/Countries/Countries.tsx";
+
 import Designation from "../pages/Settings/Desgination/Designation.tsx";
 import Providers from "../pages/Settings/Providers/Providers";
 import MediaBin from "../pages/Settings/MediaBin/MediaBin.tsx";
@@ -192,7 +192,7 @@ const routes = [
         children: [
           { path: "profile", element: <Profile /> },
           { path: "designation", element: <Designation /> },
-          { path: "countries", element: <Countries /> },
+
           { path: "payment-providers", element: <Providers /> },
           { path: "notification-sounds", element: <NotificationSounds /> },
           { path: "media-bin", element: <MediaBin /> },

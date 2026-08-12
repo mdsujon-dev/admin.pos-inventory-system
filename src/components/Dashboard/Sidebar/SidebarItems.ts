@@ -317,11 +317,6 @@ const sidebarMenuRoutes: RouteItem[] = [
       // permission module, so it's never filtered out of the sidebar.
       { label: "Profile", address: "/settings/profile" },
       {
-        label: "Countries",
-        address: "/settings/countries",
-        module: "Countries",
-      },
-      {
         label: "Payment Providers",
         address: "/settings/payment-providers",
         module: "Payment Providers",

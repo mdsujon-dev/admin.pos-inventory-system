@@ -118,7 +118,7 @@ export const routePermissions: Record<string, RoutePermission> = {
   // door. A permission that one URL enforces and another does not is not a
   // permission.
   "/settings/designation": { module: "Designations", action: "View" },
-  "/settings/countries": { module: "Countries", action: "View" },
+
   "/settings/payment-providers": { module: "Payment Providers", action: "View" },
   "/settings/media-bin": { module: "Media Bin", action: "View" },
   // /settings/notification-sounds — intentionally unguarded: it edits a

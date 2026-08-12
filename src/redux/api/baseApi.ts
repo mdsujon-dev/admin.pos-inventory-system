@@ -154,7 +154,7 @@ export const baseApi = createApi({
     "media-library-bin",
     "folders",
     "notifications",
-    "countries",
+
     "error-logs",
     // Inventory
     "categories",
