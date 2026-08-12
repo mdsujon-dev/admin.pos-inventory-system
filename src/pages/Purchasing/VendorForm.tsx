@@ -115,8 +115,18 @@ const VendorForm = () => {
         isActive: true,
         categories: [],
         subCategories: [],
-        paymentTerms: [],
-        paymentMethods: [],
+        address: {},
+        /**
+         * One of each is already open on a new vendor.
+         *
+         * Nearly every supplier has at least one term and one way of being
+         * paid, so an empty list behind an "Add" button is a click that is
+         * almost always going to be made — and a form that looks like it wants
+         * nothing there. Blank rows are dropped on save, so leaving them
+         * untouched costs nothing.
+         */
+        paymentTerms: [{ side: "ours", text: "" }],
+        paymentMethods: [{}],
       };
     }
     return {
@@ -149,9 +159,12 @@ const VendorForm = () => {
       paymentTerms: (values.paymentTerms ?? []).filter((row: any) =>
         row?.text?.trim()
       ),
+      // A method with no type is the row the form opened with and nobody
+      // filled in — not a payment method.
       paymentMethods: (values.paymentMethods ?? []).filter(
         (row: any) => row?.methodType
       ),
+      address: values.address ?? {},
       isActive: values.isActive ?? true,
     };
 
@@ -235,17 +248,79 @@ const VendorForm = () => {
               <FormInput label="Email" name="email" placeholder="Optional" />
             </div>
 
-            <div className="grid gap-x-4 sm:grid-cols-2">
-              <Form.Item label="Address" name="address">
-                <Input.TextArea rows={3} placeholder="Optional" />
-              </Form.Item>
-              <Form.Item label="Note" name="note">
-                <Input.TextArea
-                  rows={3}
-                  placeholder="Delivery days, who to ask for…"
+            {/*
+              Split rather than one box: a single free-text address is what a
+              delivery driver cannot use and a report cannot group by — "who do
+              we buy from in Bogura" is unanswerable when the district is
+              buried in the middle of a sentence.
+            */}
+            <p className="mb-2 mt-1 text-[13px] font-semibold text-secondary-700">
+              Address
+            </p>
+            <div className="grid gap-x-4 sm:grid-cols-2 lg:grid-cols-4">
+              <FormInput
+                label="Division"
+                name={["address", "division"]}
+                placeholder="e.g. Rajshahi"
+              />
+              <FormInput
+                label="District"
+                name={["address", "district"]}
+                placeholder="e.g. Bogura"
+              />
+              <FormInput
+                label="Upazila"
+                name={["address", "upazila"]}
+                tooltip="Rural areas say upazila; cities say thana. Fill in whichever they gave."
+                placeholder="e.g. Shibganj"
+              />
+              <FormInput
+                label="Thana"
+                name={["address", "thana"]}
+                placeholder="e.g. Kotwali"
+              />
+              <FormInput
+                label="Union / Ward"
+                name={["address", "union"]}
+                placeholder="Optional"
+              />
+              <FormInput
+                label="Area / Village"
+                name={["address", "area"]}
+                placeholder="e.g. Jaleshwaritola"
+              />
+              <FormInput
+                label="Road"
+                name={["address", "road"]}
+                placeholder="e.g. Sherpur Road"
+              />
+              <FormInput
+                label="House / Holding"
+                name={["address", "houseNo"]}
+                placeholder="e.g. 42/A"
+              />
+              <FormInput
+                label="Post Code"
+                name={["address", "postCode"]}
+                placeholder="e.g. 5800"
+                digitsOnly
+              />
+              <div className="sm:col-span-2 lg:col-span-3">
+                <FormInput
+                  label="Landmark"
+                  name={["address", "landmark"]}
+                  tooltip="How people actually find the place"
+                  placeholder="e.g. Opposite the central mosque"
                 />
-              </Form.Item>
+              </div>
             </div>
+
+            <Form.Item label="Note" name="note">
+              <Input.TextArea
+                rows={3}
+                placeholder="Delivery days, who to ask for…"
+              />
+            </Form.Item>
 
             <Form.Item label="Status" name="isActive" valuePropName="checked" className="!mb-0">
               <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
@@ -579,7 +654,7 @@ const VendorForm = () => {
             </Form.List>
           </SectionCard>
 
-          <div className="sticky bottom-0 z-30 -mx-3 -mb-3 mt-auto flex h-[60px] items-center justify-end gap-3 border-t border-primary/20 bg-white/80 px-3 backdrop-blur-lg sm:-mx-4 sm:-mb-4 sm:px-6">
+          <div className="sticky bottom-0 z-30 -mx-3 -mb-3 mt-auto flex h-[70px] items-center justify-end gap-3 border-t border-primary/20 bg-white/80 px-3 backdrop-blur-lg sm:-mx-4 sm:-mb-4 sm:px-6">
             <Button
               onClick={() => navigate("/vendors")}
               disabled={creating || updating}

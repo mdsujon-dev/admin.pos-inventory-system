@@ -7,6 +7,26 @@ import { ISubCategory } from "../inventory/subCategoryApi";
 /** Populated on a read, sent back as plain ids on a write. */
 type Ref<T> = T | string;
 
+/**
+ * A Bangladeshi address in the parts people give it in.
+ *
+ * `thana` and `upazila` are both here on purpose — same tier, different word:
+ * cities say thana, rural areas say upazila, and a form offering only one gets
+ * the other typed into it.
+ */
+export interface IAddress {
+  division?: string;
+  district?: string;
+  upazila?: string;
+  thana?: string;
+  union?: string;
+  area?: string;
+  road?: string;
+  houseNo?: string;
+  postCode?: string;
+  landmark?: string;
+}
+
 export type TermSide = "ours" | "vendor";
 
 /** One agreed condition, and whose promise it is. */
@@ -35,7 +55,7 @@ export interface IVendor {
   company?: string;
   phone: string;
   email?: string;
-  address?: string;
+  address?: IAddress;
   note?: string;
 
   /**

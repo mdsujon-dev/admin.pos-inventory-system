@@ -1,4 +1,4 @@
-import { Button, Form, Input, InputNumber, Modal } from "antd";
+import { Form, Input, InputNumber } from "antd";
 import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { TakaIcon } from "../../shared/Icon";
@@ -6,6 +6,7 @@ import {
   useAddTransactionMutation,
   useUpdateTransactionMutation,
 } from "../../../redux/features/transaction/transactionApi";
+import AppFormModal from "../shared/AppFormModal";
 
 interface Props {
   open: boolean;
@@ -51,14 +52,17 @@ const TransactionModal: React.FC<Props> = ({ open, setOpen, type, record }) => {
   };
 
   return (
-    <Modal
+    <AppFormModal
       title={`${isEdit ? "Edit" : "Add"} ${label} Entry`}
+      entity="Transaction"
+      isEditing={isEdit}
       open={open}
-      onCancel={() => setOpen(false)}
+      setOpen={setOpen}
       width={560}
-      footer={null}
+      form={form}
+      onSubmit={onFinish}
+      loading={adding || updating}
     >
-      <Form form={form} layout="vertical" onFinish={onFinish}>
         <Form.Item
           label={
             <span className="inline-flex items-center gap-1">
@@ -111,18 +115,7 @@ const TransactionModal: React.FC<Props> = ({ open, setOpen, type, record }) => {
         >
           <Input.TextArea rows={3} placeholder="Describe the reason…" />
         </Form.Item>
-        <div className="flex justify-end gap-2">
-          <Button onClick={() => setOpen(false)}>Cancel</Button>
-          <Button
-            type="primary"
-            onClick={() => form.submit()}
-            loading={adding || updating}
-          >
-            {isEdit ? "Save Changes" : `Add ${label}`}
-          </Button>
-        </div>
-      </Form>
-    </Modal>
+    </AppFormModal>
   );
 };
 

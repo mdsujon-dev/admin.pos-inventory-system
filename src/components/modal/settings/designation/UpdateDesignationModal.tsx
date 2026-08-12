@@ -1,8 +1,8 @@
-import { Button, Form, Input, Modal, Switch } from "antd";
-import { Save } from "lucide-react";
+import { Form, Input, Switch } from "antd";
 import React, { useEffect } from "react";
 import { toast } from "react-toastify";
 import { useUpdateDesignationMutation } from "../../../../redux/features/designation/designationApi";
+import AppFormModal from "../../shared/AppFormModal";
 
 interface UpdateDesignationModalProps {
   open: boolean;
@@ -48,14 +48,16 @@ const UpdateDesignationModal: React.FC<UpdateDesignationModalProps> = ({
   };
 
   return (
-    <Modal
-      title="Update Designation"
+    <AppFormModal
+      entity="Designation"
+      isEditing={true}
       open={open}
-      onCancel={() => setOpen(false)}
+      setOpen={setOpen}
       width={600}
-      footer={null}
+      form={form}
+      onSubmit={handleSubmit}
+      loading={isLoading}
     >
-      <Form form={form} layout="vertical" onFinish={handleSubmit}>
         <Form.Item
           label="Name"
           name="name"
@@ -72,19 +74,7 @@ const UpdateDesignationModal: React.FC<UpdateDesignationModalProps> = ({
           <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
         </Form.Item>
 
-        <Form.Item>
-          <Button
-            type="primary"
-            icon={<Save className="w-4 h-4" />}
-            onClick={() => form.submit()}
-            loading={isLoading}
-            block
-          >
-            Save Changes
-          </Button>
-        </Form.Item>
-      </Form>
-    </Modal>
+    </AppFormModal>
   );
 };
 

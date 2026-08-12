@@ -97,6 +97,28 @@ const VendorProfile = () => {
 
   const methods = (vendor.paymentMethods ?? []) as any[];
 
+  /**
+   * The address back as one line, smallest unit first.
+   *
+   * Stored in parts so it can be searched and grouped; read out as a sentence
+   * because that is how anyone actually uses it to find the place.
+   */
+  const address = (vendor.address ?? {}) as Record<string, string>;
+  const addressLine = [
+    address.houseNo,
+    address.road,
+    address.area,
+    address.union,
+    address.thana,
+    address.upazila,
+    address.district,
+    address.division,
+    address.postCode,
+  ]
+    .map((part) => part?.trim())
+    .filter(Boolean)
+    .join(", ");
+
   return (
     <div>
       <PageMeta
@@ -194,7 +216,10 @@ const VendorProfile = () => {
           <div className="mt-4 space-y-1 border-t border-secondary-100 pt-3 text-xs text-secondary-500">
             <p className="m-0">Phone: {vendor.phone}</p>
             {vendor.email && <p className="m-0">Email: {vendor.email}</p>}
-            {vendor.address && <p className="m-0">{vendor.address}</p>}
+            {addressLine && <p className="m-0">{addressLine}</p>}
+            {address.landmark && (
+              <p className="m-0 italic">Near {address.landmark}</p>
+            )}
             {vendor.note && (
               <p className="m-0 pt-1 text-secondary-600">{vendor.note}</p>
             )}
