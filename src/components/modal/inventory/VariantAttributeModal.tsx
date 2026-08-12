@@ -6,7 +6,7 @@ import {
   useUpdateVariantAttributeMutation,
 } from "../../../redux/features/inventory/variantAttributeApi";
 import { FormInput } from "../../Form/FormInput";
-import AppFormModal from "./AppFormModal";
+import AppFormModal from "../shared/AppFormModal";
 
 const VariantAttributeModal = ({
   open,

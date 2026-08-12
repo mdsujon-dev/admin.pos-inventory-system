@@ -7,7 +7,7 @@ import {
 } from "../../../redux/features/settings/paymentProviderApi";
 import { FormInput } from "../../Form/FormInput";
 import { FormSelect } from "../../Form/FormSelect";
-import AppFormModal from "../inventory/AppFormModal";
+import AppFormModal from "../shared/AppFormModal";
 
 /**
  * The banks and wallets a vendor can be paid through.

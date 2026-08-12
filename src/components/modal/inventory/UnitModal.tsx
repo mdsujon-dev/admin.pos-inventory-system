@@ -6,7 +6,7 @@ import {
   useUpdateUnitMutation,
 } from "../../../redux/features/inventory/unitApi";
 import { FormInput } from "../../Form/FormInput";
-import AppFormModal from "./AppFormModal";
+import AppFormModal from "../shared/AppFormModal";
 
 const UnitModal = ({
   open,

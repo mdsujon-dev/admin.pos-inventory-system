@@ -5,7 +5,7 @@ import {
   useCreateVendorMutation,
 } from "../../../redux/features/purchasing/vendorApi";
 import { FormInput } from "../../Form/FormInput";
-import AppFormModal from "../inventory/AppFormModal";
+import AppFormModal from "../shared/AppFormModal";
 
 /**
  * The three fields a purchase actually needs from a new supplier.

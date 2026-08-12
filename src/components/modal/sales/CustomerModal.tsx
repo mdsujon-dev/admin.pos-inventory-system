@@ -6,7 +6,7 @@ import {
   useUpdateCustomerMutation,
 } from "../../../redux/features/sales/customerApi";
 import { FormInput } from "../../Form/FormInput";
-import AppFormModal from "../inventory/AppFormModal";
+import AppFormModal from "../shared/AppFormModal";
 
 const CustomerModal = ({
   open,

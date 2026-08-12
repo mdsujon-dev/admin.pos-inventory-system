@@ -13,7 +13,7 @@ import {
 import { FormInput } from "../../Form/FormInput";
 import { FormSelect } from "../../Form/FormSelect";
 import UploadImage from "../../shared/UploadImage";
-import AppFormModal from "./AppFormModal";
+import AppFormModal from "../shared/AppFormModal";
 
 const SubCategoryModal = ({
   open,

@@ -7,7 +7,7 @@ import {
 } from "../../../redux/features/inventory/categoryApi";
 import { FormInput } from "../../Form/FormInput";
 import UploadImage from "../../shared/UploadImage";
-import AppFormModal from "./AppFormModal";
+import AppFormModal from "../shared/AppFormModal";
 
 const CategoryModal = ({
   open,

@@ -6,7 +6,7 @@ import { IVendor } from "../../../redux/features/purchasing/vendorApi";
 import { useCreateVendorPaymentMutation } from "../../../redux/features/purchasing/vendorPaymentApi";
 import { PAYMENT_METHOD_LABELS, round2 } from "../../../utils/money";
 import Money from "../../shared/Money";
-import AppFormModal from "../inventory/AppFormModal";
+import AppFormModal from "../shared/AppFormModal";
 
 interface OpenBill {
   _id: string;
