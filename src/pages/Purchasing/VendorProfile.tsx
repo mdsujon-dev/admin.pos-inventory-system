@@ -66,22 +66,36 @@ const VendorProfile = () => {
     })),
   ].filter((row) => row.label);
 
-  const payInfo = [
+  /**
+   * The terms line, then one card per method.
+   *
+   * Each method is shown with the fields that method actually has rather than
+   * flattened into a single list of labels — a bank's branch and a cash
+   * payment's "who signs for it" are not the same kind of fact, and reading
+   * them off one column makes both harder to find.
+   */
+  const terms = [
     ["Terms", vendor.paymentTerms],
     ["Credit days", vendor.creditDays ? `${vendor.creditDays} days` : ""],
-  ];
+  ].filter(([, value]) => value) as [string, string][];
 
-  (vendor.paymentMethods || []).forEach((method: any) => {
-    if (method.methodType === "Bank") {
-      payInfo.push([`Bank (${method.provider || "N/A"})`, method.accountNumber || method.accountName || "N/A"]);
-    } else if (method.methodType === "Mobile Banking") {
-      payInfo.push([method.provider || "Mobile", method.accountNumber || "N/A"]);
-    } else {
-      payInfo.push([method.methodType, method.details || "N/A"]);
-    }
-  });
+  const methodRows = (method: any): [string, string][] =>
+    (
+      [
+        ["Bank", method.provider],
+        ["Provider", method.methodType !== "Bank" ? method.provider : ""],
+        ["Branch", method.branch],
+        ["Account name", method.accountName],
+        ["Account no", method.accountNumber],
+        ["Routing", method.routingNumber],
+        ["Account type", method.accountType],
+        ["Handed to", method.receiverName],
+        ["Voucher to", method.voucherReceiver],
+        ["Confirmed by", method.confirmedBy],
+      ] as [string, string][]
+    ).filter(([, value]) => value);
 
-  const finalPayInfo = payInfo.filter(([, value]) => value);
+  const methods = (vendor.paymentMethods ?? []) as any[];
 
   return (
     <div>
@@ -192,22 +206,68 @@ const VendorProfile = () => {
           title="How they get paid"
           subtitle="Written down once instead of asked for every time"
         >
-          {finalPayInfo.length === 0 ? (
+          {terms.length === 0 && methods.length === 0 ? (
             <p className="m-0 text-sm text-secondary-500">
-              No payment details saved yet.
+              No payment details saved yet — edit the vendor to add them.
             </p>
           ) : (
-            <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
-              {finalPayInfo.map(([label, value]) => (
-                <div key={String(label)}>
-                  <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-400">
-                    {label}
-                  </p>
-                  <p className="m-0 text-sm font-medium text-secondary-800">
-                    {value}
-                  </p>
+            <div className="space-y-3">
+              {terms.length > 0 && (
+                <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
+                  {terms.map(([label, value]) => (
+                    <div key={label}>
+                      <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-400">
+                        {label}
+                      </p>
+                      <p className="m-0 text-sm font-medium text-secondary-800">
+                        {value}
+                      </p>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
+
+              {methods.map((method, index) => {
+                const rows = methodRows(method);
+                return (
+                  <div
+                    key={`${method.methodType}-${index}`}
+                    className="rounded-xl border border-secondary-100 bg-secondary-50 p-3"
+                  >
+                    <div className="mb-2 flex items-center gap-2">
+                      <Tag className="!m-0 !border-primary-200 !bg-primary-50 !text-[11px] !text-primary-700">
+                        {method.methodType}
+                      </Tag>
+                      {method.accountType && (
+                        <Tag className="!m-0 !text-[11px]">
+                          {method.accountType}
+                        </Tag>
+                      )}
+                    </div>
+
+                    {rows.length > 0 && (
+                      <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
+                        {rows.map(([label, value]) => (
+                          <div key={label}>
+                            <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-400">
+                              {label}
+                            </p>
+                            <p className="m-0 text-sm font-medium text-secondary-800">
+                              {value}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {method.details && (
+                      <p className="m-0 mt-2 border-t border-secondary-200 pt-2 text-xs text-secondary-600">
+                        {method.details}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           )}
         </SectionCard>

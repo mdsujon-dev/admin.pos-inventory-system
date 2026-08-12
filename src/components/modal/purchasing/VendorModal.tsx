@@ -365,6 +365,61 @@ const VendorModal = ({
                               </>
                             )}
 
+                            {/*
+                              "Other" is the catch-all, so it offers the lot.
+                              Anything that is not a bank, a wallet or cash in
+                              hand is something nobody anticipated — a cheque
+                              to a third party, a supplier's own agent, an
+                              offset against a return — and every one of those
+                              needs a different two of these fields.
+                            */}
+                            {methodType === "Other" && (
+                              <>
+                                <FormInput
+                                  {...restField}
+                                  label="Paid Through"
+                                  name={[name, "provider"]}
+                                  placeholder="e.g. Cheque, Card, Adjustment"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Account / Reference Name"
+                                  name={[name, "accountName"]}
+                                  placeholder="Optional"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Account / Reference Number"
+                                  name={[name, "accountNumber"]}
+                                  placeholder="Optional"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Branch / Office"
+                                  name={[name, "branch"]}
+                                  placeholder="Optional"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Handed To"
+                                  name={[name, "receiverName"]}
+                                  placeholder="Who receives it"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Voucher Handed To"
+                                  name={[name, "voucherReceiver"]}
+                                  placeholder="Who signs for it"
+                                />
+                                <FormInput
+                                  {...restField}
+                                  label="Confirmed By"
+                                  name={[name, "confirmedBy"]}
+                                  placeholder="Who checks it went out"
+                                />
+                              </>
+                            )}
+
                             {methodType && (
                               <div className="col-span-1 sm:col-span-2">
                                 <Form.Item
@@ -374,8 +429,13 @@ const VendorModal = ({
                                   className="mb-0 mt-2"
                                 >
                                   <Input.TextArea
-                                    rows={methodType === "Cash" || methodType === "Other" ? 2 : 1}
-                                    placeholder="Any additional details..."
+                                    rows={
+                                      methodType === "Cash" ||
+                                      methodType === "Other"
+                                        ? 2
+                                        : 1
+                                    }
+                                    placeholder="Anything else worth remembering about this method"
                                   />
                                 </Form.Item>
                               </div>

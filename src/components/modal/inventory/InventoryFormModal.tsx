@@ -30,6 +30,7 @@ const ENTITY_ICONS: Record<string, LucideIcon> = {
   "Vendor Payment": Wallet,
   Customer: Contact,
   "Expense Category": Landmark,
+  "Payment Provider": Landmark,
 };
 
 interface InventoryFormModalProps {

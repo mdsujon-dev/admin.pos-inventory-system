@@ -164,6 +164,7 @@ export const baseApi = createApi({
     "variant-attributes",
     "products",
     // Buying
+    "paymentProviders",
     "vendors",
     "vendor-payments",
     "purchases",

@@ -135,6 +135,9 @@ export const PERMISSION_MODULES: PermissionModule[] = [
     group: "Settings",
   },
   { module: "Notifications", permissions: ["View", "Delete"], group: "Settings" },
+  // The banks and wallets money is sent through — a short reference list, so
+  // vendors point at one instead of spelling the name out again.
+  { module: "Payment Providers", permissions: CRUD, group: "Settings" },
 ];
 
 /**
