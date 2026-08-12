@@ -13,6 +13,8 @@ import {
   IPurchase,
   useGetPurchasesQuery,
 } from "../../redux/features/purchasing/purchaseApi";
+import { MetricCard } from "../../components/Common/MetricCard";
+import { Receipt, Wallet, TrendingUp, Phone } from "lucide-react";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
 
 const { RangePicker } = DatePicker;
@@ -37,6 +39,15 @@ const Purchases = () => {
 
   const purchases: IPurchase[] = data?.data?.data || [];
   const total: number = data?.data?.meta?.total || 0;
+
+  const totals = purchases.reduce(
+    (acc, purchase) => ({
+      purchased: acc.purchased + (purchase.grandTotal || 0),
+      paid: acc.paid + (purchase.paid || 0),
+      due: acc.due + (purchase.due || 0),
+    }),
+    { purchased: 0, paid: 0, due: 0 }
+  );
 
   const columns: ColumnsType<IPurchase> = [
     {
@@ -161,13 +172,48 @@ const Purchases = () => {
               type="primary"
               icon={<Plus className="h-4 w-4" />}
               onClick={() => navigate("/purchases/new")}
-              className="!border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500"
+              className="!border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 shadow-primary"
             >
               New Purchase
             </Button>
           </PermissionGate>
         }
       />
+
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          icon={Receipt}
+          label="Bills"
+          accent="#8b5cf6"
+          hint="Total matching bills"
+          value={total}
+          loading={isFetching}
+        />
+        <MetricCard
+          icon={Wallet}
+          label="Purchased Amount"
+          accent="#3b82f6"
+          hint="On this page"
+          value={<Money value={totals.purchased} />}
+          loading={isFetching}
+        />
+        <MetricCard
+          icon={TrendingUp}
+          label="Paid Amount"
+          accent="#10b981"
+          hint="On this page"
+          value={<Money value={totals.paid} />}
+          loading={isFetching}
+        />
+        <MetricCard
+          icon={Phone}
+          label="Still owed"
+          accent={totals.due > 0 ? "#f43f5e" : "#f59e0b"}
+          hint={totals.due > 0 ? "On this page" : "No outstanding balance"}
+          value={<Money value={totals.due} />}
+          loading={isFetching}
+        />
+      </div>
 
       <div className="mb-6 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <Input

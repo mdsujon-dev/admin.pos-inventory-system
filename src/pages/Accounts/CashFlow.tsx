@@ -1,4 +1,4 @@
-import { DatePicker, Tabs } from "antd";
+import { DatePicker } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { ArrowDownLeft, ArrowUpRight, Wallet, Landmark } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -6,6 +6,7 @@ import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import Money from "../../components/shared/Money";
 import DataTable from "../../components/Table/DataTable";
+import TableEmpty from "../../components/Table/TableEmpty";
 import { useGetCashFlowQuery } from "../../redux/features/accounts/reportApi";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
 import { MetricCard } from "../../components/Common/MetricCard";
@@ -81,33 +82,83 @@ const columns = [
   },
 ];
 
-/** The tab label: what it is, and what it came to. */
-const TabLabel = ({
+/**
+ * One direction of the flow, as its own table.
+ *
+ * In and Out sit side by side rather than behind a switch: they are read
+ * against each other, and a control that shows one at a time turns a
+ * comparison into an act of memory.
+ *
+ * Paging lives here, per table, so a long list of expense methods cannot push
+ * the income table off the screen — and so turning one table's page leaves the
+ * other where it was.
+ */
+const FlowSection = ({
   icon: Icon,
   title,
+  subtitle,
   total,
   accent,
+  rows,
+  loading,
+  empty,
 }: {
   icon: React.ElementType;
   title: string;
+  subtitle: string;
   total: number;
   accent: string;
-}) => (
-  <span className="flex items-center gap-2 px-1 py-0.5">
-    <span
-      className="grid h-7 w-7 place-items-center rounded-lg text-white"
-      style={{ background: accent }}
-    >
-      <Icon className="h-[15px] w-[15px]" />
-    </span>
-    <span className="flex flex-col items-start leading-tight">
-      <span className="text-[13px] font-semibold">{title}</span>
-      <span className="text-[11px] font-normal text-secondary-400">
-        <Money value={total} />
-      </span>
-    </span>
-  </span>
-);
+  rows: FlowRow[];
+  loading?: boolean;
+  empty: React.ReactNode;
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  return (
+    <section>
+      <div className="mb-3 flex items-center gap-2.5">
+        <span
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white"
+          style={{ background: accent }}
+        >
+          <Icon className="h-[18px] w-[18px]" />
+        </span>
+        <div className="min-w-0">
+          <p className="m-0 flex items-baseline gap-2 leading-tight">
+            <span className="text-[15px] font-bold text-secondary-800">
+              {title}
+            </span>
+            <span
+              className="text-[15px] font-bold"
+              style={{ color: accent }}
+            >
+              <Money value={total} />
+            </span>
+          </p>
+          <p className="m-0 truncate text-[12px] text-secondary-400">
+            {subtitle}
+          </p>
+        </div>
+      </div>
+
+      <DataTable
+        data={rows}
+        columns={columns}
+        rowKey="key"
+        loading={loading}
+        total={rows.length}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        limit={limit}
+        setLimit={setLimit}
+        // Only worth a footer once there is a second page to reach.
+        isPaginate={rows.length > limit}
+        emptyText={empty}
+      />
+    </section>
+  );
+};
 
 /**
  * Money in and money out, by how it moved.
@@ -209,51 +260,42 @@ const CashFlow = () => {
         />
       </div>
 
-      <Tabs
-        defaultActiveKey="in"
-        items={[
-          {
-            key: "in",
-            label: (
-              <TabLabel
-                icon={ArrowDownLeft}
-                title="In"
-                total={cash?.inflow ?? 0}
-                accent="#10b981"
-              />
-            ),
-            children: (
-              <DataTable
-                data={moneyIn}
-                columns={columns}
-                rowKey="key"
-                loading={isFetching}
-                emptyText="Nothing came in during this period"
-              />
-            ),
-          },
-          {
-            key: "out",
-            label: (
-              <TabLabel
-                icon={ArrowUpRight}
-                title="Out"
-                total={cash?.outflow ?? 0}
-                accent="#f43f5e"
-              />
-            ),
-            children: (
-              <DataTable
-                data={moneyOut}
-                columns={columns}
-                rowKey="key"
-                loading={isFetching}
-                emptyText="Nothing went out during this period"
-              />
-            ),
-          },
-        ]}
-      />
+      <div className="flex flex-col gap-6">
+        <FlowSection
+          icon={ArrowDownLeft}
+          title="In"
+          subtitle="Sales receipts and anything logged as income"
+          total={cash?.inflow ?? 0}
+          accent="#10b981"
+          rows={moneyIn}
+          loading={isFetching}
+          empty={
+            <TableEmpty
+              icon={ArrowDownLeft}
+              accent="#10b981"
+              title="Nothing came in"
+              hint="No sale was paid for and no income was logged in this date range."
+            />
+          }
+        />
+        <FlowSection
+          icon={ArrowUpRight}
+          title="Out"
+          subtitle="Paid to suppliers, and the running costs of the shop"
+          total={cash?.outflow ?? 0}
+          accent="#f43f5e"
+          rows={moneyOut}
+          loading={isFetching}
+          empty={
+            <TableEmpty
+              icon={ArrowUpRight}
+              accent="#f43f5e"
+              title="Nothing went out"
+              hint="No supplier was paid and no running cost was recorded in this date range."
+            />
+          }
+        />
+      </div>
     </div>
   );
 };

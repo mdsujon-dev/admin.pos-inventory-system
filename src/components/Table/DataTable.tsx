@@ -1,4 +1,4 @@
-import { Table } from "antd";
+import { Table, Empty } from "antd";
 import { Loader2 } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import "./DataTable.css";
@@ -162,7 +162,25 @@ export default function DataTable(props: any) {
         dataSource={data || []}
         columns={columns}
         expandable={expandable}
-        locale={emptyText ? { emptyText } : undefined}
+        locale={
+          emptyText
+            ? {
+                // A plain sentence gets AntD's box drawn above it. Anything
+                // richer — a <TableEmpty> with its own icon — is already a
+                // finished empty state, and wrapping it would stack two
+                // illustrations on top of each other.
+                emptyText:
+                  typeof emptyText === "string" ? (
+                    <Empty
+                      image={Empty.PRESENTED_IMAGE_SIMPLE}
+                      description={emptyText}
+                    />
+                  ) : (
+                    emptyText
+                  ),
+              }
+            : undefined
+        }
         scroll={{ x: true }}
         pagination={
           isPaginate

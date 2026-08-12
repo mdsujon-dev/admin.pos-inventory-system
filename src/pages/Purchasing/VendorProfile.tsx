@@ -1,4 +1,4 @@
-import { Button, Empty, Table, Tag } from "antd";
+import { Button, Tag } from "antd";
 import dayjs from "dayjs";
 import {
   ArrowLeft,
@@ -18,10 +18,52 @@ import PageMeta from "../../components/Common/PageMeta";
 import PermissionGate from "../../components/Common/PermissionGate";
 import VendorPaymentModal from "../../components/modal/purchasing/VendorPaymentModal";
 import { Loading } from "../../components/shared/Loading";
+import DataTable from "../../components/Table/DataTable";
+import TableEmpty from "../../components/Table/TableEmpty";
 import Money from "../../components/shared/Money";
+import { MetricCard } from "../../components/Common/MetricCard";
 import { useGetVendorLedgerQuery } from "../../redux/features/purchasing/purchaseApi";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
-import { SectionCard, StatTile } from "../Inventory/Products/ProductFormUI";
+import { SectionCard } from "../Inventory/Products/ProductFormUI";
+
+/**
+ * A table on this page, with its own page number.
+ *
+ * Four lists share one screen here, so paging has to be per-table: turning to
+ * the second page of payments must not move the bills alongside it.
+ */
+const ProfileTable = ({
+  data,
+  columns,
+  rowKey,
+  empty,
+  pageSize = 8,
+}: {
+  data: unknown[];
+  columns: unknown[];
+  rowKey: string | ((row: any) => string);
+  empty: React.ReactNode;
+  pageSize?: number;
+}) => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(pageSize);
+  const rows = data ?? [];
+
+  return (
+    <DataTable
+      data={rows}
+      columns={columns}
+      rowKey={rowKey}
+      total={rows.length}
+      currentPage={currentPage}
+      setCurrentPage={setCurrentPage}
+      limit={limit}
+      setLimit={setLimit}
+      isPaginate={rows.length > limit}
+      emptyText={empty}
+    />
+  );
+};
 
 /** Name off a reference that may be populated or a bare id. */
 const nameOf = (row: unknown) =>
@@ -162,23 +204,34 @@ const VendorProfile = () => {
       />
 
       <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile icon={Receipt} label="Bills" tone="muted">
-          {totals.billCount}
-        </StatTile>
-        <StatTile icon={Wallet} label="Purchased" tone="brand">
-          <Money value={totals.purchased} />
-        </StatTile>
-        <StatTile icon={TrendingUp} label="Paid" tone="brand">
-          <Money value={totals.paid} />
-        </StatTile>
-        <StatTile
+        <MetricCard 
+          icon={Receipt} 
+          label="Bills" 
+          accent="#8b5cf6" 
+          hint="Total invoices received"
+          value={totals.billCount} 
+        />
+        <MetricCard 
+          icon={Wallet} 
+          label="Purchased" 
+          accent="#3b82f6" 
+          hint="Total value of goods"
+          value={<Money value={totals.purchased} />} 
+        />
+        <MetricCard 
+          icon={TrendingUp} 
+          label="Paid" 
+          accent="#10b981" 
+          hint="Total amount settled"
+          value={<Money value={totals.paid} />} 
+        />
+        <MetricCard
           icon={Phone}
           label="Still owed"
-          tone={totals.due > 0 ? "danger" : "muted"}
-          note={totals.due > 0 ? "Call them before they call you" : undefined}
-        >
-          <Money value={totals.due} />
-        </StatTile>
+          accent={totals.due > 0 ? "#f43f5e" : "#f59e0b"}
+          hint={totals.due > 0 ? "Call them before they call you" : "No outstanding balance"}
+          value={<Money value={totals.due} />}
+        />
       </div>
 
       {/* Who they are, and what they carry */}
@@ -242,47 +295,82 @@ const VendorProfile = () => {
                 </div>
               )}
 
-              {methods.map((method, index) => {
-                const rows = methodRows(method);
-                return (
-                  <div
-                    key={`${method.methodType}-${index}`}
-                    className="rounded-xl border border-secondary-100 bg-secondary-50 p-3"
-                  >
-                    <div className="mb-2 flex items-center gap-2">
-                      <Tag className="!m-0 !border-primary-200 !bg-primary-50 !text-[11px] !text-primary-700">
-                        {method.methodType}
-                      </Tag>
-                      {method.accountType && (
-                        <Tag className="!m-0 !text-[11px]">
-                          {method.accountType}
-                        </Tag>
-                      )}
-                    </div>
-
-                    {rows.length > 0 && (
-                      <div className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
-                        {rows.map(([label, value]) => (
-                          <div key={label}>
-                            <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-400">
-                              {label}
-                            </p>
-                            <p className="m-0 text-sm font-medium text-secondary-800">
-                              {value}
-                            </p>
+              {methods.length > 0 && (
+                <ProfileTable
+                  data={methods}
+                  pageSize={5}
+                  rowKey={(row: any) =>
+                    `${row.methodType}-${row.accountNumber ?? row.provider ?? ""}`
+                  }
+                  empty={
+                    <TableEmpty
+                      icon={Banknote}
+                      title="No payment method saved"
+                      hint="Edit the vendor to record how they take money."
+                    />
+                  }
+                  columns={[
+                    {
+                      title: "Method",
+                      key: "methodType",
+                      width: 150,
+                      render: (_: unknown, row: any) => (
+                        <div className="flex flex-col items-start gap-1">
+                          <Tag className="!m-0 !border-primary-200 !bg-primary-50 !text-[11px] !text-primary-700">
+                            {row.methodType}
+                          </Tag>
+                          {row.accountType && (
+                            <span className="text-[11px] text-secondary-400">
+                              {row.accountType}
+                            </span>
+                          )}
+                        </div>
+                      ),
+                    },
+                    {
+                      title: "Details",
+                      key: "details",
+                      render: (_: unknown, row: any) => {
+                        // Only the fields this method actually has: a bank's
+                        // branch and a cash payment's "who signs for it" are
+                        // not the same kind of fact, and a fixed set of
+                        // columns would leave most of them blank.
+                        const pairs = methodRows(row);
+                        if (pairs.length === 0) {
+                          return <span className="text-secondary-400">—</span>;
+                        }
+                        return (
+                          <div className="grid gap-x-6 gap-y-1.5 sm:grid-cols-2">
+                            {pairs.map(([label, value]) => (
+                              <div key={label} className="min-w-0">
+                                <p className="m-0 text-[10px] uppercase tracking-wide text-secondary-400">
+                                  {label}
+                                </p>
+                                <p className="m-0 truncate text-[13px] font-medium text-secondary-800">
+                                  {value}
+                                </p>
+                              </div>
+                            ))}
                           </div>
-                        ))}
-                      </div>
-                    )}
-
-                    {method.details && (
-                      <p className="m-0 mt-2 border-t border-secondary-200 pt-2 text-xs text-secondary-600">
-                        {method.details}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
+                        );
+                      },
+                    },
+                    {
+                      title: "Note",
+                      key: "note",
+                      width: 200,
+                      render: (_: unknown, row: any) =>
+                        row.details ? (
+                          <span className="text-[12px] text-secondary-600">
+                            {row.details}
+                          </span>
+                        ) : (
+                          <span className="text-secondary-400">—</span>
+                        ),
+                    },
+                  ]}
+                />
+              )}
             </div>
           )}
         </SectionCard>
@@ -294,12 +382,16 @@ const VendorProfile = () => {
           title="Bills"
           subtitle="Newest first, with what is still owed on each"
         >
-          <Table
-            dataSource={purchases}
+          <ProfileTable
+            data={purchases}
             rowKey="_id"
-            size="small"
-            pagination={{ pageSize: 8, hideOnSinglePage: true }}
-            locale={{ emptyText: "Nothing bought from them yet" }}
+            empty={
+              <TableEmpty
+                icon={Receipt}
+                title="No bills yet"
+                hint="Nothing has been bought from this supplier."
+              />
+            }
             columns={[
               {
                 title: "Bill",
@@ -361,15 +453,17 @@ const VendorProfile = () => {
           title="Payments"
           subtitle="Every taka handed over, and what it settled"
         >
-          {(payments ?? []).length === 0 ? (
-            <Empty description="No payments recorded yet" />
-          ) : (
-            <Table
-              dataSource={payments}
-              rowKey="_id"
-              size="small"
-              pagination={{ pageSize: 8, hideOnSinglePage: true }}
-              columns={[
+          <ProfileTable
+            data={payments}
+            rowKey="_id"
+            empty={
+              <TableEmpty
+                icon={Wallet}
+                title="No payments recorded"
+                hint="Nothing has been handed to this supplier yet."
+              />
+            }
+            columns={[
                 {
                   title: "Payment",
                   key: "paymentNo",
@@ -448,8 +542,7 @@ const VendorProfile = () => {
                   ),
                 },
               ]}
-            />
-          )}
+          />
         </SectionCard>
       </div>
 
@@ -459,14 +552,19 @@ const VendorProfile = () => {
           title="What we buy from them"
           subtitle="With the last price paid — no need to open five bills"
         >
-          <Table
-            dataSource={byProduct}
+          <ProfileTable
+            data={byProduct}
+            pageSize={10}
             rowKey={(row: any) =>
               `${row._id.product}-${row._id.variantId ?? "none"}`
             }
-            size="small"
-            pagination={{ pageSize: 10, hideOnSinglePage: true }}
-            locale={{ emptyText: "Nothing bought from them yet" }}
+            empty={
+              <TableEmpty
+                icon={Package}
+                title="Nothing bought yet"
+                hint="Items appear here once a bill from this supplier is saved."
+              />
+            }
             columns={[
               {
                 title: "Item",
