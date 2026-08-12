@@ -19,7 +19,7 @@ import {
 } from "../../redux/features/purchasing/vendorPaymentApi";
 import { useGetPayablesQuery } from "../../redux/features/accounts/reportApi";
 import { formatAmount, PAYMENT_METHOD_LABELS } from "../../utils/money";
-import KpiCard from "../Dashboard/components/KpiCard";
+import { MetricCard } from "../../components/Common/MetricCard";
 
 const { RangePicker } = DatePicker;
 
@@ -206,7 +206,7 @@ const VendorPayments = () => {
       />
 
       <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <KpiCard
+        <MetricCard
           label="Paid out"
           value={<Money value={summary.totalPaid} />}
           hint={`Across ${summary.paymentCount} payment${
@@ -216,7 +216,7 @@ const VendorPayments = () => {
           accent="#019532"
           loading={loadingSummary}
         />
-        <KpiCard
+        <MetricCard
           label="Still owed"
           value={<Money value={outstanding} />}
           hint={
@@ -226,7 +226,7 @@ const VendorPayments = () => {
           accent="#e91e63"
           loading={loadingPayables}
         />
-        <KpiCard
+        <MetricCard
           label="Suppliers paid"
           value={summary.vendorCount}
           hint={
@@ -238,7 +238,7 @@ const VendorPayments = () => {
           accent="#8b5cf6"
           loading={loadingSummary}
         />
-        <KpiCard
+        <MetricCard
           label="Last payment"
           value={
             summary.lastPaidAt

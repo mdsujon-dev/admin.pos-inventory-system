@@ -1,77 +1,179 @@
-/* Table Head Color (সবসময় একই রঙ) */
+/* ---------------------------------------------------------------------------
+   The table, in the brand's own colours.
+
+   Every list in the app renders through this one file, so the rules are
+   deliberately plain: a tinted header, white rows, and one green hover. The
+   old grey-on-grey zebra is gone — striping two near-identical greys made
+   long tables read as noise without actually helping anyone follow a row.
+   --------------------------------------------------------------------------- */
+
+/* Head — a soft emerald wash with a solid brand rule under it, so the header
+   reads as a lid on the table rather than just another row. */
 .ant-table-wrapper .ant-table-thead > tr > th {
-  background-color: #f3f3f3 !important;
-  color: #232323;
-  font-size: 14px;
-  border-radius: 0% !important;
+  background: linear-gradient(180deg, #f4fdf7 0%, #e9f9ef 100%) !important;
+  color: #015b1f;
+  font-size: 11.5px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
+  padding: 13px 16px !important;
+  border-bottom: 2px solid #a8f0c0 !important;
+  border-radius: 0 !important;
 }
 
-/* Table Body Cell Style */
+/* The hairline AntD draws between header cells. Left at its default grey it
+   cuts through the wash; in the header's own hue it just separates. */
+.ant-table-wrapper .ant-table-thead > tr > th::before {
+  background-color: #c8f0d6 !important;
+  height: 1.4em !important;
+}
+
+/* Sort and filter affordances follow the header text, not AntD's blue-grey. */
+.ant-table-wrapper .ant-table-column-sorter,
+.ant-table-wrapper .ant-table-filter-trigger {
+  color: #65a97e;
+}
+
+.ant-table-wrapper .ant-table-column-sorter-up.active,
+.ant-table-wrapper .ant-table-column-sorter-down.active,
+.ant-table-wrapper .ant-table-filter-trigger.active {
+  color: #019532;
+}
+
+.ant-table-wrapper .ant-table-thead th.ant-table-column-has-sorters:hover {
+  background: linear-gradient(180deg, #edfbf2 0%, #ddf5e6 100%) !important;
+}
+
+/* Body — white rows, one hairline between them, room to breathe. */
 .ant-table-wrapper .ant-table-tbody > tr > td {
+  background-color: #ffffff;
   color: #232323;
-  font-size: 14px;
+  font-size: 13.5px;
+  padding: 13px 16px !important;
+  border-bottom: 1px solid #f2f4f2 !important;
+  transition: background-color 0.15s ease;
 }
 
-/* Zebra Striping */
-.ant-table-wrapper .ant-table-tbody > tr:nth-child(odd) > td {
-  background-color: #f7f7f7 !important; /* হালকা গ্রে */
+/* The last row's divider would sit on top of the wrapper's own border. */
+.ant-table-wrapper .ant-table-tbody > tr:last-child > td {
+  border-bottom: none !important;
 }
 
-.ant-table-wrapper .ant-table-tbody > tr:nth-child(even) > td {
-  background-color: #ffffff !important; /* সাদা */
+/* Hover — the row lifts into brand tint and grows a bar down its left edge,
+   which is what makes a wide row scannable end to end. `cell-row-hover` is
+   AntD's own class and is the only one that reaches pinned columns. */
+.ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td,
+.ant-table-wrapper .ant-table-tbody > tr > td.ant-table-cell-row-hover {
+  background-color: #f3fcf6 !important;
+}
+
+.ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td:first-child {
+  box-shadow: inset 3px 0 0 #019532;
+}
+
+/* A selected row keeps the tint permanently, one shade stronger. */
+.ant-table-wrapper .ant-table-tbody > tr.ant-table-row-selected > td,
+.ant-table-wrapper
+  .ant-table-tbody
+  > tr.ant-table-row-selected:hover
+  > td {
+  background-color: #edfdf2 !important;
+}
+
+.ant-table-wrapper
+  .ant-table-tbody
+  > tr.ant-table-row-selected
+  > td:first-child {
+  box-shadow: inset 3px 0 0 #019532;
 }
 
 /* Pinned (fixed) columns — left or right.
-   Ant Design paints these over the scrolling body, so they must carry their own
-   opaque background at every state: striped, hovered, and while the body is
-   being dragged sideways. */
-.ant-table-wrapper .ant-table-tbody > tr:nth-child(odd) > td.ant-table-cell-fix-left,
-.ant-table-wrapper .ant-table-tbody > tr:nth-child(odd) > td.ant-table-cell-fix-right {
-  background-color: #f7f7f7;
-}
-
-.ant-table-wrapper .ant-table-tbody > tr:nth-child(even) > td.ant-table-cell-fix-left,
-.ant-table-wrapper .ant-table-tbody > tr:nth-child(even) > td.ant-table-cell-fix-right {
+   AntD paints these over the scrolling body, so they must carry their own
+   opaque background at every state, or the rows underneath show through as
+   they slide past. */
+.ant-table-wrapper .ant-table-tbody > tr > td.ant-table-cell-fix-left,
+.ant-table-wrapper .ant-table-tbody > tr > td.ant-table-cell-fix-right {
   background-color: #ffffff;
 }
 
 .ant-table-wrapper
   .ant-table-tbody
-  > tr.ant-table-row:nth-child(odd):hover
+  > tr.ant-table-row:hover
   > td.ant-table-cell-fix-left,
 .ant-table-wrapper
   .ant-table-tbody
-  > tr.ant-table-row:nth-child(odd):hover
+  > tr.ant-table-row:hover
   > td.ant-table-cell-fix-right {
-  background-color: #f7f7f7 !important;
-}
-
-.ant-table-wrapper
-  .ant-table-tbody
-  > tr.ant-table-row:nth-child(even):hover
-  > td.ant-table-cell-fix-left,
-.ant-table-wrapper
-  .ant-table-tbody
-  > tr.ant-table-row:nth-child(even):hover
-  > td.ant-table-cell-fix-right {
-  background-color: #ffffff !important;
+  background-color: #f3fcf6 !important;
 }
 
 .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-left,
 .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-right {
-  background-color: #f3f3f3 !important;
+  background: linear-gradient(180deg, #f4fdf7 0%, #e9f9ef 100%) !important;
+}
+
+/* The shadow AntD casts from a pinned column, softened to match the table. */
+.ant-table-wrapper .ant-table-ping-left .ant-table-cell-fix-left-last::after,
+.ant-table-wrapper .ant-table-ping-right .ant-table-cell-fix-right-first::after {
+  box-shadow: none;
+  width: 18px;
+}
+
+/* Summary rows (totals) belong to the header family, not the body. */
+.ant-table-wrapper .ant-table-summary > tr > td {
+  background-color: #f7fdf9 !important;
+  border-top: 2px solid #a8f0c0 !important;
+  font-weight: 700;
+  color: #015b1f;
+}
+
+/* Expanded detail panels sit back so the row they belong to stays dominant. */
+.ant-table-wrapper .ant-table-expanded-row > td {
+  background-color: #fafbfa !important;
+}
+
+/* Empty state — centred, quiet, and given room rather than crammed. */
+.ant-table-wrapper .ant-table-placeholder > td {
+  border-bottom: none !important;
+  padding: 40px 16px !important;
+}
+
+.ant-table-wrapper .ant-table-placeholder .ant-empty-description {
+  color: #858585;
+  font-size: 13px;
+}
+
+.ant-table-wrapper .ant-table-placeholder:hover > td {
+  background-color: #ffffff !important;
 }
 
 /* Table Wrapper Background.
-   No `border-bottom: none` here — the wrapper carries the `border-gray-300`
-   outline from DataTable.tsx, and killing the bottom edge left the table
-   open-ended once the scrollbar under it was hidden. */
+   No `border-bottom: none` here — the wrapper carries its outline from
+   DataTable.tsx, and killing the bottom edge left the table open-ended once
+   the scrollbar under it was hidden. */
 .ant-table-wrapper,
 .ant-table-wrapper .ant-table,
 .ant-table-wrapper .ant-table-container {
   background-color: #fff;
+}
+
+/* Pagination — the current page in brand green, the rest unobtrusive. */
+.ant-table-wrapper .ant-table-pagination.ant-pagination {
+  margin: 14px 16px !important;
+}
+
+.ant-table-wrapper .ant-pagination .ant-pagination-item-active {
+  background-color: #019532;
+  border-color: #019532;
+}
+
+.ant-table-wrapper .ant-pagination .ant-pagination-item-active a {
+  color: #ffffff;
+}
+
+.ant-table-wrapper .ant-pagination .ant-pagination-item:hover {
+  border-color: #a8f0c0;
 }
 
 /* Horizontal scrollbar inside the table.

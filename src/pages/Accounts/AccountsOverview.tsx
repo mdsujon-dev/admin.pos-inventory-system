@@ -21,7 +21,8 @@ import {
   useGetPotentialProfitQuery,
   useGetProfitAndLossQuery,
 } from "../../redux/features/accounts/reportApi";
-import { SectionCard, StatTile } from "../Inventory/Products/ProductFormUI";
+import { SectionCard } from "../Inventory/Products/ProductFormUI";
+import { MetricCard } from "../../components/Common/MetricCard";
 
 const { RangePicker } = DatePicker;
 
@@ -87,35 +88,30 @@ const AccountsOverview = () => {
         subtitle="Revenue less what the goods cost, then less what the shop costs to run"
       >
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatTile icon={Receipt} label="Revenue" tone="brand" note="VAT excluded">
-            <Money value={pnl?.revenue ?? 0} />
-          </StatTile>
-          <StatTile
+          <MetricCard icon={Receipt} label="Revenue" accent="#10b981" hint="VAT excluded" value={<Money value={pnl?.revenue ?? 0} />} />
+          <MetricCard
             icon={Package}
             label="Cost of goods"
-            tone="muted"
-            note="From the batches actually sold"
-          >
-            <Money value={pnl?.costOfGoods ?? 0} />
-          </StatTile>
-          <StatTile
+            accent="#64748b"
+            hint="From the batches actually sold"
+            value={<Money value={pnl?.costOfGoods ?? 0} />}
+          />
+          <MetricCard
             icon={TrendingUp}
             label="Gross profit"
-            tone={(pnl?.grossProfit ?? 0) < 0 ? "danger" : "brand"}
-            note={`${(pnl?.grossMargin ?? 0).toFixed(1)}% margin`}
-          >
-            <Money value={pnl?.grossProfit ?? 0} />
-          </StatTile>
-          <StatTile
+            accent={(pnl?.grossProfit ?? 0) < 0 ? "#f43f5e" : "#10b981"}
+            hint={`${(pnl?.grossMargin ?? 0).toFixed(1)}% margin`}
+            value={<Money value={pnl?.grossProfit ?? 0} />}
+          />
+          <MetricCard
             icon={Percent}
             label="Net profit"
-            tone={(pnl?.netProfit ?? 0) < 0 ? "danger" : "brand"}
-            note={`After ${
+            accent={(pnl?.netProfit ?? 0) < 0 ? "#f43f5e" : "#10b981"}
+            hint={`After ${
               pnl ? Math.round(pnl.operatingExpense) : 0
             } of running costs`}
-          >
-            <Money value={pnl?.netProfit ?? 0} />
-          </StatTile>
+            value={<Money value={pnl?.netProfit ?? 0} />}
+          />
         </div>
 
         <div className="mt-3 flex flex-wrap gap-4 text-sm text-secondary-500">
@@ -143,27 +139,21 @@ const AccountsOverview = () => {
           subtitle="What actually moved — a profitable month can still be a tight one"
         >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <StatTile icon={ArrowDownLeft} label="Money in" tone="brand">
-              <Money value={cash?.inflow ?? 0} />
-            </StatTile>
-            <StatTile icon={ArrowUpRight} label="Money out" tone="muted">
-              <Money value={cash?.outflow ?? 0} />
-            </StatTile>
-            <StatTile
+            <MetricCard icon={ArrowDownLeft} label="Money in" accent="#10b981" hint="Total cash received" value={<Money value={cash?.inflow ?? 0} />} />
+            <MetricCard icon={ArrowUpRight} label="Money out" accent="#64748b" hint="Total cash spent" value={<Money value={cash?.outflow ?? 0} />} />
+            <MetricCard
               icon={Wallet}
               label="Net movement"
-              tone={(cash?.net ?? 0) < 0 ? "danger" : "brand"}
-            >
-              <Money value={cash?.net ?? 0} />
-            </StatTile>
-            <StatTile
+              accent={(cash?.net ?? 0) < 0 ? "#f43f5e" : "#10b981"}
+              value={<Money value={cash?.net ?? 0} />}
+            />
+            <MetricCard
               icon={Landmark}
               label="Paid to vendors"
-              tone="muted"
-              note="Stock bought in this period"
-            >
-              <Money value={cash?.supplierPayments?.total ?? 0} />
-            </StatTile>
+              accent="#64748b"
+              hint="Stock bought in this period"
+              value={<Money value={cash?.supplierPayments?.total ?? 0} />}
+            />
           </div>
           <div className="mt-3">
             <Link to="/accounts/cash-flow" className="text-sm text-primary underline">
@@ -181,27 +171,21 @@ const AccountsOverview = () => {
           subtitle="What the stock cost, and what it would earn if it all sold today"
         >
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <StatTile icon={Package} label="Stock at cost" tone="brand">
-              <Money value={stock?.stockCost ?? 0} />
-            </StatTile>
-            <StatTile icon={Receipt} label="At today's prices" tone="muted">
-              <Money value={stock?.stockRetail ?? 0} />
-            </StatTile>
-            <StatTile
+            <MetricCard icon={Package} label="Stock at cost" accent="#10b981" hint="Total paid for inventory" value={<Money value={stock?.stockCost ?? 0} />} />
+            <MetricCard icon={Receipt} label="At today's prices" accent="#64748b" hint="Expected retail value" value={<Money value={stock?.stockRetail ?? 0} />} />
+            <MetricCard
               icon={TrendingUp}
               label="Potential profit"
-              tone="brand"
-              note="A forecast — none of it is sold yet"
-            >
-              <Money value={stock?.potentialProfit ?? 0} />
-            </StatTile>
-            <StatTile
+              accent="#10b981"
+              hint="A forecast — none of it is sold yet"
+              value={<Money value={stock?.potentialProfit ?? 0} />}
+            />
+            <MetricCard
               icon={Percent}
               label="Potential margin"
-              tone="brand"
-            >
-              {(stock?.potentialMargin ?? 0).toFixed(1)}%
-            </StatTile>
+              accent="#10b981"
+              value={`${(stock?.potentialMargin ?? 0).toFixed(1)}%`}
+            />
           </div>
           <div className="mt-3">
             <Link

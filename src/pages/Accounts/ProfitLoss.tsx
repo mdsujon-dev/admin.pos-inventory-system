@@ -60,6 +60,7 @@ const ProfitLoss = () => {
           icon={Receipt} 
           label="Revenue" 
           accent="#10b981" 
+          hint="Total income from sales"
           value={<Money value={pnl?.revenue ?? 0} />} 
           loading={isFetching}
         />
@@ -67,6 +68,7 @@ const ProfitLoss = () => {
           icon={Package} 
           label="Cost of goods" 
           accent="#64748b" 
+          hint="Direct costs for items sold"
           value={<Money value={pnl?.costOfGoods ?? 0} />} 
           loading={isFetching}
         />

@@ -1,13 +1,14 @@
 import { DatePicker, Table } from "antd";
 import dayjs, { Dayjs } from "dayjs";
-import { ArrowDownLeft, ArrowUpRight, Wallet } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Wallet, Landmark } from "lucide-react";
 import { useState } from "react";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import Money from "../../components/shared/Money";
 import { useGetCashFlowQuery } from "../../redux/features/accounts/reportApi";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
-import { SectionCard, StatTile } from "../Inventory/Products/ProductFormUI";
+import { SectionCard } from "../Inventory/Products/ProductFormUI";
+import { MetricCard } from "../../components/Common/MetricCard";
 
 const { RangePicker } = DatePicker;
 
@@ -100,21 +101,39 @@ const CashFlow = () => {
         }
       />
 
-      <div className="mb-5 grid gap-3 sm:grid-cols-3">
-        <StatTile icon={ArrowDownLeft} label="Money in" tone="brand">
-          <Money value={cash?.inflow ?? 0} />
-        </StatTile>
-        <StatTile icon={ArrowUpRight} label="Money out" tone="muted">
-          <Money value={cash?.outflow ?? 0} />
-        </StatTile>
-        <StatTile
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          icon={ArrowDownLeft}
+          label="Money in"
+          accent="#10b981"
+          hint="Total cash received"
+          value={<Money value={cash?.inflow ?? 0} />}
+          loading={isFetching}
+        />
+        <MetricCard
+          icon={ArrowUpRight}
+          label="Money out"
+          accent="#f43f5e"
+          hint="Total cash spent"
+          value={<Money value={cash?.outflow ?? 0} />}
+          loading={isFetching}
+        />
+        <MetricCard
+          icon={Landmark}
+          label="Paid to vendors"
+          accent="#f59e0b"
+          hint="Stock bought in this period"
+          value={<Money value={cash?.supplierPayments?.total ?? 0} />}
+          loading={isFetching}
+        />
+        <MetricCard
           icon={Wallet}
           label="Net movement"
-          tone={(cash?.net ?? 0) < 0 ? "danger" : "brand"}
-          note={(cash?.net ?? 0) < 0 ? "More went out than came in" : undefined}
-        >
-          <Money value={cash?.net ?? 0} />
-        </StatTile>
+          accent={(cash?.net ?? 0) < 0 ? "#f43f5e" : "#10b981"}
+          hint={(cash?.net ?? 0) < 0 ? "More went out than came in" : "Positive cash flow"}
+          value={<Money value={cash?.net ?? 0} />}
+          loading={isFetching}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

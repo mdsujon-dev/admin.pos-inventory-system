@@ -50,8 +50,10 @@ export default function DataTable(props: any) {
     if (!tableEl) return;
 
     // Ant Design's scroll container
-    const scrollContainer = tableEl.querySelector(".ant-table-content") || tableEl.querySelector(".ant-table-body");
-    
+    const scrollContainer =
+      tableEl.querySelector(".ant-table-content") ||
+      tableEl.querySelector(".ant-table-body");
+
     if (!scrollContainer) return;
 
     let isDown = false;
@@ -111,18 +113,21 @@ export default function DataTable(props: any) {
     scrollContainer.addEventListener("mousemove", onMouseMove as EventListener);
 
     return () => {
-      scrollContainer.removeEventListener("mousedown", onMouseDown as EventListener);
+      scrollContainer.removeEventListener(
+        "mousedown",
+        onMouseDown as EventListener,
+      );
       scrollContainer.removeEventListener("mouseleave", onMouseLeave);
       scrollContainer.removeEventListener("mouseup", onMouseUp);
-      scrollContainer.removeEventListener("mousemove", onMouseMove as EventListener);
+      scrollContainer.removeEventListener(
+        "mousemove",
+        onMouseMove as EventListener,
+      );
     };
   }, [loading, isFetching, data]); // Re-bind if DOM updates
 
   // Handle row selection change
-  const handleRowSelectionChange = (
-    nextKeys: any,
-    selectedRows: any
-  ) => {
+  const handleRowSelectionChange = (nextKeys: any, selectedRows: any) => {
     if (isControlled) {
       setControlledSelectedKeys(nextKeys);
     } else {
@@ -145,51 +150,53 @@ export default function DataTable(props: any) {
   return (
     <div ref={tableRef}>
       <Table
-      loading={{
-        spinning: showLoader,
-        indicator: <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
-      }}
-      className="border border-gray-300 rounded-lg overflow-hidden bg-white"
-      rowKey={rowKey ? rowKey : "_id"}
-      rowSelection={selectRow ? rowSelection : undefined}
-      dataSource={data || []}
-      columns={columns}
-      expandable={expandable}
-      locale={emptyText ? { emptyText } : undefined}
-      scroll={{ x: true }}
-      pagination={
-        isPaginate
-          ? {
-              pageSize: limit || 20,
-              // Nothing to page through on a single page, so the whole footer
-              // stays out of the way until there is a second one.
-              hideOnSinglePage: true,
-              showTotal: (t: number, range: [number, number]) => (
-                <span className="text-xs text-secondary-500">
-                  {range[0]}–{range[1]} of {t}
-                </span>
-              ),
-              total: total || data?.count || data?.length || 0,
-              current: currentPage,
-              // onChange: handlePageChange,
-              onChange: (page) => {
-                // handlePageChange(page);
-                setCurrentPage(page);
-              },
-              showSizeChanger: isShowSizeChanger,
-              pageSizeOptions: ["10", "25", "50", "100"],
-              onShowSizeChange: (_current, newSize) => {
-                setLimit(newSize);
-                setCurrentPage(1);
-              },
-              showQuickJumper: true,
-            }
-          : false
-      }
-      showHeader={showHeader}
-      onChange={onTableChange}
-      onRow={onRow}
-    />
+        loading={{
+          spinning: showLoader,
+          indicator: (
+            <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
+          ),
+        }}
+        className="rounded-xl overflow-hidden border border-primary-100 bg-white shadow-[0_10px_28px_-16px_rgba(1,149,50,.35),0_2px_6px_-2px_rgba(16,24,40,.06)]"
+        rowKey={rowKey ? rowKey : "_id"}
+        rowSelection={selectRow ? rowSelection : undefined}
+        dataSource={data || []}
+        columns={columns}
+        expandable={expandable}
+        locale={emptyText ? { emptyText } : undefined}
+        scroll={{ x: true }}
+        pagination={
+          isPaginate
+            ? {
+                pageSize: limit || 20,
+                // Nothing to page through on a single page, so the whole footer
+                // stays out of the way until there is a second one.
+                hideOnSinglePage: true,
+                showTotal: (t: number, range: [number, number]) => (
+                  <span className="text-xs text-secondary-500">
+                    {range[0]}–{range[1]} of {t}
+                  </span>
+                ),
+                total: total || data?.count || data?.length || 0,
+                current: currentPage,
+                // onChange: handlePageChange,
+                onChange: (page) => {
+                  // handlePageChange(page);
+                  setCurrentPage(page);
+                },
+                showSizeChanger: isShowSizeChanger,
+                pageSizeOptions: ["10", "25", "50", "100"],
+                onShowSizeChange: (_current, newSize) => {
+                  setLimit(newSize);
+                  setCurrentPage(1);
+                },
+                showQuickJumper: true,
+              }
+            : false
+        }
+        showHeader={showHeader}
+        onChange={onTableChange}
+        onRow={onRow}
+      />
     </div>
   );
 }

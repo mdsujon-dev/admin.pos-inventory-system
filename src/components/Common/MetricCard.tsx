@@ -24,11 +24,24 @@ export const MetricCard = ({
   loading,
   onClick,
 }: MetricCardProps) => {
+  /**
+   * The edge takes the card's own colour rather than white.
+   *
+   * A white border on a white page is not an edge at all — it only reads as
+   * one over a photo. Tinting it keeps the glass look while giving each card
+   * a visible outline that matches the number inside it.
+   */
+  const edge = {
+    "--edge": `${accent}59`,
+    "--edge-strong": `${accent}99`,
+  } as React.CSSProperties;
+
   if (loading) {
     return (
       <div
-        className="h-[92px] animate-pulse rounded-xl border-[1.5px] border-white/50 backdrop-blur-md"
+        className="h-[92px] animate-pulse rounded-xl border-[1.5px] border-[var(--edge)] backdrop-blur-md"
         style={{
+          ...edge,
           background: `linear-gradient(135deg, ${accent}14 0%, rgba(255,255,255,0.7) 100%)`,
         }}
       />
@@ -39,10 +52,11 @@ export const MetricCard = ({
     <motion.div
       whileHover={{ y: -4 }}
       onClick={onClick}
-      className={`group relative overflow-hidden rounded-xl border-[1.5px] border-white/50 backdrop-blur-md shadow-[0_10px_28px_-12px_rgba(16,24,40,.3)] p-4 transition-all duration-300 hover:shadow-[0_14px_32px_-12px_rgba(16,24,40,.4)] hover:border-white/80 ${
+      className={`group relative overflow-hidden rounded-xl border-[1.5px] border-[var(--edge)] backdrop-blur-md shadow-[0_10px_28px_-12px_rgba(16,24,40,.3)] p-4 transition-all duration-300 hover:shadow-[0_14px_32px_-12px_rgba(16,24,40,.4)] hover:border-[var(--edge-strong)] ${
         onClick ? "cursor-pointer" : ""
       }`}
       style={{
+        ...edge,
         background: `linear-gradient(135deg, ${accent}1a 0%, ${accent}08 42%, rgba(255,255,255,0.7) 100%)`,
       }}
     >
