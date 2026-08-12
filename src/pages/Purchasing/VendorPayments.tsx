@@ -1,7 +1,7 @@
 import { Button, DatePicker, Input, Select, Tag, Tooltip } from "antd";
 import { ColumnsType } from "antd/es/table";
 import dayjs, { Dayjs } from "dayjs";
-import { Search, Wallet } from "lucide-react";
+import { CalendarClock, Receipt, Search, Users, Wallet } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/Common/PageHeader";
@@ -15,9 +15,11 @@ import {
 import {
   IVendorPayment,
   useGetVendorPaymentsQuery,
+  useGetVendorPaymentsSummaryQuery,
 } from "../../redux/features/purchasing/vendorPaymentApi";
-import { PAYMENT_METHOD_LABELS } from "../../utils/money";
-import { StatTile } from "../Inventory/Products/ProductFormUI";
+import { useGetPayablesQuery } from "../../redux/features/accounts/reportApi";
+import { formatAmount, PAYMENT_METHOD_LABELS } from "../../utils/money";
+import KpiCard from "../Dashboard/components/KpiCard";
 
 const { RangePicker } = DatePicker;
 
@@ -42,19 +44,42 @@ const VendorPayments = () => {
   ]);
   const vendors: IVendor[] = vendorData?.data?.data || [];
 
-  const { data, isFetching } = useGetVendorPaymentsQuery([
-    { name: "page", value: currentPage },
-    { name: "limit", value: limit },
+  // The filters, minus paging — the cards summarise the whole filtered set,
+  // so a page change must not make the totals move.
+  const filters = [
     ...(searchText ? [{ name: "keyword", value: searchText }] : []),
     ...(vendor ? [{ name: "vendor", value: vendor }] : []),
     ...(method ? [{ name: "method", value: method }] : []),
     ...(range?.[0] ? [{ name: "from", value: range[0].toISOString() }] : []),
     ...(range?.[1] ? [{ name: "to", value: range[1].toISOString() }] : []),
+  ];
+
+  const { data, isFetching } = useGetVendorPaymentsQuery([
+    { name: "page", value: currentPage },
+    { name: "limit", value: limit },
+    ...filters,
   ]);
+
+  const { data: summaryData, isFetching: loadingSummary } =
+    useGetVendorPaymentsSummaryQuery(filters);
+
+  // What is still owed is the other half of the story: money out means little
+  // without the bill left behind it.
+  const { data: payableData, isFetching: loadingPayables } =
+    useGetPayablesQuery(undefined);
 
   const payments: IVendorPayment[] = data?.data?.data || [];
   const total: number = data?.data?.meta?.total || 0;
-  const pageTotal = payments.reduce((sum, row) => sum + row.amount, 0);
+
+  const summary = {
+    paymentCount: summaryData?.data?.paymentCount ?? 0,
+    totalPaid: summaryData?.data?.totalPaid ?? 0,
+    largest: summaryData?.data?.largest ?? 0,
+    unallocated: summaryData?.data?.unallocated ?? 0,
+    lastPaidAt: summaryData?.data?.lastPaidAt ?? null,
+    vendorCount: summaryData?.data?.vendorCount ?? 0,
+  };
+  const outstanding = payableData?.data?.totalDue ?? 0;
 
   const columns: ColumnsType<IVendorPayment> = [
     {
@@ -180,13 +205,55 @@ const VendorPayments = () => {
         ]}
       />
 
-      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-        <StatTile icon={Wallet} label="Payments" tone="muted">
-          {total}
-        </StatTile>
-        <StatTile icon={Wallet} label="On this page" tone="brand">
-          <Money value={pageTotal} />
-        </StatTile>
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <KpiCard
+          label="Paid out"
+          value={<Money value={summary.totalPaid} />}
+          hint={`Across ${summary.paymentCount} payment${
+            summary.paymentCount === 1 ? "" : "s"
+          }`}
+          icon={Wallet}
+          accent="#019532"
+          loading={loadingSummary}
+        />
+        <KpiCard
+          label="Still owed"
+          value={<Money value={outstanding} />}
+          hint={
+            outstanding > 0 ? "Bills not yet settled" : "Every bill is settled"
+          }
+          icon={Receipt}
+          accent="#e91e63"
+          loading={loadingPayables}
+        />
+        <KpiCard
+          label="Suppliers paid"
+          value={summary.vendorCount}
+          hint={
+            summary.unallocated > 0
+              ? `${formatAmount(summary.unallocated)} sitting as advance`
+              : "No unallocated advances"
+          }
+          icon={Users}
+          accent="#8b5cf6"
+          loading={loadingSummary}
+        />
+        <KpiCard
+          label="Last payment"
+          value={
+            summary.lastPaidAt
+              ? dayjs(summary.lastPaidAt).format("DD MMM")
+              : "—"
+          }
+          hint={
+            summary.lastPaidAt
+              ? `Largest so far ${formatAmount(summary.largest)}`
+              : "Nothing paid yet"
+          }
+          icon={CalendarClock}
+          accent="#f59e0b"
+          loading={loadingSummary}
+        />
       </div>
 
       <div className="mb-6 flex flex-col gap-4 md:flex-row">

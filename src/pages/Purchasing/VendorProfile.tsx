@@ -407,6 +407,37 @@ const VendorProfile = () => {
                     ),
                 },
                 {
+                  title: "Proof",
+                  key: "reference",
+                  render: (_: unknown, row: any) => {
+                    // Whatever the method recorded, in one line — the trx id
+                    // and the number it came from, the cheque and its bank.
+                    const extras = Object.values(row.details ?? {})
+                      .filter(
+                        (value) =>
+                          typeof value === "string" && value.trim() !== ""
+                      )
+                      .join(" · ");
+                    if (!row.reference && !extras) {
+                      return <span className="text-secondary-400">—</span>;
+                    }
+                    return (
+                      <div className="min-w-0">
+                        {row.reference && (
+                          <p className="m-0 truncate font-mono text-[11px] text-secondary-700">
+                            {row.reference}
+                          </p>
+                        )}
+                        {extras && (
+                          <span className="text-[11px] text-secondary-400">
+                            {extras}
+                          </span>
+                        )}
+                      </div>
+                    );
+                  },
+                },
+                {
                   title: "Amount",
                   key: "amount",
                   width: 110,

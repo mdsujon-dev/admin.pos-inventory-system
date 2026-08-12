@@ -506,6 +506,7 @@ const PurchaseForm = () => {
                 width: 110,
                 render: (_: unknown, row: DraftLine) => (
                   <InputNumber
+                    type="number"
                     min={1}
                     precision={0}
                     value={row.quantity}
@@ -522,6 +523,7 @@ const PurchaseForm = () => {
                 width: 130,
                 render: (_: unknown, row: DraftLine) => (
                   <InputNumber
+                    type="number"
                     min={0}
                     value={row.unitCost}
                     onChange={(value) =>
@@ -593,6 +595,7 @@ const PurchaseForm = () => {
             tooltip="Flat discount applied to the entire bill by the vendor"
           >
             <InputNumber
+              type="number"
               min={0}
               value={discount || null}
               placeholder="0"
@@ -605,6 +608,7 @@ const PurchaseForm = () => {
             tooltip="Transportation or delivery cost to bring the products from the vendor"
           >
             <InputNumber
+              type="number"
               min={0}
               value={shippingCost || null}
               placeholder="0"
@@ -614,6 +618,7 @@ const PurchaseForm = () => {
           </Field>
           <Field label="Other charges">
             <InputNumber
+              type="number"
               min={0}
               value={otherCost || null}
               placeholder="0"
@@ -623,6 +628,7 @@ const PurchaseForm = () => {
           </Field>
           <Field label="VAT %">
             <InputNumber
+              type="number"
               min={0}
               max={100}
               value={vatPercent || null}
@@ -668,6 +674,7 @@ const PurchaseForm = () => {
                 tooltip="Leave blank to pay the bill in full"
               >
                 <InputNumber
+                  type="number"
                   min={0}
                   max={totals.grandTotal}
                   value={paid}

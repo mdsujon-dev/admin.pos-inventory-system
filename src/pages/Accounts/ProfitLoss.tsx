@@ -6,7 +6,8 @@ import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import Money from "../../components/shared/Money";
 import { useGetProfitAndLossQuery } from "../../redux/features/accounts/reportApi";
-import { SectionCard, StatTile } from "../Inventory/Products/ProductFormUI";
+import { SectionCard } from "../Inventory/Products/ProductFormUI";
+import { MetricCard } from "../../components/Common/MetricCard";
 
 const { RangePicker } = DatePicker;
 
@@ -55,28 +56,36 @@ const ProfitLoss = () => {
       />
 
       <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile icon={Receipt} label="Revenue" tone="brand">
-          <Money value={pnl?.revenue ?? 0} />
-        </StatTile>
-        <StatTile icon={Package} label="Cost of goods" tone="muted">
-          <Money value={pnl?.costOfGoods ?? 0} />
-        </StatTile>
-        <StatTile
+        <MetricCard 
+          icon={Receipt} 
+          label="Revenue" 
+          accent="#10b981" 
+          value={<Money value={pnl?.revenue ?? 0} />} 
+          loading={isFetching}
+        />
+        <MetricCard 
+          icon={Package} 
+          label="Cost of goods" 
+          accent="#64748b" 
+          value={<Money value={pnl?.costOfGoods ?? 0} />} 
+          loading={isFetching}
+        />
+        <MetricCard
           icon={TrendingUp}
           label="Gross profit"
-          tone={(pnl?.grossProfit ?? 0) < 0 ? "danger" : "brand"}
-          note={`${(pnl?.grossMargin ?? 0).toFixed(1)}% margin`}
-        >
-          <Money value={pnl?.grossProfit ?? 0} />
-        </StatTile>
-        <StatTile
+          accent={(pnl?.grossProfit ?? 0) < 0 ? "#f43f5e" : "#10b981"}
+          hint={`${(pnl?.grossMargin ?? 0).toFixed(1)}% margin`}
+          value={<Money value={pnl?.grossProfit ?? 0} />}
+          loading={isFetching}
+        />
+        <MetricCard
           icon={Percent}
           label="Net profit"
-          tone={(pnl?.netProfit ?? 0) < 0 ? "danger" : "brand"}
-          note={`${(pnl?.netMargin ?? 0).toFixed(1)}% of revenue`}
-        >
-          <Money value={pnl?.netProfit ?? 0} />
-        </StatTile>
+          accent={(pnl?.netProfit ?? 0) < 0 ? "#f43f5e" : "#10b981"}
+          hint={`${(pnl?.netMargin ?? 0).toFixed(1)}% of revenue`}
+          value={<Money value={pnl?.netProfit ?? 0} />}
+          loading={isFetching}
+        />
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">

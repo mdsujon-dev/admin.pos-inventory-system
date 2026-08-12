@@ -8,6 +8,47 @@ import { PAYMENT_METHOD_LABELS, round2 } from "../../../utils/money";
 import Money from "../../shared/Money";
 import AppFormModal from "../shared/AppFormModal";
 
+/**
+ * What the one "proof" field is called, per method.
+ *
+ * The same field every time — one string that settles "did this really go
+ * out" — but nobody calls a bKash trx id a reference, so the label follows
+ * the method rather than making the cashier translate.
+ */
+const REFERENCE_LABEL: Record<string, string> = {
+  cash: "Voucher no",
+  bkash: "Transaction ID",
+  nagad: "Transaction ID",
+  rocket: "Transaction ID",
+  bank: "Cheque / transfer no",
+  card: "Approval code",
+  other: "Reference",
+};
+
+const REFERENCE_HINT: Record<string, string> = {
+  cash: "e.g. VCH-1042",
+  bkash: "e.g. 9F2K7XQ1PL",
+  nagad: "e.g. 9F2K7XQ1PL",
+  rocket: "e.g. 9F2K7XQ1PL",
+  bank: "e.g. 004512 or the transfer id",
+  card: "e.g. 013422",
+  other: "Optional",
+};
+
+const WALLETS = ["bkash", "nagad", "rocket"];
+
+/** Which extra fields each method offers — and therefore which ones it saves. */
+const WALLET_FIELDS = ["senderNumber", "receiverNumber", "accountType"];
+const DETAIL_FIELDS: Record<string, string[]> = {
+  cash: ["handedTo", "receivedBy"],
+  bkash: WALLET_FIELDS,
+  nagad: WALLET_FIELDS,
+  rocket: WALLET_FIELDS,
+  bank: ["bankName", "branch", "accountNumber", "chequeDate"],
+  card: ["cardLast4"],
+  other: [],
+};
+
 interface OpenBill {
   _id: string;
   purchaseNo: string;
@@ -41,6 +82,11 @@ const VendorPaymentModal = ({
   const [picked, setPicked] = useState<string[]>([]);
   const [amount, setAmount] = useState<number | null>(null);
 
+  // Watched rather than held in state: the method decides which fields the
+  // form shows, and AntD already owns the value.
+  const method: string = Form.useWatch("method", form) ?? "cash";
+  const isWallet = WALLETS.includes(method);
+
   const openBills = useMemo(
     () => bills.filter((bill) => bill.due > 0),
     [bills]
@@ -56,15 +102,33 @@ const VendorPaymentModal = ({
     amount: number;
     method: string;
     reference?: string;
+    details?: Record<string, unknown>;
     note?: string;
     paidAt?: Dayjs;
   }) => {
+    /**
+     * Only the fields the chosen method actually showed are sent.
+     *
+     * Switching from bank to cash mid-form leaves the bank values behind in
+     * the form store, and saving them would file a cheque number against a
+     * payment made in notes.
+     */
+    const raw = (values.details ?? {}) as Record<string, unknown>;
+    const details: Record<string, unknown> = {};
+    for (const key of DETAIL_FIELDS[values.method] ?? []) {
+      const value = raw[key];
+      if (value === undefined || value === null || value === "") continue;
+      details[key] =
+        key === "chequeDate" ? (value as Dayjs).toISOString() : value;
+    }
+
     try {
       const result = await createPayment({
         vendor: vendor._id,
         amount: values.amount,
         method: values.method,
         reference: values.reference?.trim() || undefined,
+        details,
         note: values.note?.trim() || undefined,
         paidAt: (values.paidAt ?? dayjs()).toISOString(),
         ...(picked.length ? { purchases: picked } : {}),
@@ -133,12 +197,86 @@ const VendorPaymentModal = ({
           <DatePicker className="w-full" allowClear={false} />
         </Form.Item>
         <Form.Item
-          label="Reference"
+          label={REFERENCE_LABEL[method] ?? "Reference"}
           name="reference"
-          tooltip="Cheque number, bKash trx id — whatever proves it moved"
+          tooltip="Whatever single thing proves this money moved"
         >
-          <Input placeholder="Optional" />
+          <Input placeholder={REFERENCE_HINT[method] ?? "Optional"} />
         </Form.Item>
+
+        {/*
+          The rest depends on how it was paid. A wallet transfer has numbers on
+          both ends, a cheque has a date, cash has a person who took it — and
+          none of those mean anything on the other methods, so asking for all
+          of them every time would be a form of mostly-empty boxes.
+        */}
+        {isWallet && (
+          <>
+            <Form.Item label="Sender number" name={["details", "senderNumber"]}>
+              <Input placeholder="Our number" inputMode="numeric" />
+            </Form.Item>
+            <Form.Item
+              label="Receiver number"
+              name={["details", "receiverNumber"]}
+            >
+              <Input placeholder="Their number" inputMode="numeric" />
+            </Form.Item>
+            <Form.Item label="Account type" name={["details", "accountType"]}>
+              <Select
+                allowClear
+                placeholder="Personal, Agent or Merchant"
+                options={["Personal", "Agent", "Merchant"].map((row) => ({
+                  label: row,
+                  value: row,
+                }))}
+              />
+            </Form.Item>
+          </>
+        )}
+
+        {method === "bank" && (
+          <>
+            <Form.Item label="Bank" name={["details", "bankName"]}>
+              <Input placeholder="e.g. Dutch Bangla Bank" />
+            </Form.Item>
+            <Form.Item label="Branch" name={["details", "branch"]}>
+              <Input placeholder="e.g. Gulshan" />
+            </Form.Item>
+            <Form.Item
+              label="Account number"
+              name={["details", "accountNumber"]}
+            >
+              <Input placeholder="Whose account it left" />
+            </Form.Item>
+            <Form.Item label="Cheque date" name={["details", "chequeDate"]}>
+              <DatePicker
+                className="w-full"
+                placeholder="If it was a cheque"
+              />
+            </Form.Item>
+          </>
+        )}
+
+        {method === "card" && (
+          <Form.Item
+            label="Card last 4"
+            name={["details", "cardLast4"]}
+            tooltip="Only the last four — never the full number"
+          >
+            <Input maxLength={4} placeholder="e.g. 4821" inputMode="numeric" />
+          </Form.Item>
+        )}
+
+        {method === "cash" && (
+          <>
+            <Form.Item label="Handed to" name={["details", "handedTo"]}>
+              <Input placeholder="Who at the vendor took it" />
+            </Form.Item>
+            <Form.Item label="Paid by" name={["details", "receivedBy"]}>
+              <Input placeholder="Who from our side handed it over" />
+            </Form.Item>
+          </>
+        )}
       </div>
 
       {overpaying && (

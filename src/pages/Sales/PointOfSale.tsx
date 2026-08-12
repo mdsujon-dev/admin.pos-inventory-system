@@ -321,6 +321,7 @@ const PointOfSale = () => {
                           </Tag>
                         )}
                         <InputNumber
+                          type="number"
                           size="small"
                           min={0}
                           value={line.discount || null}
@@ -403,6 +404,7 @@ const PointOfSale = () => {
               <div className="flex items-center justify-between gap-2">
                 <span className="text-secondary-500">Bill discount</span>
                 <InputNumber
+                  type="number"
                   size="small"
                   min={0}
                   max={cart.totals.subtotal}
@@ -415,6 +417,7 @@ const PointOfSale = () => {
               <div className="flex items-center justify-between gap-2">
                 <span className="text-secondary-500">VAT %</span>
                 <InputNumber
+                  type="number"
                   size="small"
                   min={0}
                   max={100}
@@ -459,6 +462,7 @@ const PointOfSale = () => {
                   Tendered
                 </label>
                 <InputNumber
+                  type="number"
                   min={0}
                   value={tendered}
                   placeholder={String(grand)}

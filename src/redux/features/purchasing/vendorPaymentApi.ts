@@ -9,6 +9,25 @@ export interface IVendorPaymentAllocation {
   amount: number;
 }
 
+/**
+ * The bits only some methods have — a wallet's transaction has numbers, a
+ * cheque has a date, cash has a person. Kept apart so the form asks for what
+ * the chosen method actually uses instead of showing mostly-empty fields.
+ */
+export interface IPaymentDetails {
+  senderNumber?: string;
+  receiverNumber?: string;
+  accountType?: string;
+  bankName?: string;
+  accountNumber?: string;
+  branch?: string;
+  chequeNo?: string;
+  chequeDate?: string | null;
+  cardLast4?: string;
+  handedTo?: string;
+  receivedBy?: string;
+}
+
 export interface IVendorPayment {
   _id: string;
   paymentNo: string;
@@ -17,6 +36,7 @@ export interface IVendorPayment {
   amount: number;
   method: PaymentMethod;
   reference?: string;
+  details?: IPaymentDetails;
   note?: string;
   /** Which bills this money settled — oldest first unless told otherwise. */
   allocations: IVendorPaymentAllocation[];
@@ -46,6 +66,16 @@ const vendorPaymentApi = baseApi.injectEndpoints({
       providesTags: ["vendor-payments"],
     }),
 
+    /** Totals across every payment the current filters match, not just the page. */
+    getVendorPaymentsSummary: builder.query({
+      query: (args: QueryArg[] | undefined) => ({
+        url: "/vendor-payments/summary",
+        method: "GET",
+        params: buildQueryParams(args),
+      }),
+      providesTags: ["vendor-payments"],
+    }),
+
     createVendorPayment: builder.mutation({
       query: (data: Record<string, unknown>) => ({
         url: "/vendor-payments",
@@ -67,6 +97,7 @@ const vendorPaymentApi = baseApi.injectEndpoints({
 
 export const {
   useGetVendorPaymentsQuery,
+  useGetVendorPaymentsSummaryQuery,
   useGetPaymentsOfVendorQuery,
   useCreateVendorPaymentMutation,
 } = vendorPaymentApi;
