@@ -76,7 +76,7 @@ const InventoryFormModal = ({
           position: "relative",
           overflow: "hidden",
           margin: "-20px -24px 0",
-          padding: "11px 24px",
+          padding: "8px 24px",
           borderRadius: "8px 8px 0 0",
           background:
             "linear-gradient(100deg, #017527 0%, #019532 48%, #09ae40 100%)",
@@ -94,20 +94,20 @@ const InventoryFormModal = ({
           <span className="pointer-events-none absolute -right-16 -top-20 h-36 w-36 rounded-full bg-white/10" />
           <span className="pointer-events-none absolute -bottom-24 right-6 h-36 w-36 rounded-full bg-white/[0.07]" />
 
-          <div className="relative flex items-center gap-3.5 pr-8">
-            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/25 bg-white/15 text-white shadow-inner backdrop-blur-sm">
-              <Icon className="h-[22px] w-[22px]" />
+          <div className="relative flex items-center gap-3 pr-8">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg border border-white/25 bg-white/15 text-white backdrop-blur-sm">
+              <Icon className="h-[18px] w-[18px]" />
             </span>
             <span className="min-w-0">
-              <span className="mb-0.5 flex items-center gap-2">
-                <span className="truncate text-[17px] font-semibold leading-tight text-white">
+              <span className="flex items-center gap-2">
+                <span className="truncate text-[19px] font-semibold leading-tight text-white">
                   {isEditing ? `Edit ${entity}` : `Create ${entity}`}
                 </span>
                 <span className="shrink-0 rounded-full bg-white/20 px-2 py-px text-[10px] font-semibold uppercase tracking-wider text-white">
                   {isEditing ? "Editing" : "New"}
                 </span>
               </span>
-              <span className="block truncate text-xs font-normal text-white/80">
+              <span className="block truncate text-[13px] font-normal leading-tight text-white/80">
                 {isEditing
                   ? `Update this ${entity.toLowerCase()}'s details`
                   : `Add a new ${entity.toLowerCase()} to the catalog`}
