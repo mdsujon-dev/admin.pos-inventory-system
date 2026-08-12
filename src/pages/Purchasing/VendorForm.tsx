@@ -401,7 +401,7 @@ const VendorForm = () => {
                   {fields.map(({ key, name, ...restField }) => (
                     <div
                       key={key}
-                      className="flex flex-wrap items-start gap-3 rounded-xl border border-secondary-100 bg-secondary-50 p-3"
+                      className="flex flex-wrap items-center gap-3 border-b border-secondary-100/60 pb-3 last:border-0 last:pb-0"
                     >
                       <Form.Item
                         {...restField}
@@ -430,7 +430,6 @@ const VendorForm = () => {
                       </Form.Item>
                       <Button
                         danger
-                        type="text"
                         icon={<Trash2 className="h-4 w-4" />}
                         onClick={() => remove(name)}
                       />
@@ -466,11 +465,10 @@ const VendorForm = () => {
                   {fields.map(({ key, name, ...restField }) => (
                     <div
                       key={key}
-                      className="relative rounded-xl border border-secondary-100 bg-secondary-50 p-4"
+                      className="relative border-b border-secondary-100/60 pb-6 last:border-0 last:pb-0"
                     >
                       <Button
                         danger
-                        type="text"
                         size="small"
                         className="!absolute !right-2 !top-2"
                         icon={<Trash2 className="h-4 w-4" />}

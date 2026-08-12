@@ -187,12 +187,29 @@ input[type="number"] {
 .ant-input-affix-wrapper:not(.ant-input-affix-wrapper-sm):not(.ant-input-affix-wrapper-lg),
 .ant-input:not(.ant-input-sm):not(.ant-input-lg):not(textarea):not(.ant-input-affix-wrapper .ant-input),
 .ant-input-number-input:not(.ant-input-number-input-sm):not(.ant-input-number-input-lg),
-.ant-select-selector:not(.ant-select-sm):not(.ant-select-lg),
 .ant-picker:not(.ant-picker-sm):not(.ant-picker-lg) {
   height: 40px !important;
   padding-top: 8px !important;
   padding-bottom: 8px !important;
   border-radius: 8px !important;
+}
+
+.ant-select-single:not(.ant-select-sm):not(.ant-select-lg) .ant-select-selector {
+  height: 40px !important;
+  border-radius: 8px !important;
+  padding-left: 11px !important;
+  padding-right: 11px !important;
+  align-items: center !important;
+  display: flex !important;
+}
+
+.ant-select-multiple:not(.ant-select-sm):not(.ant-select-lg) .ant-select-selector {
+  min-height: 40px !important;
+  border-radius: 8px !important;
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+  padding-left: 11px !important;
+  padding-right: 11px !important;
 }
 /* AntD Css */
 .ant-modal {

@@ -31,15 +31,27 @@ export const FormSelect = ({
   tooltip,
   ...rest
 }: FormSelectProps) => {
+  // If inside a Form.List, ...rest might contain fieldKey and isListField.
+  // We should pass them to Form.Item, not Select.
+  const { fieldKey, isListField, ...selectProps } = rest as any;
+
   return (
-    <Form.Item name={name} label={label} rules={rules} help={help} tooltip={tooltip}>
+    <Form.Item
+      name={name}
+      label={label}
+      rules={rules}
+      help={help}
+      tooltip={tooltip}
+      fieldKey={fieldKey}
+      isListField={isListField}
+    >
       <Select
         size={size}
         placeholder={placeholder}
         allowClear={allowClear}
         onChange={() => setFieldError?.((prev) => ({ ...prev, [name as string]: "" }))}
         getPopupContainer={(trigger: any) => trigger.parentNode}
-        {...rest}
+        {...selectProps}
       />
       {fieldError?.[name] && <InputError>{fieldError[name]}</InputError>}
     </Form.Item>
