@@ -1,70 +1,73 @@
 /* ---------------------------------------------------------------------------
-   The table, in the brand's own colours.
+   The table, as glass.
 
    Every list in the app renders through this one file, so the rules are
-   deliberately plain: a tinted header, white rows, and one green hover. The
-   old grey-on-grey zebra is gone — striping two near-identical greys made
-   long tables read as noise without actually helping anyone follow a row.
+   deliberately restrained: translucent surfaces, one hairline between rows,
+   and colour only where it means something. Nothing here is a solid fill —
+   the page shows through, which is what makes it read as glass rather than
+   as a white box with a blur filter on it.
+
+   The old grey-on-grey zebra is gone too: striping two near-identical greys
+   made long tables read as noise without helping anyone follow a row.
    --------------------------------------------------------------------------- */
 
-/* Head — the brand colour itself, carrying white type.
-   This is the one band of solid colour in the table; the rows stay white so
-   the data, not the chrome, is what the eye lands on. */
+/* Surfaces stay see-through. AntD paints an opaque white on all of these by
+   default, and any one left solid kills the effect for the whole table. */
+.ant-table-wrapper,
+.ant-table-wrapper .ant-table,
+.ant-table-wrapper .ant-table-container,
+.ant-table-wrapper .ant-table-content,
+.ant-table-wrapper table {
+  background: transparent !important;
+}
+
+/* Head — the faintest brand wash, not a band of colour.
+   Enough tint to separate the labels from the data, little enough that it
+   never competes with them. */
 .ant-table-wrapper .ant-table-thead > tr > th {
-  background: linear-gradient(180deg, #019532 0%, #017527 100%) !important;
-  color: #ffffff;
+  background: rgba(1, 149, 50, 0.07) !important;
+  backdrop-filter: blur(6px);
+  color: #017527;
   font-size: 11.5px;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
-  padding: 13px 16px !important;
-  border-bottom: none !important;
+  padding: 14px 16px !important;
+  border-bottom: 1px solid rgba(1, 149, 50, 0.18) !important;
   border-radius: 0 !important;
 }
 
-/* The hairline AntD draws between header cells — its default grey is invisible
-   on green, so it becomes a translucent white notch instead. */
+/* The hairline AntD draws between header cells, dropped to a whisper. */
 .ant-table-wrapper .ant-table-thead > tr > th::before {
-  background-color: rgba(255, 255, 255, 0.28) !important;
-  height: 1.4em !important;
+  background-color: rgba(1, 149, 50, 0.15) !important;
+  height: 1.2em !important;
 }
 
 /* Sort and filter affordances follow the header text, not AntD's blue-grey. */
 .ant-table-wrapper .ant-table-column-sorter,
 .ant-table-wrapper .ant-table-filter-trigger {
-  color: rgba(255, 255, 255, 0.55);
+  color: rgba(1, 149, 50, 0.4);
 }
 
 .ant-table-wrapper .ant-table-column-sorter-up.active,
 .ant-table-wrapper .ant-table-column-sorter-down.active,
 .ant-table-wrapper .ant-table-filter-trigger.active,
 .ant-table-wrapper .ant-table-filter-trigger:hover {
-  color: #ffffff;
+  color: #019532;
 }
 
 .ant-table-wrapper .ant-table-thead th.ant-table-column-has-sorters:hover {
-  background: linear-gradient(180deg, #017527 0%, #015b1f 100%) !important;
+  background: rgba(1, 149, 50, 0.12) !important;
 }
 
-/* Selection checkboxes sit on green now, so they need a white outline to be
-   seen at all before they are ticked. */
-.ant-table-wrapper
-  .ant-table-thead
-  > tr
-  > th.ant-table-selection-column
-  .ant-checkbox-inner {
-  border-color: rgba(255, 255, 255, 0.7);
-  background-color: transparent;
-}
-
-/* Body — white rows, one hairline between them, room to breathe. */
+/* Body — translucent rows, one hairline between them, room to breathe. */
 .ant-table-wrapper .ant-table-tbody > tr > td {
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.55);
   color: #232323;
   font-size: 13.5px;
   padding: 13px 16px !important;
-  border-bottom: 1px solid #f2f4f2 !important;
+  border-bottom: 1px solid rgba(16, 24, 40, 0.06) !important;
   transition: background-color 0.15s ease;
 }
 
@@ -73,41 +76,31 @@
   border-bottom: none !important;
 }
 
-/* Hover — the row lifts into brand tint and grows a bar down its left edge,
-   which is what makes a wide row scannable end to end. `cell-row-hover` is
-   AntD's own class and is the only one that reaches pinned columns. */
+/* Hover — tint only. No edge, no bar: the colour change alone says which row
+   the pointer is on, and a line drawn at a cell boundary reads as a stray
+   border that appears and vanishes as the mouse moves. `cell-row-hover` is
+   AntD's own class and the only one that reaches pinned columns. */
 .ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td,
 .ant-table-wrapper .ant-table-tbody > tr > td.ant-table-cell-row-hover {
-  background-color: #f3fcf6 !important;
+  background: rgba(1, 149, 50, 0.06) !important;
+  box-shadow: none !important;
 }
 
-.ant-table-wrapper .ant-table-tbody > tr.ant-table-row:hover > td:first-child {
-  box-shadow: inset 3px 0 0 #019532;
-}
-
-/* A selected row keeps the tint permanently, one shade stronger. */
+/* A selected row keeps that tint permanently, a shade stronger. */
 .ant-table-wrapper .ant-table-tbody > tr.ant-table-row-selected > td,
-.ant-table-wrapper
-  .ant-table-tbody
-  > tr.ant-table-row-selected:hover
-  > td {
-  background-color: #edfdf2 !important;
-}
-
-.ant-table-wrapper
-  .ant-table-tbody
-  > tr.ant-table-row-selected
-  > td:first-child {
-  box-shadow: inset 3px 0 0 #019532;
+.ant-table-wrapper .ant-table-tbody > tr.ant-table-row-selected:hover > td {
+  background: rgba(1, 149, 50, 0.1) !important;
 }
 
 /* Pinned (fixed) columns — left or right.
-   AntD paints these over the scrolling body, so they must carry their own
-   opaque background at every state, or the rows underneath show through as
-   they slide past. */
+   These are painted over the scrolling body, so glass is the one thing they
+   cannot have: the rows sliding underneath would show straight through. They
+   get a near-opaque pane and a blur instead, which keeps the family
+   resemblance without letting the content bleed. */
 .ant-table-wrapper .ant-table-tbody > tr > td.ant-table-cell-fix-left,
 .ant-table-wrapper .ant-table-tbody > tr > td.ant-table-cell-fix-right {
-  background-color: #ffffff;
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(8px);
 }
 
 .ant-table-wrapper
@@ -118,36 +111,44 @@
   .ant-table-tbody
   > tr.ant-table-row:hover
   > td.ant-table-cell-fix-right {
-  background-color: #f3fcf6 !important;
+  background: rgba(240, 251, 244, 0.95) !important;
 }
 
 .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-left,
 .ant-table-wrapper .ant-table-thead > tr > th.ant-table-cell-fix-right {
-  background: linear-gradient(180deg, #019532 0%, #017527 100%) !important;
+  background: rgba(238, 250, 242, 0.95) !important;
+  backdrop-filter: blur(8px);
 }
 
-/* The shadow AntD casts from a pinned column, softened to match the table. */
+/* The line AntD draws where a pinned column meets the scrolling body. It only
+   shows up once the table can scroll sideways, which made it look like a
+   border that appeared on hover — so it is off in every state. */
+.ant-table-wrapper .ant-table-cell-fix-left-last::after,
+.ant-table-wrapper .ant-table-cell-fix-right-first::after,
 .ant-table-wrapper .ant-table-ping-left .ant-table-cell-fix-left-last::after,
 .ant-table-wrapper .ant-table-ping-right .ant-table-cell-fix-right-first::after {
-  box-shadow: none;
-  width: 18px;
+  box-shadow: none !important;
+  border-inline-start: none !important;
+  border-inline-end: none !important;
+  width: 0;
 }
 
 /* Summary rows (totals) belong to the header family, not the body. */
 .ant-table-wrapper .ant-table-summary > tr > td {
-  background-color: #f4fdf7 !important;
-  border-top: 2px solid #019532 !important;
+  background: rgba(1, 149, 50, 0.07) !important;
+  border-top: 1px solid rgba(1, 149, 50, 0.18) !important;
   font-weight: 700;
-  color: #015b1f;
+  color: #017527;
 }
 
 /* Expanded detail panels sit back so the row they belong to stays dominant. */
 .ant-table-wrapper .ant-table-expanded-row > td {
-  background-color: #fafbfa !important;
+  background: rgba(245, 247, 246, 0.6) !important;
 }
 
 /* Empty state — centred, quiet, and given room rather than crammed. */
 .ant-table-wrapper .ant-table-placeholder > td {
+  background: transparent !important;
   border-bottom: none !important;
   padding: 40px 16px !important;
 }
@@ -157,28 +158,14 @@
   font-size: 13px;
 }
 
-.ant-table-wrapper .ant-table-placeholder:hover > td {
-  background-color: #ffffff !important;
-}
-
-/* Table Wrapper Background.
-   No `border-bottom: none` here — the wrapper carries its outline from
-   DataTable.tsx, and killing the bottom edge left the table open-ended once
-   the scrollbar under it was hidden. */
-.ant-table-wrapper,
-.ant-table-wrapper .ant-table,
-.ant-table-wrapper .ant-table-container {
-  background-color: #fff;
-}
-
 /* Pagination — the current page in brand green, the rest unobtrusive.
    It lives inside the table's outline, so it needs a rule above it; without
    one the controls read as floating loose under the last row. */
 .ant-table-wrapper.pos-table .ant-table-pagination.ant-pagination {
   margin: 0 !important;
   padding: 12px 16px;
-  border-top: 1px solid #e9f4ec;
-  background-color: #fcfdfc;
+  border-top: 1px solid rgba(16, 24, 40, 0.06);
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .ant-table-wrapper .ant-pagination .ant-pagination-item-active {
@@ -192,6 +179,13 @@
 
 .ant-table-wrapper .ant-pagination .ant-pagination-item:hover {
   border-color: #a8f0c0;
+}
+
+/* The loading veil is opaque white by default, which flashes the glass off
+   every time a filter changes. */
+.ant-table-wrapper .ant-spin-blur::after,
+.ant-table-wrapper .ant-spin-container::after {
+  background: rgba(255, 255, 255, 0.45) !important;
 }
 
 /* Horizontal scrollbar inside the table.
