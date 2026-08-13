@@ -10,6 +10,7 @@ import {
   LayoutGrid,
   Layers,
   Package,
+  PackageX,
   PhoneCall,
   PieChart,
   Ruler,
@@ -113,6 +114,12 @@ const sidebarMenuRoutes: RouteItem[] = [
         module: "Print Labels",
       },
       {
+        label: "Write-offs",
+        address: "/inventory/write-offs",
+        icon: PackageX,
+        module: "Stock Write-offs",
+      },
+      {
         label: "Stock Batches",
         address: "/inventory/stock-lots",
         icon: Layers,
@@ -200,6 +207,12 @@ const sidebarMenuRoutes: RouteItem[] = [
         exactMatch: true,
       },
       {
+        label: "Purchase Returns",
+        address: "/purchases/returns",
+        icon: Undo2,
+        module: "Purchase Returns",
+      },
+      {
         label: "Vendor Payments",
         address: "/purchases/payments",
         icon: Banknote,
@@ -233,6 +246,12 @@ const sidebarMenuRoutes: RouteItem[] = [
         icon: PieChart,
         module: "Accounts",
         exactMatch: true,
+      },
+      {
+        label: "Ledger",
+        address: "/accounts/ledger",
+        icon: ClipboardList,
+        module: "Accounts",
       },
       {
         label: "Profit & Loss",

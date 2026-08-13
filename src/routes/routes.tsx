@@ -21,6 +21,7 @@ import Brands from "../pages/Inventory/Brands/Brands.tsx";
 import CategoryTabs from "../pages/Inventory/Categories/CategoryTabs.tsx";
 import PrintBarcode from "../pages/Inventory/Print/PrintBarcode.tsx";
 import PrintLabelsView from "../pages/Inventory/Print/PrintLabelsView.tsx";
+import WriteOffs from "../pages/Inventory/WriteOffs.tsx";
 import PrintQRCode from "../pages/Inventory/Print/PrintQRCode.tsx";
 import ExpiredProducts from "../pages/Inventory/Products/ExpiredProducts.tsx";
 import LowStocks from "../pages/Inventory/Products/LowStocks.tsx";
@@ -33,6 +34,7 @@ import CashFlow from "../pages/Accounts/CashFlow.tsx";
 import EmployeeSales from "../pages/Accounts/EmployeeSales.tsx";
 import ExpenseCategories from "../pages/Accounts/ExpenseCategories.tsx";
 import ProfitLoss from "../pages/Accounts/ProfitLoss.tsx";
+import Ledger from "../pages/Accounts/Ledger.tsx";
 import Receivables from "../pages/Accounts/Receivables.tsx";
 import StockValuation from "../pages/Accounts/StockValuation.tsx";
 import CustomerProfile from "../pages/Customers/CustomerProfile.tsx";
@@ -51,6 +53,7 @@ import InvoiceView from "../pages/Sales/InvoiceView.tsx";
 import PointOfSale from "../pages/Sales/PointOfSale.tsx";
 import SalesList from "../pages/Sales/SalesList.tsx";
 import SaleReturns from "../pages/Sales/SaleReturns.tsx";
+import PurchaseReturns from "../pages/Purchasing/PurchaseReturns.tsx";
 import RolePermissions from "../pages/Users/RolePermissions.tsx";
 import Roles from "../pages/Users/Roles.tsx";
 import Users from "../pages/Users/Users.tsx";
@@ -91,6 +94,7 @@ const routes = [
           { path: "units", element: <Units /> },
           { path: "variant-attributes", element: <VariantAttributes /> },
           { path: "print-labels", element: <PrintLabelsView /> },
+          { path: "write-offs", element: <WriteOffs /> },
           // Old addresses, now redirects — see the note in PrintBarcode.
           { path: "print-barcode", element: <PrintBarcode /> },
           { path: "print-qr-code", element: <PrintQRCode /> },
@@ -113,6 +117,7 @@ const routes = [
         path: "accounts",
         children: [
           { path: "", element: <AccountsOverview /> },
+          { path: "ledger", element: <Ledger /> },
           { path: "profit-loss", element: <ProfitLoss /> },
           { path: "stock-valuation", element: <StockValuation /> },
           { path: "cash-flow", element: <CashFlow /> },
@@ -139,6 +144,7 @@ const routes = [
           { path: "new", element: <PurchaseForm /> },
           { path: "payables", element: <Receivables mode="payable" /> },
           { path: "payments", element: <VendorPayments /> },
+          { path: "returns", element: <PurchaseReturns /> },
           { path: ":id/edit", element: <PurchaseForm /> },
           { path: ":id", element: <PurchaseView /> },
         ],

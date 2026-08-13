@@ -50,6 +50,7 @@ export const routePermissions: Record<string, RoutePermission> = {
     action: "View",
   },
   "/inventory/print-labels": { module: "Print Labels", action: "View" },
+  "/inventory/write-offs": { module: "Stock Write-offs", action: "View" },
   "/inventory/stock-lots": { module: "Stock Batches", action: "View" },
   // The old split screens. Kept so a bookmark still lands somewhere it is
   // allowed to be; both now redirect to Print Labels.
@@ -75,11 +76,13 @@ export const routePermissions: Record<string, RoutePermission> = {
   "/vendors/new": { module: "Vendors", action: "Create" },
   "/vendors/:id/edit": { module: "Vendors", action: "Update" },
   "/vendors/:id": { module: "Vendors", action: "View" },
+  "/accounts/ledger": { module: "Accounts", action: "View" },
   "/sales/returns": { module: "Sales Returns", action: "View" },
   "/purchases": { module: "Purchases", action: "View" },
   "/purchases/new": { module: "Purchases", action: "Create" },
   "/purchases/payables": { module: "Accounts", action: "View" },
   "/purchases/payments": { module: "Vendor Payments", action: "View" },
+  "/purchases/returns": { module: "Purchase Returns", action: "View" },
   "/purchases/:id/edit": { module: "Purchases", action: "Update" },
   "/purchases/:id": { module: "Purchases", action: "View" },
 

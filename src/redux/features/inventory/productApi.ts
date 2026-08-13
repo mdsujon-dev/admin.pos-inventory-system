@@ -141,6 +141,24 @@ const productApi = baseApi.injectEndpoints({
       invalidatesTags: ["products"],
     }),
 
+    /** A whole spreadsheet at once. Answers with a verdict per row. */
+    importProducts: builder.mutation({
+      query: (data: { rows: Record<string, unknown>[] }) => ({
+        url: "/products/import",
+        method: "POST",
+        body: data,
+      }),
+      // Categories, brands and units can all be created along the way.
+      invalidatesTags: [
+        "products",
+        "categories",
+        "sub-categories",
+        "brands",
+        "units",
+        "reports",
+      ],
+    }),
+
     updateProduct: builder.mutation({
       query: ({ id, data }: { id: string; data: Record<string, unknown> }) => ({
         url: `/products/${id}`,
@@ -178,6 +196,7 @@ export const {
   useLazyGetLowStockProductsQuery,
   useGetProductByIdQuery,
   useCreateProductMutation,
+  useImportProductsMutation,
   useUpdateProductMutation,
   useToggleProductStatusMutation,
   useDeleteProductMutation,

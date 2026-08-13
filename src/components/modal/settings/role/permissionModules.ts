@@ -99,10 +99,22 @@ export const PERMISSION_MODULES: PermissionModule[] = [
   { module: "Purchases", permissions: ["View", "Create", "Update"], group: "Purchasing" },
   // Returns cannot be edited or deleted either — taking one back wrongly is
   // corrected by a second document, never by rewriting the first.
+  // Throwing stock away is a loss on the books, so it is its own permission
+  // rather than folded into editing a product.
+  {
+    module: "Stock Write-offs",
+    permissions: ["View", "Create"],
+    group: "Inventory",
+  },
   {
     module: "Sales Returns",
     permissions: ["View", "Create"],
     group: "Sales",
+  },
+  {
+    module: "Purchase Returns",
+    permissions: ["View", "Create"],
+    group: "Purchasing",
   },
   // Payments cannot be edited or deleted — a correction is a second entry.
   {

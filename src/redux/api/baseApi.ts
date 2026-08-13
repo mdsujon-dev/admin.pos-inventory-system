@@ -172,6 +172,8 @@ export const baseApi = createApi({
     // Selling
     "sales",
     "sale-returns",
+    "write-offs",
+    "purchase-returns",
     "customers",
     // The books and the customer relationship
     "expense-categories",

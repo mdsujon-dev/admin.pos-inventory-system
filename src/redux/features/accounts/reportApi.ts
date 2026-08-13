@@ -106,6 +106,16 @@ const reportApi = baseApi.injectEndpoints({
       providesTags: ["reports"],
     }),
 
+    /** Every money movement, assembled from the documents themselves. */
+    getLedger: builder.query({
+      query: (args: QueryArg[] | undefined) => ({
+        url: "/reports/ledger",
+        method: "GET",
+        params: buildQueryParams(args),
+      }),
+      providesTags: ["reports"],
+    }),
+
     getExpenseCategories: builder.query({
       query: (args: QueryArg[] | undefined) => ({
         url: "/expense-categories",
@@ -161,6 +171,7 @@ export const {
   useGetCashFlowQuery,
   useGetProductProfitabilityQuery,
   useGetDashboardSummaryQuery,
+  useGetLedgerQuery,
   useGetExpenseCategoriesQuery,
   useCreateExpenseCategoryMutation,
   useUpdateExpenseCategoryMutation,
