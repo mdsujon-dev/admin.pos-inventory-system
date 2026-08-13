@@ -5,6 +5,7 @@ import {
   ClipboardList,
   Contact,
   FileText,
+  HandCoins,
   HeartHandshake,
   Landmark,
   LayoutGrid,
@@ -204,6 +205,15 @@ const sidebarMenuRoutes: RouteItem[] = [
         label: "Purchase Returns",
         address: "/purchases/returns",
         icon: Undo2,
+        module: "Purchase Returns",
+      },
+      // Its own entry rather than a filter on the list above: money a supplier
+      // owes is chased, not browsed, and a chase list nobody can find is one
+      // nobody works.
+      {
+        label: "Supplier Refunds",
+        address: "/purchases/refunds",
+        icon: HandCoins,
         module: "Purchase Returns",
       },
     ],

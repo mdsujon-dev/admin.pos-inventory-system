@@ -1,28 +1,32 @@
 import { Button, Tag, Card } from "antd";
 import dayjs from "dayjs";
 import {
+  ArrowDownLeft,
   ArrowLeft,
+  ArrowUpRight,
   Banknote,
   Edit,
   Package,
-  Phone,
   Receipt,
+  Scale,
   TrendingUp,
   Wallet,
 } from "lucide-react";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import PermissionGate from "../../components/Common/PermissionGate";
 import VendorPaymentModal from "../../components/modal/purchasing/VendorPaymentModal";
+import RefundReceiptModal from "../../components/modal/purchasing/RefundReceiptModal";
 import { Loading } from "../../components/shared/Loading";
 import DataTable from "../../components/Table/DataTable";
 import TableEmpty from "../../components/Table/TableEmpty";
 import Money from "../../components/shared/Money";
 import { MetricCard } from "../../components/Common/MetricCard";
 import { useGetVendorLedgerQuery } from "../../redux/features/purchasing/purchaseApi";
-import { PAYMENT_METHOD_LABELS } from "../../utils/money";
+import { IPurchaseReturn } from "../../redux/features/purchasing/purchaseReturnApi";
+import { PAYMENT_METHOD_LABELS, round2 } from "../../utils/money";
 import ExportMenu from "../../components/Common/ExportMenu";
 import { makeSheet } from "../../utils/tableExport";
 
@@ -81,6 +85,7 @@ const VendorProfile = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [paying, setPaying] = useState(false);
+  const [collecting, setCollecting] = useState<IPurchaseReturn | null>(null);
 
   const { data, isFetching } = useGetVendorLedgerQuery(
     { vendorId: id as string },
@@ -94,6 +99,11 @@ const VendorProfile = () => {
 
   const { vendor, purchases, payments, totals, byProduct } = ledger;
   const openBills = (purchases ?? []).filter((row: any) => row.due > 0);
+
+  // The account runs both ways. `owed` is ours to pay; `refundDue` is theirs.
+  const refunds: IPurchaseReturn[] = ledger.refunds ?? [];
+  const owed = totals.due ?? 0;
+  const refundDue = totals.refundDue ?? 0;
 
   const supplies = [
     ...(vendor.categories ?? []).map((row: unknown) => ({
@@ -203,34 +213,41 @@ const VendorProfile = () => {
         }
       />
 
-      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard 
-          icon={Receipt} 
-          label="Bills" 
-          accent="#8b5cf6" 
+      {/*
+        The question this page exists to answer, before anything else on it.
+        A supplier account runs in both directions — unpaid bills one way,
+        refunds they owe on returned goods the other — and a screen that shows
+        only the first has someone paying a bill in full while the supplier is
+        sitting on money that should have come off it.
+      */}
+      <BalancePanel
+        owed={owed}
+        refundDue={refundDue}
+        openBillCount={openBills.length}
+        refundCount={refunds.length}
+      />
+
+      <div className="mb-5 grid gap-3 sm:grid-cols-3">
+        <MetricCard
+          icon={Receipt}
+          label="Bills"
+          accent="#8b5cf6"
           hint="Total invoices received"
-          value={totals.billCount} 
-        />
-        <MetricCard 
-          icon={Wallet} 
-          label="Purchased" 
-          accent="#3b82f6" 
-          hint="Total value of goods"
-          value={<Money value={totals.purchased} />} 
-        />
-        <MetricCard 
-          icon={TrendingUp} 
-          label="Paid" 
-          accent="#10b981" 
-          hint="Total amount settled"
-          value={<Money value={totals.paid} />} 
+          value={totals.billCount}
         />
         <MetricCard
-          icon={Phone}
-          label="Still owed"
-          accent={totals.due > 0 ? "#f43f5e" : "#f59e0b"}
-          hint={totals.due > 0 ? "Call them before they call you" : "No outstanding balance"}
-          value={<Money value={totals.due} />}
+          icon={Wallet}
+          label="Purchased"
+          accent="#3b82f6"
+          hint="Total value of goods"
+          value={<Money value={totals.purchased} />}
+        />
+        <MetricCard
+          icon={TrendingUp}
+          label="Paid"
+          accent="#10b981"
+          hint="Total amount settled"
+          value={<Money value={totals.paid} />}
         />
       </div>
 
@@ -584,6 +601,128 @@ const VendorProfile = () => {
         </Card>
       </div>
 
+      {/*
+        Only rendered when there is something to chase. An empty table here
+        would sit under every settled supplier saying nothing, and the empty
+        case is already covered by the panel at the top of the page.
+      */}
+      {refunds.length > 0 && (
+        <div className="mt-4">
+          <Card
+            className="!rounded-xl !border-[#f59e0b55] shadow-card"
+            styles={{ body: { padding: "20px" } }}
+          >
+            <div className="mb-4 flex items-start justify-between gap-4">
+              <div>
+                <h3 className="m-0 text-[16px] font-semibold text-secondary-800">
+                  Refunds they owe us
+                </h3>
+                <p className="m-0 mt-1 text-xs text-secondary-500">
+                  Goods went back off a paid bill — none of this counts as cash
+                  until it is recorded as received
+                </p>
+              </div>
+              <ExportMenu
+                size="small"
+                sheet={() =>
+                  makeSheet({
+                    title: `${vendor.name} - Refunds owed`,
+                    unit: "return",
+                    headers: [
+                      "Return",
+                      "Sent back",
+                      "Bill",
+                      "Value",
+                      "Received",
+                      "Still owed",
+                    ],
+                    rows: refunds,
+                    isLow: () => true,
+                    cells: (r: IPurchaseReturn) => [
+                      r.returnNo,
+                      dayjs(r.returnedAt).format("DD MMM YYYY"),
+                      r.purchaseNo,
+                      r.totalCost,
+                      r.refundAmount ?? 0,
+                      r.refundDue ?? 0,
+                    ],
+                    note: `Owed in total ${refundDue.toLocaleString("en-BD")}`,
+                  })
+                }
+              />
+            </div>
+            <ProfileTable
+              data={refunds}
+              rowKey="_id"
+              empty={<span />}
+              columns={[
+                {
+                  title: "Return",
+                  key: "returnNo",
+                  render: (_: unknown, row: IPurchaseReturn) => (
+                    <div>
+                      <p className="m-0 font-mono text-xs font-semibold">
+                        {row.returnNo}
+                      </p>
+                      <span className="text-[11px] text-secondary-400">
+                        {dayjs(row.returnedAt).format("DD MMM YYYY")} ·{" "}
+                        {row.purchaseNo}
+                      </span>
+                    </div>
+                  ),
+                },
+                {
+                  title: "Received",
+                  key: "refundAmount",
+                  width: 150,
+                  render: (_: unknown, row: IPurchaseReturn) => (
+                    <span className="text-[12px] text-secondary-500">
+                      {(row.refundAmount ?? 0) > 0 ? (
+                        <>
+                          <Money value={row.refundAmount} /> of{" "}
+                          <Money value={row.totalCost} />
+                        </>
+                      ) : (
+                        <>
+                          — of <Money value={row.totalCost} />
+                        </>
+                      )}
+                    </span>
+                  ),
+                },
+                {
+                  title: "Still owed",
+                  key: "refundDue",
+                  width: 120,
+                  render: (_: unknown, row: IPurchaseReturn) => (
+                    <span className="font-semibold text-[#92400e]">
+                      <Money value={row.refundDue} />
+                    </span>
+                  ),
+                },
+                {
+                  title: "",
+                  key: "collect",
+                  width: 130,
+                  render: (_: unknown, row: IPurchaseReturn) => (
+                    <PermissionGate module="Purchase Returns" action="Create">
+                      <Button
+                        size="small"
+                        type="primary"
+                        className="whitespace-nowrap"
+                        onClick={() => setCollecting(row)}
+                      >
+                        Record refund
+                      </Button>
+                    </PermissionGate>
+                  ),
+                },
+              ]}
+            />
+          </Card>
+        </div>
+      )}
+
       <div className="mt-4">
         <Card className="!rounded-xl !border-secondary-100 shadow-card" styles={{ body: { padding: '20px' } }}>
           <div className="mb-4 flex items-start justify-between gap-4">
@@ -677,9 +816,144 @@ const VendorProfile = () => {
           bills={openBills}
         />
       )}
+
+      {collecting && (
+        <RefundReceiptModal
+          row={collecting}
+          open={!!collecting}
+          setOpen={(value) => !value && setCollecting(null)}
+        />
+      )}
     </div>
   );
 };
+
+/**
+ * The supplier account in both directions, and the one number that settles it.
+ *
+ * Two halves rather than a single signed figure: "we owe 300,000" and "they
+ * owe us 500,000" are two facts a shopkeeper acts on separately — one is a
+ * cheque to write, the other is a phone call to make — and netting them to
+ * "-200,000" hides both behind a minus sign nobody reads correctly.
+ *
+ * The net line underneath says what one payment today would settle, and is
+ * the only place the two are allowed to cancel out.
+ */
+const BalancePanel = ({
+  owed,
+  refundDue,
+  openBillCount,
+  refundCount,
+}: {
+  owed: number;
+  refundDue: number;
+  openBillCount: number;
+  refundCount: number;
+}) => {
+  const net = round2(owed - refundDue);
+  const settled = owed === 0 && refundDue === 0;
+
+  return (
+    <div className="mb-4 overflow-hidden rounded-xl border border-secondary-100 bg-white shadow-card">
+      <div className="grid divide-y divide-secondary-100 sm:grid-cols-2 sm:divide-x sm:divide-y-0">
+        <BalanceSide
+          icon={ArrowUpRight}
+          label="We owe them"
+          caption={
+            openBillCount > 0
+              ? `${openBillCount} bill${openBillCount === 1 ? "" : "s"} unpaid`
+              : "Every bill settled"
+          }
+          value={owed}
+          tone={owed > 0 ? "#f43f5e" : "#94a3b8"}
+        />
+        <BalanceSide
+          icon={ArrowDownLeft}
+          label="They owe us"
+          caption={
+            refundCount > 0
+              ? `${refundCount} return${
+                  refundCount === 1 ? "" : "s"
+                } waiting on a refund`
+              : "No refunds outstanding"
+          }
+          value={refundDue}
+          tone={refundDue > 0 ? "#f59e0b" : "#94a3b8"}
+        />
+      </div>
+
+      {/* Said in words, because a minus sign is the easiest thing to misread. */}
+      <div
+        className="flex flex-wrap items-center justify-between gap-2 border-t border-secondary-100 px-5 py-3"
+        style={{
+          background: settled
+            ? "#f8fafc"
+            : net > 0
+            ? "#fef2f2"
+            : "#fffbeb",
+        }}
+      >
+        <span className="flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wide text-secondary-500">
+          <Scale className="h-4 w-4" />
+          Where the account stands
+        </span>
+        <span
+          className="text-[15px] font-bold"
+          style={{
+            color: settled ? "#64748b" : net > 0 ? "#be123c" : "#92400e",
+          }}
+        >
+          {settled ? (
+            "Nothing owed either way"
+          ) : net > 0 ? (
+            <>
+              We owe <Money value={net} /> after their refund
+            </>
+          ) : net < 0 ? (
+            <>
+              They owe us <Money value={Math.abs(net)} /> after our bills
+            </>
+          ) : (
+            "The two cancel out exactly"
+          )}
+        </span>
+      </div>
+    </div>
+  );
+};
+
+/** One direction of the account: a figure, and what it is made of. */
+const BalanceSide = ({
+  icon: Icon,
+  label,
+  caption,
+  value,
+  tone,
+}: {
+  icon: React.ElementType;
+  label: string;
+  caption: string;
+  value: number;
+  tone: string;
+}) => (
+  <div className="flex items-center gap-3 px-5 py-4">
+    <span
+      className="grid h-11 w-11 shrink-0 place-items-center rounded-lg"
+      style={{ background: `${tone}1a`, color: tone }}
+    >
+      <Icon className="h-5 w-5" />
+    </span>
+    <div className="min-w-0">
+      <p className="m-0 text-[11px] font-semibold uppercase tracking-wide text-secondary-400">
+        {label}
+      </p>
+      <p className="m-0 text-[22px] font-bold leading-tight" style={{ color: tone }}>
+        <Money value={value} />
+      </p>
+      <p className="m-0 text-[11px] text-secondary-400">{caption}</p>
+    </div>
+  </div>
+);
 
 /** One side's promises. Empty is stated rather than left blank. */
 const TermList = ({

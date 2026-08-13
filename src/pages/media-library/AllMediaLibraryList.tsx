@@ -434,7 +434,7 @@ const AllMediaLibraryList = () => {
                 onDragEnd={() => (dragKeyRef.current = null)}
                 styles={{ body: { padding: '12px' } }}
                 bodyStyle={{ padding: '12px' }}
-                className={`overflow-hidden w-full transition-all duration-300 shadow-card border !border-primary/10 hover:!border-primary-100 cursor-grab active:cursor-grabbing ${
+                className={`overflow-hidden w-full transition-all duration-300 shadow-md hover:shadow-xl hover:-translate-y-1 border !border-primary/10 hover:!border-primary-100 cursor-grab active:cursor-grabbing ${
                   selectedItems.includes(img.path)
                     ? "ring-[1px] ring-primary !border-primary"
                     : ""

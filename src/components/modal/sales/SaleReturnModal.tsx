@@ -1,4 +1,4 @@
-import { Alert, Checkbox, InputNumber, Modal, Segmented, Select, Input } from "antd";
+import { Alert, Checkbox, InputNumber, Modal, Segmented, Select, Input, Tooltip } from "antd";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import Money from "../../shared/Money";
@@ -215,9 +215,20 @@ const SaleReturnModal = ({ saleId, open, setOpen }: Props) => {
                 value={mode}
                 onChange={(value) => setMode(value as "cash" | "credit")}
                 options={[
-                  { label: "Hand money back", value: "cash" },
                   {
-                    label: "Take off what they owe",
+                    label: (
+                      <Tooltip title="Hand money back">
+                        <div className="truncate">Hand money back</div>
+                      </Tooltip>
+                    ),
+                    value: "cash",
+                  },
+                  {
+                    label: (
+                      <Tooltip title="Take off what they owe">
+                        <div className="truncate">Take off what they owe</div>
+                      </Tooltip>
+                    ),
                     value: "credit",
                     disabled: (invoice?.due ?? 0) <= 0,
                   },

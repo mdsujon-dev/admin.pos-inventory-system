@@ -52,10 +52,27 @@ interface LedgerRow {
   reference: string;
   party: string;
   direction: "in" | "out";
+  /** What the document was worth. */
   amount: number;
+  /** How much of it actually changed hands. */
+  cashAmount: number;
   onPaper: boolean;
   link?: string;
 }
+
+/**
+ * The three things a row can be, rather than the two it used to be.
+ *
+ * "Part cash" is the state that was missing and the one that did the damage:
+ * an invoice with a deposit against it was counted as though the whole bill
+ * had been paid, and the day's takings came out higher than the drawer.
+ */
+const cashState = (row: LedgerRow) => {
+  const cash = row.cashAmount ?? 0;
+  if (cash <= 0) return "none" as const;
+  if (cash >= row.amount) return "full" as const;
+  return "part" as const;
+};
 
 /**
  * Every money movement in the shop, in one list.
@@ -85,7 +102,14 @@ const Ledger = () => {
   ]);
 
   const entries: LedgerRow[] = data?.data?.entries ?? [];
-  const totals = data?.data?.totals ?? { count: 0, cashIn: 0, cashOut: 0, net: 0 };
+  const totals = data?.data?.totals ?? {
+    count: 0,
+    cashIn: 0,
+    cashOut: 0,
+    net: 0,
+    billedIn: 0,
+    billedOut: 0,
+  };
 
   // Paged in the browser: the list is one period's documents, not a table that
   // grows without bound, and holding it lets the totals stay honest.
@@ -105,7 +129,16 @@ const Ledger = () => {
         `${range[0].format("DD MMM YYYY")} to ${range[1].format("DD MMM YYYY")}`,
         kind !== "all" ? `Kind: ${KINDS[kind]?.label ?? kind}` : "",
       ],
-      headers: ["Date", "Kind", "Reference", "Who / what", "In", "Out", "Cash"],
+      headers: [
+        "Date",
+        "Kind",
+        "Reference",
+        "Who / what",
+        "In",
+        "Out",
+        "Cash",
+        "Cash amount",
+      ],
       rows: entries,
       // Money leaving is the row a reader scans for, so it is the one the
       // export marks — the same convention the other lists use.
@@ -117,7 +150,12 @@ const Ledger = () => {
         row.party,
         row.direction === "in" ? row.amount.toLocaleString("en-BD") : "",
         row.direction === "out" ? row.amount.toLocaleString("en-BD") : "",
-        row.onPaper ? "On paper" : "Cash moved",
+        // Its own column beside the label, so a spreadsheet can add up the
+        // cash without anyone re-deriving which rows counted.
+        { none: "On paper", part: "Part cash", full: "Cash moved" }[
+          cashState(row)
+        ],
+        (row.cashAmount ?? 0).toLocaleString("en-BD"),
       ],
       note: `Cash in ${totals.cashIn.toLocaleString(
         "en-BD"
@@ -174,11 +212,18 @@ const Ledger = () => {
           value={totals.count}
           loading={isFetching}
         />
+        {/*
+          Both tiles name what they are a fraction of. "Cash in 40,000" alone
+          reads as a slow month; "of 90,000 invoiced" reads as a collection
+          problem, which is the thing worth acting on.
+        */}
         <MetricCard
           icon={ArrowDownLeft}
           label="Cash in"
           accent="#10b981"
-          hint="Money actually received"
+          hint={`Received, of ${totals.billedIn.toLocaleString(
+            "en-BD"
+          )} invoiced`}
           value={<Money value={totals.cashIn} />}
           loading={isFetching}
         />
@@ -186,7 +231,7 @@ const Ledger = () => {
           icon={ArrowUpRight}
           label="Cash out"
           accent="#f43f5e"
-          hint="Money actually paid"
+          hint={`Paid, of ${totals.billedOut.toLocaleString("en-BD")} billed`}
           value={<Money value={totals.cashOut} />}
           loading={isFetching}
         />
@@ -304,18 +349,39 @@ const Ledger = () => {
           },
           {
             title: "Cash",
-            key: "onPaper",
-            width: 110,
-            render: (_: unknown, row: LedgerRow) =>
-              row.onPaper ? (
-                // The row belongs in the books but no money changed hands —
-                // a bill on terms, a credit against an unpaid invoice.
-                <Tag className="!m-0 !text-[10px]">On paper</Tag>
-              ) : (
+            key: "cashAmount",
+            width: 130,
+            render: (_: unknown, row: LedgerRow) => {
+              const state = cashState(row);
+
+              // The row belongs in the books but no money changed hands —
+              // a bill on terms, a credit against an unpaid invoice.
+              if (state === "none") {
+                return <Tag className="!m-0 !text-[10px]">On paper</Tag>;
+              }
+
+              // Some of it did. The figure is shown because "part" without an
+              // amount only replaces one wrong impression with another.
+              if (state === "part") {
+                return (
+                  <div className="flex flex-col items-start gap-0.5">
+                    <Tag className="!m-0 !border-[#f59e0b55] !bg-[#fffbeb] !text-[10px] !text-[#92400e]">
+                      Part cash
+                    </Tag>
+                    <span className="text-[10px] text-secondary-400">
+                      <Money value={row.cashAmount} /> of{" "}
+                      <Money value={row.amount} />
+                    </span>
+                  </div>
+                );
+              }
+
+              return (
                 <Tag className="!m-0 !border-primary-200 !bg-primary-50 !text-[10px] !text-primary-700">
                   Cash moved
                 </Tag>
-              ),
+              );
+            },
           },
         ]}
       />

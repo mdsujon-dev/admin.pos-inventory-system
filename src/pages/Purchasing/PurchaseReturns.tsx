@@ -194,13 +194,14 @@ const PurchaseReturns = () => {
           accent="#f59e0b"
           hint={
             totalOwed > 0
-              ? `Promised, not yet received — ${outstanding.length} return${
+              ? `${outstanding.length} return${
                   outstanding.length === 1 ? "" : "s"
-                }`
+                } waiting — open the chase list`
               : "Every refund has come in"
           }
           value={<Money value={totalOwed} />}
           loading={owedLoading}
+          onClick={() => navigate("/purchases/refunds")}
         />
       </div>
 
@@ -327,7 +328,7 @@ const PurchaseReturns = () => {
                           event.stopPropagation();
                           setCollecting(row);
                         }}
-                        className="text-[11px] font-semibold text-primary-700 underline-offset-2 hover:underline"
+                        className="text-[11px] font-semibold text-primary-700 underline-offset-2 hover:underline whitespace-nowrap"
                       >
                         Record refund
                       </button>

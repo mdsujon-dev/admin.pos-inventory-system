@@ -54,6 +54,7 @@ import PointOfSale from "../pages/Sales/PointOfSale.tsx";
 import SalesList from "../pages/Sales/SalesList.tsx";
 import SaleReturns from "../pages/Sales/SaleReturns.tsx";
 import PurchaseReturns from "../pages/Purchasing/PurchaseReturns.tsx";
+import SupplierRefunds from "../pages/Purchasing/SupplierRefunds.tsx";
 import RolePermissions from "../pages/Users/RolePermissions.tsx";
 import Roles from "../pages/Users/Roles.tsx";
 import Users from "../pages/Users/Users.tsx";
@@ -159,6 +160,7 @@ const routes = [
             element: <Navigate to="/accounts/vendor-payments" replace />,
           },
           { path: "returns", element: <PurchaseReturns /> },
+          { path: "refunds", element: <SupplierRefunds /> },
           { path: ":id/edit", element: <PurchaseForm /> },
           { path: ":id", element: <PurchaseView /> },
         ],
