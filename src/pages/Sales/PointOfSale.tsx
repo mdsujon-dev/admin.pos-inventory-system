@@ -190,11 +190,10 @@ const PointOfSale = () => {
         noindex
       />
 
-      {/* Scan bar. Full width and loud, because it is the only way in. */}
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-primary-700 via-primary-600 to-primary-500 p-3 shadow-primary sm:p-4">
-        <span className="pointer-events-none absolute -right-12 -top-16 h-40 w-40 rounded-full bg-white/10" />
-        <div className="relative flex flex-wrap items-center gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl border border-white/25 bg-white/15 text-white">
+      {/* Scan bar. Full width and simple. */}
+      <div className="rounded-2xl border border-secondary-200 bg-white p-3 shadow-sm sm:p-4">
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary">
             <ScanLine className="h-5 w-5" />
           </span>
           <div className="min-w-[240px] flex-1">
@@ -213,20 +212,20 @@ const PointOfSale = () => {
               className="!rounded-xl"
             />
           </div>
-          <div className="flex items-center gap-4 text-white">
+          <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="m-0 text-[11px] uppercase tracking-wide text-white/75">
+              <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-500">
                 Items
               </p>
-              <p className="m-0 text-xl font-semibold leading-tight">
+              <p className="m-0 text-xl font-semibold leading-tight text-secondary-800">
                 {cart.totals.unitCount}
               </p>
             </div>
             <div className="text-right">
-              <p className="m-0 text-[11px] uppercase tracking-wide text-white/75">
+              <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-500">
                 Total
               </p>
-              <p className="m-0 text-xl font-semibold leading-tight">
+              <p className="m-0 text-xl font-semibold leading-tight text-primary">
                 <Money value={grand} />
               </p>
             </div>

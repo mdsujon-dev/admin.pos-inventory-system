@@ -85,7 +85,7 @@ const CustomerModal = ({
         <FormInput
           label="Phone"
           name="phone"
-          help="This is the customer's identity — one number, one person"
+          tooltip="This is the customer's identity — one number, one person"
           rules={[{ required: true, message: "A phone number is required" }]}
           placeholder="e.g. 01711223344"
         />

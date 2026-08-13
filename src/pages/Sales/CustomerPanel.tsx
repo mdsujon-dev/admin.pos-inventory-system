@@ -1,4 +1,4 @@
-import { Button, Input, Tag } from "antd";
+import { Button, Input, Tag, Tooltip } from "antd";
 import { Check, Loader2, Phone, UserPlus, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import Money from "../../components/shared/Money";
@@ -126,7 +126,11 @@ const CustomerPanel = ({
             onDraft(null);
           }}
           onPressEnter={search}
-          prefix={<Phone className="h-4 w-4 text-secondary-400" />}
+          prefix={
+            <Tooltip title="This is the customer's identity — one number, one person">
+              <Phone className="h-4 w-4 text-secondary-400 cursor-help" />
+            </Tooltip>
+          }
           placeholder="Customer phone (optional)"
           allowClear
         />

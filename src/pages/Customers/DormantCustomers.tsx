@@ -1,13 +1,15 @@
-import { Button, Select, Table, Tag } from "antd";
+import { Button, Select, Tag } from "antd";
 import dayjs from "dayjs";
-import { Phone, UserRoundX, Wallet } from "lucide-react";
+import { AlertCircle, Phone, UserRoundX, Wallet } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import Money from "../../components/shared/Money";
 import { useGetDormantCustomersQuery } from "../../redux/features/crm/crmApi";
-import { SectionCard, StatTile } from "../Inventory/Products/ProductFormUI";
+import DataTable from "../../components/Table/DataTable";
+import { MetricCard } from "../../components/Common/MetricCard";
+import { SectionCard } from "../Inventory/Products/ProductFormUI";
 
 /**
  * Who has stopped coming.
@@ -29,6 +31,10 @@ const DormantCustomers = () => {
   const rows = data?.data ?? [];
   const lostValue = rows.reduce(
     (sum: number, row: any) => sum + (row.totalSpent ?? 0),
+    0
+  );
+  const totalOwed = rows.reduce(
+    (sum: number, row: any) => sum + (row.totalDue ?? 0),
     0
   );
 
@@ -63,21 +69,37 @@ const DormantCustomers = () => {
         }
       />
 
-      <div className="mb-5 grid gap-3 sm:grid-cols-3">
-        <StatTile icon={UserRoundX} label="Gone quiet" tone="muted">
-          {rows.length}
-        </StatTile>
-        <StatTile
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          icon={UserRoundX}
+          label="Gone quiet"
+          accent="#64748b"
+          value={rows.length}
+          loading={isFetching}
+        />
+        <MetricCard
           icon={Wallet}
           label="They used to spend"
-          tone="brand"
-          note="Across all their purchases"
-        >
-          <Money value={lostValue} />
-        </StatTile>
-        <StatTile icon={Phone} label="Cut-off" tone="muted">
-          {days} days
-        </StatTile>
+          accent="#10b981"
+          hint="Across all their purchases"
+          value={<Money value={lostValue} />}
+          loading={isFetching}
+        />
+        <MetricCard
+          icon={Phone}
+          label="Cut-off"
+          accent="#64748b"
+          value={`${days} days`}
+          loading={isFetching}
+        />
+        <MetricCard
+          icon={AlertCircle}
+          label="Still owed"
+          accent="#ef4444"
+          hint="Total unpaid balances"
+          value={<Money value={totalOwed} />}
+          loading={isFetching}
+        />
       </div>
 
       <SectionCard
@@ -85,15 +107,11 @@ const DormantCustomers = () => {
         title="The call list"
         subtitle="Biggest former spenders first"
       >
-        <Table
-          dataSource={rows}
+        <DataTable
+          data={rows}
           rowKey="_id"
           loading={isFetching}
-          size="small"
-          locale={{
-            emptyText: `Nobody has been away ${days}+ days — everyone who buys is still coming back`,
-          }}
-          pagination={{ pageSize: 20, showSizeChanger: true }}
+          emptyText={`Nobody has been away ${days}+ days — everyone who buys is still coming back`}
           columns={[
             {
               title: "Customer",
