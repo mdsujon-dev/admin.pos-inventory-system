@@ -8,7 +8,7 @@ import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import Money from "../../components/shared/Money";
 import DataTable from "../../components/Table/DataTable";
-import { StatTile } from "../Inventory/Products/ProductFormUI";
+import { MetricCard } from "../../components/Common/MetricCard";
 import {
   ISale,
   useGetSalesQuery,
@@ -192,27 +192,35 @@ const SalesList = () => {
 
       {summary && (
         <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-          <StatTile icon={Receipt} label="Invoices" tone="muted">
-            {summary.saleCount}
-          </StatTile>
-          <StatTile icon={Wallet} label="Revenue" tone="brand">
-            <Money value={summary.revenue} />
-          </StatTile>
-          <StatTile
+          <MetricCard
+            icon={Receipt}
+            label="Invoices"
+            accent="#64748b"
+            value={summary.saleCount}
+            loading={isFetching}
+          />
+          <MetricCard
+            icon={Wallet}
+            label="Revenue"
+            accent="#10b981"
+            value={<Money value={summary.revenue} />}
+            loading={isFetching}
+          />
+          <MetricCard
             icon={TrendingUp}
             label="Profit"
-            tone={summary.profit < 0 ? "danger" : "brand"}
-          >
-            <Money value={summary.profit} />
-          </StatTile>
-          <StatTile
+            accent={summary.profit < 0 ? "#ef4444" : "#10b981"}
+            value={<Money value={summary.profit} />}
+            loading={isFetching}
+          />
+          <MetricCard
             icon={Percent}
             label="Outstanding"
-            tone={summary.outstanding > 0 ? "danger" : "muted"}
-            note={summary.outstanding > 0 ? "Still to collect" : undefined}
-          >
-            <Money value={summary.outstanding} />
-          </StatTile>
+            accent={summary.outstanding > 0 ? "#ef4444" : "#64748b"}
+            hint={summary.outstanding > 0 ? "Still to collect" : undefined}
+            value={<Money value={summary.outstanding} />}
+            loading={isFetching}
+          />
         </div>
       )}
 
