@@ -548,23 +548,45 @@ const PrintLabelsView = () => {
             <Select
               value={sizeKey}
               onChange={setSizeKey}
-              className="min-w-[180px]"
-              // The size a printer is loaded with is the first thing to pick,
-              // because it decides how much room the rest of the label has.
-              options={Object.entries(SIZES).map(([value, row]) => ({
-                value,
-                label: (
-                  <span className="flex items-center justify-between gap-3">
-                    <span>
-                      {row.label}
-                      {row.roll ? " mm" : ""}
-                    </span>
-                    <span className="text-[11px] text-secondary-400">
-                      {row.hint}
-                    </span>
-                  </span>
-                ),
-              }))}
+              className="min-w-[200px]"
+              // Grouped, because the two kinds are not alternatives on a
+              // spectrum: one is a die-cut roll on a label printer, the other
+              // is an ordinary sheet to be cut by hand. Which one you want is
+              // decided by the hardware in the shop, not by preference.
+              options={[
+                {
+                  label: "Label roll — thermal printer",
+                  options: Object.entries(SIZES)
+                    .filter(([, row]) => row.roll)
+                    .map(([value, row]) => ({
+                      value,
+                      label: (
+                        <span className="flex items-center justify-between gap-3">
+                          <span>{row.label} mm</span>
+                          <span className="text-[11px] text-secondary-400">
+                            {row.hint}
+                          </span>
+                        </span>
+                      ),
+                    })),
+                },
+                {
+                  label: "Plain paper — office printer",
+                  options: Object.entries(SIZES)
+                    .filter(([, row]) => !row.roll)
+                    .map(([value, row]) => ({
+                      value,
+                      label: (
+                        <span className="flex items-center justify-between gap-3">
+                          <span>{row.label}</span>
+                          <span className="text-[11px] text-secondary-400">
+                            {row.hint}
+                          </span>
+                        </span>
+                      ),
+                    })),
+                },
+              ]}
             />
             <Segmented
               value={format}
@@ -721,8 +743,8 @@ const PrintLabelsView = () => {
           title="The sheet"
           subtitle={
             size.roll
-              ? `${size.width} × ${size.height} mm — one label per page`
-              : "Tiled on an A4 sheet, to be cut by hand"
+              ? `${size.width} × ${size.height} mm — one label per page, for a label printer`
+              : "Tiled on an A4 sheet, for an ordinary printer — cut by hand"
           }
         >
           <div className="mb-3 flex flex-wrap items-center gap-4">
@@ -785,25 +807,49 @@ const PrintLabelsView = () => {
                         {label.brand}
                       </p>
                     )}
-                    {showName && (
-                      <p
-                        className="m-0 w-full overflow-hidden text-center font-semibold text-black"
-                        style={{
-                          fontSize: `${TYPE.name}mm`,
-                          lineHeight: TYPE.nameLead,
-                          // Two lines then stop, rather than one line cut mid
-                          // word — the second line is usually where the size or
-                          // the colour lives.
-                          display: "-webkit-box",
-                          WebkitBoxOrient: "vertical",
-                          WebkitLineClamp: box.nameLines,
-                        }}
-                      >
-                        {/* The variant is the thing being sold, so it is named
-                            as such rather than appended as an afterthought. */}
-                        {label.variantLabel || label.productName}
-                      </p>
-                    )}
+                    {showName &&
+                      (box.nameLines >= 2 && label.variantLabel ? (
+                        <>
+                          {/* Two lines: what it is, then which one. "Red /
+                              Small" on its own names nothing, and the product
+                              name on its own is wrong on the shelf. */}
+                          <p
+                            className="m-0 w-full truncate text-center font-semibold text-black"
+                            style={{
+                              fontSize: `${TYPE.name}mm`,
+                              lineHeight: TYPE.nameLead,
+                            }}
+                          >
+                            {label.productName}
+                          </p>
+                          <p
+                            className="m-0 w-full truncate text-center text-black"
+                            style={{
+                              fontSize: `${TYPE.name * 0.88}mm`,
+                              lineHeight: TYPE.nameLead,
+                            }}
+                          >
+                            {label.variantLabel}
+                          </p>
+                        </>
+                      ) : (
+                        <p
+                          className="m-0 w-full overflow-hidden text-center font-semibold text-black"
+                          style={{
+                            fontSize: `${TYPE.name}mm`,
+                            lineHeight: TYPE.nameLead,
+                            display: "-webkit-box",
+                            WebkitBoxOrient: "vertical",
+                            WebkitLineClamp: box.nameLines,
+                          }}
+                        >
+                          {/* Too short for two lines, so the variant wins —
+                              it is the thing actually being sold. */}
+                          {label.variantLabel
+                            ? `${label.productName} · ${label.variantLabel}`
+                            : label.productName}
+                        </p>
+                      ))}
                     {renderCode(label.code, box)}
                     {showPrice && (
                       <p

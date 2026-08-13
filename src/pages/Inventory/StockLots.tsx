@@ -1,6 +1,6 @@
-import { Empty, Select, Switch, Table, Tag } from "antd";
+import { Empty, Select, Switch, Tag } from "antd";
 import dayjs from "dayjs";
-import { Layers, Package, Wallet } from "lucide-react";
+import { Layers, Package, Wallet, Calculator } from "lucide-react";
 import { useState } from "react";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
@@ -13,7 +13,9 @@ import {
   IStockLot,
   useGetProductLotsQuery,
 } from "../../redux/features/purchasing/purchaseApi";
-import { SectionCard, StatTile } from "./Products/ProductFormUI";
+import { SectionCard } from "./Products/ProductFormUI";
+import { MetricCard } from "../../components/Common/MetricCard";
+import DataTable from "../../components/Table/DataTable";
 
 /**
  * The batches behind one product.
@@ -27,6 +29,8 @@ import { SectionCard, StatTile } from "./Products/ProductFormUI";
 const StockLots = () => {
   const [productId, setProductId] = useState<string | undefined>();
   const [includeSpent, setIncludeSpent] = useState(false);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(20);
 
   const { data: productData } = useGetProductsQuery([
     { name: "limit", value: 500 },
@@ -42,6 +46,7 @@ const StockLots = () => {
   const open = lots.filter((lot) => lot.remaining > 0);
   const onHand = open.reduce((sum, lot) => sum + lot.remaining, 0);
   const value = open.reduce((sum, lot) => sum + lot.remaining * lot.unitCost, 0);
+  const avgCost = onHand > 0 ? value / onHand : 0;
 
   return (
     <div>
@@ -89,38 +94,52 @@ const StockLots = () => {
         </div>
       ) : (
         <>
-          <div className="mb-5 grid gap-3 sm:grid-cols-3">
-            <StatTile icon={Package} label="On hand" tone="brand">
-              {onHand}
-            </StatTile>
-            <StatTile icon={Wallet} label="Stock value" tone="brand">
-              <Money value={value} />
-            </StatTile>
-            <StatTile
+          <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            <MetricCard
+              icon={Package}
+              label="On hand"
+              accent="#10b981"
+              value={onHand}
+            />
+            <MetricCard
+              icon={Wallet}
+              label="Stock value"
+              accent="#3b82f6"
+              value={<Money value={value} />}
+            />
+            <MetricCard
               icon={Layers}
               label="Open batches"
-              tone="muted"
-              note={`${lots.length} in total`}
-            >
-              {open.length}
-            </StatTile>
+              accent="#64748b"
+              value={open.length}
+            />
+            <MetricCard
+              icon={Calculator}
+              label="Avg. cost"
+              accent="#f59e0b"
+              value={<Money value={avgCost} />}
+            />
           </div>
 
+
           <SectionCard
-            icon={Layers}
             title="Batches"
             subtitle="Oldest first — that is the order sales consume them in"
           >
-            <Table
-              dataSource={[...lots].sort(
+            <DataTable
+              data={[...lots].sort(
                 (a, b) =>
                   new Date(a.receivedAt).getTime() -
                   new Date(b.receivedAt).getTime()
               )}
               rowKey="_id"
               loading={isFetching}
-              size="small"
-              pagination={{ pageSize: 20, hideOnSinglePage: true }}
+              isPaginate={lots.length > limit}
+              currentPage={page}
+              setCurrentPage={setPage}
+              limit={limit}
+              setLimit={setLimit}
+              total={lots.length}
               columns={[
                 {
                   title: "Received",
