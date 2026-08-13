@@ -187,6 +187,10 @@ const CashFlow = () => {
       toRows([
         { label: "Suppliers", rows: cash?.supplierPayments?.byMethod },
         { label: "Running costs", rows: cash?.expensePayments?.byMethod },
+        // Money handed back on a return. It was already inside the "Money out"
+        // card, so leaving it off this list made the breakdown add up to less
+        // than the total it was supposed to explain.
+        { label: "Refunds", rows: cash?.refunds?.byMethod },
       ]),
     [cash]
   );

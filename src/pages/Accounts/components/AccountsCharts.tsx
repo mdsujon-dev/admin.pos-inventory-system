@@ -67,6 +67,7 @@ export interface AccountsChartsProps {
     otherIncome?: { total: number };
     supplierPayments?: { total: number };
     expensePayments?: { total: number };
+    refunds?: { total: number };
   };
   stock?: { stockCost: number; potentialProfit: number };
 }
@@ -89,6 +90,7 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
   const otherIn = cash?.otherIncome?.total ?? 0;
   const suppliersOut = cash?.supplierPayments?.total ?? 0;
   const costsOut = cash?.expensePayments?.total ?? 0;
+  const refundsOut = cash?.refunds?.total ?? 0;
 
   const stockCost = stock?.stockCost ?? 0;
   const markup = stock?.potentialProfit ?? 0;
@@ -129,7 +131,7 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
   /** Which way the till leaned, and what each side was made of. */
   const cashOptions: ApexOptions = {
     chart: { ...baseChart, type: "bar", stacked: true },
-    colors: ["#10b981", "#06b6d4"],
+    colors: ["#10b981", "#06b6d4", "#f43f5e"],
     plotOptions: {
       bar: { borderRadius: 6, horizontal: true, barHeight: "45%" },
     },
@@ -151,6 +153,9 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
   const cashSeries = [
     { name: "Sales / Suppliers", data: [salesIn, suppliersOut] },
     { name: "Other / Running costs", data: [otherIn, costsOut] },
+    // Refunds only ever land on the Out bar; the In side keeps a zero so the
+    // two rows stay the same shape.
+    { name: "Refunds", data: [0, refundsOut] },
   ];
 
   /** How much of the shelf's ticket price is markup rather than cost. */
@@ -207,7 +212,7 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
       <ChartCard
         title="Cash in and out"
         subtitle="What moved through the till, and where it came from"
-        hasData={salesIn + otherIn + suppliersOut + costsOut > 0}
+        hasData={salesIn + otherIn + suppliersOut + costsOut + refundsOut > 0}
         emptyText="No money moved in this period."
       >
         <ReactApexChart

@@ -124,6 +124,22 @@ const ProfitLoss = () => {
           subtitle="Each line takes from the one above it"
         >
           <div className="space-y-2 text-sm">
+            {/* Revenue arrives already net of what came back. Shown as its
+                own line anyway: "we sold 20,000 and 3,000 walked back in" is a
+                different fact from "we sold 17,000", and only the first one
+                tells anybody to go and look at why. */}
+            {(pnl?.returnedRevenue ?? 0) > 0 && (
+              <>
+                <Row
+                  label="Sales before returns"
+                  value={(pnl?.revenue ?? 0) + (pnl?.returnedRevenue ?? 0)}
+                />
+                <Row
+                  label={`Less returns (${pnl?.returnCount ?? 0})`}
+                  value={-(pnl?.returnedRevenue ?? 0)}
+                />
+              </>
+            )}
             <Row
               label="Revenue (VAT excluded)"
               value={pnl?.revenue ?? 0}
@@ -167,6 +183,13 @@ const ProfitLoss = () => {
               Stock bought in this period is not a cost here — it becomes one
               when it sells.
             </p>
+            {(pnl?.returnedRevenue ?? 0) > 0 && (
+              <p className="m-0">
+                Returns are dated to the day the goods came back, not the day
+                they were sold. Of them, <Money value={pnl?.refundedCash ?? 0} />{" "}
+                was handed back in cash; the rest came off unpaid balances.
+              </p>
+            )}
           </div>
         </SectionCard>
 
