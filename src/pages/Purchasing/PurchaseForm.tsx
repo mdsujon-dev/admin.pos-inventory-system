@@ -525,7 +525,7 @@ const PurchaseForm = () => {
                   <InputNumber
                     type="number"
                     min={0}
-                    value={row.unitCost}
+                    value={row.unitCost || null}
                     onChange={(value) =>
                       patchLine(row.key, { unitCost: Number(value) || 0 })
                     }

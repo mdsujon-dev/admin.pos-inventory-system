@@ -171,7 +171,7 @@ const SaleReturnModal = ({ saleId, open, setOpen }: Props) => {
                           min={0}
                           max={line.returnable}
                           disabled={line.returnable === 0}
-                          value={row?.quantity ?? 0}
+                          value={row?.quantity || null}
                           onChange={(value) =>
                             setQuantity(line, Number(value) || 0)
                           }

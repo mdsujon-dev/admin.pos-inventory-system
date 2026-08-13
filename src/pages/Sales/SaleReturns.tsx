@@ -4,6 +4,10 @@ import { Boxes, PackageX, Search, Undo2, Wallet } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/Common/PageHeader";
+import PermissionGate from "../../components/Common/PermissionGate";
+import Button from "../../components/ui/Button";
+import PickInvoiceModal from "../../components/modal/sales/PickInvoiceModal";
+import SaleReturnModal from "../../components/modal/sales/SaleReturnModal";
 import PageMeta from "../../components/Common/PageMeta";
 import { MetricCard } from "../../components/Common/MetricCard";
 import Money from "../../components/shared/Money";
@@ -31,6 +35,15 @@ const SaleReturns = () => {
   const [limit, setLimit] = useState(20);
   const [searchText, setSearchText] = useState("");
   const [range, setRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
+  /**
+   * Starting a return from here rather than from an invoice.
+   *
+   * Two steps, because a return is always against one sale: find the invoice,
+   * then pick the lines. The counter works the same way — the receipt comes
+   * across first.
+   */
+  const [choosing, setChoosing] = useState(false);
+  const [returningSale, setReturningSale] = useState<string | null>(null);
 
   const { data, isFetching } = useGetSaleReturnsQuery([
     { name: "page", value: currentPage },
@@ -73,6 +86,14 @@ const SaleReturns = () => {
           { title: "Sales" },
           { title: "Returns" },
         ]}
+        extra={
+          <PermissionGate module="Sales Returns" action="Create">
+            <Button variant="primary" onClick={() => setChoosing(true)}>
+              <Undo2 className="h-4 w-4" />
+              Take a return
+            </Button>
+          </PermissionGate>
+        }
       />
 
       <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -153,7 +174,7 @@ const SaleReturns = () => {
             hint={
               searchText || range
                 ? "No return matches those filters."
-                : "Returns are taken from an invoice — open one and use “Take a return”."
+                : "Nothing has been sent back yet. Use “Take a return” to start one."
             }
           />
         }
@@ -240,6 +261,20 @@ const SaleReturns = () => {
           },
         ]}
       />
+
+      <PickInvoiceModal
+        open={choosing}
+        setOpen={setChoosing}
+        onPick={setReturningSale}
+      />
+
+      {returningSale && (
+        <SaleReturnModal
+          saleId={returningSale}
+          open={!!returningSale}
+          setOpen={(value) => !value && setReturningSale(null)}
+        />
+      )}
     </div>
   );
 };

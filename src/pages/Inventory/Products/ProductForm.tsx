@@ -106,13 +106,13 @@ const TYPE_OPTIONS: TypeOption[] = [
  * label renderer draws and it carries the whole alphabet, so there is nothing
  * to gain from falling back to an opaque run of digits.
  */
-const generateBarcode = (sku: string, name: string) => {
+const generateBarcode = (sku: string, name: string, index: number = 0) => {
   const root =
     (sku || name || "")
       .toUpperCase()
       .replace(/[^A-Z0-9]/g, "")
       .slice(0, 10) || "ITEM";
-  return `${root}-${Date.now().toString().slice(-6)}`;
+  return `${root}-${(Date.now() + index).toString().slice(-6)}`;
 };
 
 /**
@@ -335,12 +335,12 @@ const ProductForm = () => {
     } else {
       // Sent as a whole array — a variant the user removed here is simply
       // absent, which is what deletes it on the server.
-      payload.variants = variants.map((variant) => ({
+      payload.variants = variants.map((variant, index) => ({
         ...(variant._id ? { _id: variant._id } : {}),
         name: variant.name.trim(),
         options: variant.options ?? [],
         sku: variant.sku.trim().toUpperCase(),
-        barcode: variant.barcode?.trim() || null,
+        barcode: variant.barcode?.trim() || generateBarcode(variant.sku, variant.name, index),
         description: variant.description?.trim() || "",
         weight: variant.weight ?? null,
         purchasePrice: Number(variant.purchasePrice) || 0,

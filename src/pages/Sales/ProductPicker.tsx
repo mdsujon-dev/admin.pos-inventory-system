@@ -1,6 +1,7 @@
-import { Input, Modal, Select, Tag } from "antd";
-import { Check, Loader2, PackageSearch, Search } from "lucide-react";
+import { Input, Modal, Select } from "antd";
+import { Check, Loader2, PackageSearch, Search, X } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
+import Button from "../../components/ui/Button";
 import Money from "../../components/shared/Money";
 import {
   ICategory,
@@ -19,6 +20,8 @@ import {
   IBrand,
   useGetBrandsQuery,
 } from "../../redux/features/inventory/brandApi";
+
+const ALL = "all";
 
 /**
  * Finding an item without its barcode.
@@ -44,10 +47,19 @@ const ProductPicker = ({
   selectedCodes?: string[];
 }) => {
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState<string>("all");
-  const [subCategory, setSubCategory] = useState<string>("all");
-  const [brand, setBrand] = useState<string>("all");
+  /** What the search box has settled on, a beat behind the typing. */
+  const [term, setTerm] = useState("");
+  const [category, setCategory] = useState<string>(ALL);
+  const [subCategory, setSubCategory] = useState<string>(ALL);
+  const [brand, setBrand] = useState<string>(ALL);
   const searchRef = useRef<HTMLInputElement>(null);
+
+  // One request per pause, not one per keystroke. On a counter connection the
+  // difference between those two is whether the grid feels alive or stuck.
+  useEffect(() => {
+    const timer = setTimeout(() => setTerm(search.trim()), 250);
+    return () => clearTimeout(timer);
+  }, [search]);
 
   const { data: categoryData } = useGetCategoriesQuery(
     [{ name: "limit", value: 100 }],
@@ -56,25 +68,29 @@ const ProductPicker = ({
   const categories: ICategory[] = categoryData?.data?.data ?? [];
 
   const { data: subCategoryData } = useGetSubCategoriesQuery(
-    [{ name: "limit", value: 100 }, ...(category !== "all" ? [{ name: "category", value: category }] : [])],
+    [
+      { name: "limit", value: 100 },
+      ...(category !== ALL ? [{ name: "category", value: category }] : []),
+    ],
     { skip: !open }
   );
   const subCategories: ISubCategory[] = subCategoryData?.data?.data ?? [];
 
-  const { data: brandData } = useGetBrandsQuery(
-    [{ name: "limit", value: 100 }],
-    { skip: !open }
-  );
+  const { data: brandData } = useGetBrandsQuery([{ name: "limit", value: 100 }], {
+    skip: !open,
+  });
   const brands: IBrand[] = brandData?.data?.data ?? [];
 
   const { data, isFetching } = useGetProductsQuery(
     [
       { name: "limit", value: 50 },
       { name: "isActive", value: true },
-      ...(search ? [{ name: "keyword", value: search }] : []),
-      ...(category !== "all" ? [{ name: "category", value: category }] : []),
-      ...(subCategory !== "all" ? [{ name: "subCategory", value: subCategory }] : []),
-      ...(brand !== "all" ? [{ name: "brand", value: brand }] : []),
+      ...(term ? [{ name: "keyword", value: term }] : []),
+      ...(category !== ALL ? [{ name: "category", value: category }] : []),
+      ...(subCategory !== ALL
+        ? [{ name: "subCategory", value: subCategory }]
+        : []),
+      ...(brand !== ALL ? [{ name: "brand", value: brand }] : []),
     ],
     { skip: !open }
   );
@@ -82,16 +98,22 @@ const ProductPicker = ({
   const products: IProduct[] = useMemo(() => data?.data?.data ?? [], [data]);
   const rows = useMemo(() => toPickRows(products), [products]);
 
+  const filtered = category !== ALL || subCategory !== ALL || brand !== ALL;
+
+  const reset = () => {
+    setCategory(ALL);
+    setSubCategory(ALL);
+    setBrand(ALL);
+  };
+
   useEffect(() => {
-    if (open) {
-      setSearch("");
-      setCategory("all");
-      setSubCategory("all");
-      setBrand("all");
-      // The cashier opened this to type a name, so the caret starts there.
-      const timer = setTimeout(() => searchRef.current?.focus(), 120);
-      return () => clearTimeout(timer);
-    }
+    if (!open) return;
+    setSearch("");
+    setTerm("");
+    reset();
+    // The cashier opened this to type a name, so the caret starts there.
+    const timer = setTimeout(() => searchRef.current?.focus(), 120);
+    return () => clearTimeout(timer);
   }, [open]);
 
   const pick = (row: PickRow) => {
@@ -100,22 +122,46 @@ const ProductPicker = ({
     setOpen(false);
   };
 
+  /**
+   * Enter takes the first result.
+   *
+   * Typing a name and pressing Enter is how a till is used when both hands are
+   * busy; making the cashier reach for the mouse to confirm the one obvious
+   * match is the slowest possible ending to a fast search.
+   */
+  const takeFirst = () => {
+    const first = rows.find((row) => row.stock > 0);
+    if (first) pick(first);
+  };
+
   return (
     <Modal
-      title="Add an item"
+      title={
+        <div className="flex items-baseline gap-2">
+          <span>Add an item</span>
+          {rows.length > 0 && (
+            <span className="text-[12px] font-normal text-secondary-400">
+              {rows.length} result{rows.length === 1 ? "" : "s"}
+            </span>
+          )}
+        </div>
+      }
       open={open}
       onCancel={() => setOpen(false)}
       footer={null}
       width={1000}
       destroyOnHidden
     >
-      <div className="mb-3 flex flex-col gap-3">
+      {/* The controls stay put while the grid scrolls under them — a filter
+          you have to scroll back up to change is a filter nobody changes. */}
+      <div className="sticky top-0 z-10 -mx-6 mb-3 border-b border-secondary-100 bg-white px-6 pb-3">
         <Input
           ref={searchRef as never}
           size="large"
           allowClear
           value={search}
           onChange={(event) => setSearch(event.target.value)}
+          onPressEnter={takeFirst}
           placeholder="Type a product name, SKU or barcode…"
           prefix={<Search className="h-4 w-4 text-secondary-400" />}
           suffix={
@@ -126,92 +172,133 @@ const ProductPicker = ({
           className="!rounded-md"
         />
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+        <div className="mt-2 flex flex-wrap items-center gap-2">
           <Select
             value={category}
-            onChange={(val) => {
-              setCategory(val);
-              setSubCategory("all"); // Reset subcategory when category changes
+            onChange={(value) => {
+              setCategory(value);
+              // A sub-category from the old category would match nothing.
+              setSubCategory(ALL);
             }}
+            showSearch
+            optionFilterProp="label"
+            className="min-w-[170px] flex-1"
             options={[
-              { label: "All Categories", value: "all" },
-              ...categories.map((c) => ({ label: c.name, value: c._id })),
+              { label: "All categories", value: ALL },
+              ...categories.map((row) => ({ label: row.name, value: row._id })),
             ]}
           />
           <Select
             value={subCategory}
-            onChange={(val) => setSubCategory(val)}
+            onChange={setSubCategory}
+            showSearch
+            optionFilterProp="label"
+            className="min-w-[170px] flex-1"
             options={[
-              { label: "All Sub-categories", value: "all" },
-              ...subCategories.map((s) => ({ label: s.name, value: s._id })),
+              { label: "All sub-categories", value: ALL },
+              ...subCategories.map((row) => ({
+                label: row.name,
+                value: row._id,
+              })),
             ]}
           />
           <Select
             value={brand}
-            onChange={(val) => setBrand(val)}
+            onChange={setBrand}
+            showSearch
+            optionFilterProp="label"
+            className="min-w-[170px] flex-1"
             options={[
-              { label: "All Brands", value: "all" },
-              ...brands.map((b) => ({ label: b.name, value: b._id })),
+              { label: "All brands", value: ALL },
+              ...brands.map((row) => ({ label: row.name, value: row._id })),
             ]}
           />
+          {filtered && (
+            <Button variant="link" size="sm" onClick={reset}>
+              <X className="h-3.5 w-3.5" />
+              Clear filters
+            </Button>
+          )}
         </div>
       </div>
 
       <div className="max-h-[52vh] overflow-y-auto pr-1">
         {rows.length === 0 ? (
-          <div className="grid place-items-center gap-2 py-14 text-center">
-            <PackageSearch className="h-8 w-8 text-secondary-300" />
-            <p className="m-0 text-[13px] text-secondary-500">
-              {search
-                ? `Nothing matches “${search}”`
-                : "No active products in this category"}
+          <div className="grid place-items-center gap-2 py-16 text-center">
+            <span className="grid h-14 w-14 place-items-center rounded-md bg-secondary-50 text-secondary-300">
+              <PackageSearch className="h-6 w-6" />
+            </span>
+            <p className="m-0 text-[14px] font-semibold text-secondary-700">
+              {term ? `Nothing matches “${term}”` : "Nothing to show"}
+            </p>
+            <p className="m-0 max-w-[320px] text-[12px] text-secondary-400">
+              {filtered
+                ? "Try clearing the filters — the item may sit under a different heading."
+                : "Only active products appear here."}
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-4">
             {rows.map((row) => {
               const out = row.stock <= 0;
+              const inCart = selectedCodes.includes(row.code);
+              const low =
+                !out && row.lowStockAt != null && row.stock <= row.lowStockAt;
+              const onOffer = row.price < row.listPrice;
               const src = imageUrl(row.image);
+
               return (
                 <button
                   key={row.key}
                   type="button"
                   disabled={out}
                   onClick={() => pick(row)}
-                  className={`relative flex flex-col overflow-hidden rounded-md border text-left transition ${
+                  className={`group relative flex flex-col overflow-hidden rounded-md border text-left transition ${
                     out
                       ? "cursor-not-allowed border-secondary-100 bg-secondary-50 opacity-60"
-                      : selectedCodes?.includes(row.code)
-                      ? "border-primary-500 bg-primary-50 ring-2 ring-primary-500/50"
-                      : "border-secondary-200 bg-white hover:border-primary"
+                      : inCart
+                        ? "border-primary bg-primary-50/60"
+                        : "border-secondary-200 bg-white hover:border-primary hover:bg-primary-50/30"
                   }`}
                 >
-                  <div className="relative h-24 w-full bg-secondary-50">
+                  <div className="relative h-28 w-full bg-secondary-50">
                     {src ? (
                       <img
                         src={src}
                         alt={row.name}
-                        className="h-full w-full object-cover"
+                        className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]"
                       />
                     ) : (
                       <div className="grid h-full place-items-center text-secondary-300">
                         <PackageSearch className="h-6 w-6" />
                       </div>
                     )}
-                    {selectedCodes?.includes(row.code) && (
-                      <div className="absolute inset-0 bg-primary-500/10 flex items-center justify-center">
-                        <div className="bg-primary text-white rounded-full p-1 shadow-sm">
-                          <Check className="h-5 w-5" />
-                        </div>
-                      </div>
+
+                    {/* Already in the cart: a corner mark, not a veil over the
+                        photo — the picture is how the item is recognised. */}
+                    {inCart && (
+                      <span className="absolute left-1.5 top-1.5 grid h-5 w-5 place-items-center rounded bg-primary text-white">
+                        <Check className="h-3.5 w-3.5" />
+                      </span>
                     )}
+
+                    {onOffer && (
+                      <span className="absolute bottom-1.5 left-1.5 rounded bg-primary px-1.5 py-[1px] text-[9px] font-bold uppercase tracking-[0.08em] text-white">
+                        Offer
+                      </span>
+                    )}
+
                     {/* Stock on the tile, because a cashier picking by sight
-                        needs to know before the tap, not after the refusal. */}
+                        needs to know before the tap, not after the refusal.
+                        Amber once it is near the reorder level — the moment
+                        worth noticing is before the last one goes. */}
                     <span
-                      className={`absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
+                      className={`absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 text-[10px] font-bold ${
                         out
                           ? "bg-danger/10 text-danger"
-                          : "bg-white/90 text-secondary-700"
+                          : low
+                            ? "bg-[#fffbeb] text-[#92400e]"
+                            : "bg-white/90 text-secondary-700"
                       }`}
                     >
                       {out ? "None" : row.stock}
@@ -219,21 +306,31 @@ const ProductPicker = ({
                   </div>
 
                   <div className="min-w-0 flex-1 p-2">
-                    <p className="m-0 line-clamp-2 text-[12px] font-semibold leading-tight text-secondary-800">
+                    {row.brand && (
+                      <p className="m-0 truncate text-[10px] font-semibold uppercase tracking-wide text-secondary-400">
+                        {row.brand}
+                      </p>
+                    )}
+                    <p className="m-0 line-clamp-2 text-[12.5px] font-semibold leading-tight text-secondary-800">
                       {row.name}
                     </p>
                     {row.variantName && (
-                      <Tag className="!m-0 !mt-1 !border-primary-200 !bg-primary-50 !px-1.5 !text-[10px] !text-primary-700">
+                      <span className="mt-1 inline-block max-w-full truncate rounded bg-primary-50 px-1.5 py-0.5 text-[10px] font-medium text-primary-700">
                         {row.variantName}
-                      </Tag>
+                      </span>
                     )}
-                    <p className="m-0 mt-1 flex items-baseline gap-1.5">
+                    <p className="m-0 mt-1.5 flex items-baseline gap-1.5">
                       <span className="text-[14px] font-bold text-primary-700">
                         <Money value={row.price} />
                       </span>
-                      {row.price < row.listPrice && (
+                      {onOffer && (
                         <span className="text-[11px] text-secondary-400 line-through">
                           <Money value={row.listPrice} />
+                        </span>
+                      )}
+                      {row.unit && (
+                        <span className="text-[10px] text-secondary-400">
+                          / {row.unit}
                         </span>
                       )}
                     </p>
