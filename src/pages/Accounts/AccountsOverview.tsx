@@ -23,6 +23,7 @@ import {
 } from "../../redux/features/accounts/reportApi";
 import { SectionCard } from "../Inventory/Products/ProductFormUI";
 import { MetricCard } from "../../components/Common/MetricCard";
+import AccountsCharts from "./components/AccountsCharts";
 
 const { RangePicker } = DatePicker;
 
@@ -196,6 +197,12 @@ const AccountsOverview = () => {
             </Link>
           </div>
         </SectionCard>
+      </div>
+
+      {/* The same figures as the cards above, drawn. Numbers first, because
+          they are what gets written down; the shapes are for the second look. */}
+      <div className="mt-4">
+        <AccountsCharts pnl={pnl} cash={cash} stock={stock} />
       </div>
 
       {/* Owed both ways */}

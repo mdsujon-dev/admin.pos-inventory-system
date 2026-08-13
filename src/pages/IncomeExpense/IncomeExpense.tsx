@@ -2,14 +2,15 @@
 import { ColumnsType } from "antd/es/table";
 import dayjs from "dayjs";
 import {
+  AlertTriangle,
   ArrowDownCircle,
+  ArrowLeftRight,
   ArrowUpCircle,
   CalendarDays,
   Clock,
   Hash,
   Pencil,
   Plus,
-  Scale,
   Search,
 } from "lucide-react";
 import React, { useState } from "react";
@@ -20,36 +21,25 @@ import TransactionModal from "../../components/modal/transaction/TransactionModa
 import CustomDatePicker from "../../components/shared/CustomDatePicker";
 import DateTimeStacked from "../../components/shared/DateTimeStacked";
 import { Money } from "../../components/shared/Money";
+import { MetricCard } from "../../components/Common/MetricCard";
+import TableEmpty from "../../components/Table/TableEmpty";
+import { Link } from "react-router-dom";
+import { Select, Tag } from "antd";
+import {
+  IExpenseCategory,
+  useGetExpenseCategoriesQuery,
+} from "../../redux/features/accounts/reportApi";
 import DataTable from "../../components/Table/DataTable";
 import {
   useGetTransactionsQuery,
   useGetTransactionStatsQuery,
   useLazyGetTransactionsQuery,
+  useUpdateTransactionMutation,
 } from "../../redux/features/transaction/transactionApi";
+import { toast } from "react-toastify";
 import ExportMenu from "../../components/Common/ExportMenu";
+import { PAYMENT_METHOD_LABELS } from "../../utils/money";
 import { makeSheet } from "../../utils/tableExport";
-
-type IconType = React.ComponentType<{ className?: string }>;
-
-const StatCard: React.FC<{
-  label: string;
-  value: React.ReactNode;
-  icon: IconType;
-  accent: string;
-}> = ({ label, value, icon: Icon, accent }) => (
-  <div className="flex items-center gap-3 rounded-lg border border-secondary-100 bg-white px-4 py-3">
-    <span
-      className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-white"
-      style={{ backgroundColor: accent }}
-    >
-      <Icon className="h-5 w-5" />
-    </span>
-    <div className="min-w-0">
-      <p className="text-xs text-secondary-500">{label}</p>
-      <p className="truncate text-lg font-bold text-secondary-900">{value}</p>
-    </div>
-  </div>
-);
 
 const TransactionList: React.FC<{ type: "income" | "expense" }> = ({ type }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -60,12 +50,35 @@ const TransactionList: React.FC<{ type: "income" | "expense" }> = ({ type }) => 
     null,
   ]);
   const [editRecord, setEditRecord] = useState<any | null>(null);
+  /** Narrows the list to the entries that still have no heading. */
+  const [onlyLoose, setOnlyLoose] = useState(false);
+
+  const { data: categoryData } = useGetExpenseCategoriesQuery(undefined);
+  const categories: IExpenseCategory[] = categoryData?.data ?? [];
+  const [patchEntry] = useUpdateTransactionMutation();
+
+  /**
+   * Set one field on one row, from the row.
+   *
+   * Fixing a missing heading through the edit modal means opening it, finding
+   * the field, saving, and repeating — for a clean-up of thirty rows that is
+   * the reason the clean-up never happens.
+   */
+  const fixField = async (id: string, patch: Record<string, unknown>) => {
+    try {
+      await patchEntry({ id, data: patch }).unwrap();
+      toast.success("Entry updated");
+    } catch (e: any) {
+      toast.error(e?.data?.message || "Could not update that entry");
+    }
+  };
 
   const filters = {
     type,
     search: searchText || undefined,
     startDate: dateRange[0] || undefined,
     endDate: dateRange[1] || undefined,
+    uncategorised: onlyLoose || undefined,
   };
 
   const { data, isFetching } = useGetTransactionsQuery({
@@ -92,7 +105,7 @@ const TransactionList: React.FC<{ type: "income" | "expense" }> = ({ type }) => 
       title: isIncome ? "Income" : "Expense",
       unit: "entry",
       filters: [period, searchText && `Search: "${searchText}"`],
-      headers: ["Date", "Amount", "Reason", "Client", "Added by"],
+      headers: ["Date", "Amount", "Heading", "Method", "Reason", "Added by"],
       rows: all?.result || [],
       // A refund is a contra-entry, so the sign flips — the file has to agree
       // with the ledger on screen or the column will not add up.
@@ -104,8 +117,9 @@ const TransactionList: React.FC<{ type: "income" | "expense" }> = ({ type }) => 
           `${positive ? "+" : "−"} ${Number(t.amount || 0).toLocaleString(
             "en-BD"
           )}${t.isRefund ? " (refund)" : ""}`,
+          t.category?.name || "Uncategorised",
+          t.method ? PAYMENT_METHOD_LABELS[t.method] ?? t.method : "Not recorded",
           t.reason || "—",
-          t.client?.name || "—",
           t.createdBy?.name || "—",
         ];
       },
@@ -149,21 +163,72 @@ const TransactionList: React.FC<{ type: "income" | "expense" }> = ({ type }) => 
       title: "Reason",
       dataIndex: "reason",
       key: "reason",
-      render: (r: string) => (
-        <span className="line-clamp-2 max-w-[420px] text-sm text-secondary-700">
-          {r}
-        </span>
+      render: (r: string, row: any) => (
+        <div className="min-w-0 max-w-[420px]">
+          <span className="line-clamp-2 text-sm text-secondary-700">{r}</span>
+          {/* A pass-through never touched stock, so both sides of the deal are
+              shown — a margin on its own cannot be checked against anything. */}
+          {row.kind === "passthrough" && (
+            <span className="mt-0.5 block text-[11px] text-secondary-400">
+              Pass-through: sold <Money value={row.dealValue} /> · cost{" "}
+              <Money value={row.dealCost} />
+              {row.party ? ` · ${row.party}` : ""}
+            </span>
+          )}
+          {row.reference && (
+            <span className="mt-0.5 block font-mono text-[11px] text-secondary-400">
+              {row.reference}
+            </span>
+          )}
+        </div>
       ),
     },
     {
-      title: "Client",
-      key: "client",
+      title: "Heading",
+      key: "category",
+      width: 170,
+      render: (_: any, r: any) =>
+        r.category?.name ? (
+          <Tag className="!m-0 !border-primary-200 !bg-primary-50 !text-[11px] !text-primary-700">
+            {r.category.name}
+          </Tag>
+        ) : (
+          <Select
+            size="small"
+            showSearch
+            optionFilterProp="label"
+            placeholder="Set heading"
+            className="w-full"
+            status="warning"
+            options={categories.map((row) => ({
+              label: row.name,
+              value: row._id,
+            }))}
+            onChange={(value) => fixField(r._id, { category: value })}
+          />
+        ),
+    },
+    {
+      title: "Method",
+      key: "method",
       width: 140,
-      render: (_: any, r: any) => (
-        <span className="text-sm font-medium text-secondary-800">
-          {r.client?.name || "—"}
-        </span>
-      ),
+      render: (_: any, r: any) =>
+        r.method ? (
+          <span className="text-sm text-secondary-700">
+            {PAYMENT_METHOD_LABELS[r.method] ?? r.method}
+          </span>
+        ) : (
+          <Select
+            size="small"
+            placeholder="Set method"
+            className="w-full"
+            status="warning"
+            options={Object.entries(PAYMENT_METHOD_LABELS).map(
+              ([value, label]) => ({ value, label })
+            )}
+            onChange={(value) => fixField(r._id, { method: value })}
+          />
+        ),
     },
     {
       title: "Added by",
@@ -196,47 +261,97 @@ const TransactionList: React.FC<{ type: "income" | "expense" }> = ({ type }) => 
 
   return (
     <div>
-      {/* Stat cards */}
-      <div className="mb-4 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
-        <StatCard
-          label={`Total ${isIncome ? "Income" : "Expense"}`}
+      {/* What this ledger holds. Deliberately not called profit: the shop's
+          profit lives in Accounts, where sales and cost of goods are counted
+          too. A card here that said "Net Loss" was answering a different
+          question from the one it appeared to answer. */}
+      <div className="mb-4 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          label={`Total ${isIncome ? "income" : "expense"}`}
           value={<Money value={stats?.totalAmount} />}
+          hint={`${stats?.count ?? 0} ${
+            (stats?.count ?? 0) === 1 ? "entry" : "entries"
+          } in this view`}
           icon={isIncome ? ArrowUpCircle : ArrowDownCircle}
-          accent={isIncome ? "#019532" : "#019532"}
+          accent={isIncome ? "#10b981" : "#f43f5e"}
         />
-        <StatCard
-          label="Entries"
-          value={stats?.count ?? 0}
-          icon={Hash}
-          accent="#019532"
-        />
-        <StatCard
-          label="This Month"
+        <MetricCard
+          label="This month"
           value={<Money value={stats?.monthTotal} />}
+          hint={dayjs().format("MMMM YYYY")}
           icon={CalendarDays}
-          accent="#019532"
+          accent="#3b82f6"
         />
-        <StatCard
+        <MetricCard
           label="Today"
           value={<Money value={stats?.todayTotal} />}
+          hint={dayjs().format("DD MMM YYYY")}
           icon={Clock}
-          accent="#019532"
+          accent="#8b5cf6"
         />
-        <StatCard
-          label={(stats?.net ?? 0) >= 0 ? "Net Profit" : "Net Loss"}
+        <MetricCard
+          label="Ledger balance"
           value={
             <span
               className={
-                (stats?.net ?? 0) >= 0 ? "text-primary-600" : "text-primary-600"
+                (stats?.net ?? 0) >= 0 ? "text-primary-600" : "text-danger"
               }
             >
               <Money value={Math.abs(stats?.net ?? 0)} />
             </span>
           }
-          icon={Scale}
-          accent={(stats?.net ?? 0) >= 0 ? "#019532" : "#019532"}
+          hint={
+            (stats?.net ?? 0) >= 0
+              ? "Hand-entered income above expense"
+              : "Hand-entered expense above income"
+          }
+          icon={Hash}
+          accent={(stats?.net ?? 0) >= 0 ? "#019532" : "#f59e0b"}
         />
       </div>
+
+      {/* Where these entries actually land, said once instead of guessed at. */}
+      <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-primary-200 bg-primary-50 px-3 py-2 text-[12px] text-primary-800">
+        <ArrowLeftRight className="h-4 w-4 shrink-0" />
+        <span>
+          {isIncome
+            ? "Every income entry is added to net profit as other income, on top of what the till took."
+            : "Every expense entry is subtracted from gross profit as a running cost, under its heading."}
+        </span>
+        <Link
+          to="/accounts/profit-loss"
+          className="font-semibold underline underline-offset-2"
+        >
+          See it in the profit &amp; loss
+        </Link>
+      </div>
+
+      {/* Money that left with no heading cannot be reported on. Said plainly,
+          with a count, rather than left to be discovered in a report. */}
+      {!isIncome && (stats?.uncategorisedCount ?? 0) > 0 && (
+        <div className="mb-4 flex flex-wrap items-center gap-2 rounded-lg border border-[#f59e0b55] bg-[#fffbeb] px-3 py-2 text-[12px] text-[#92400e]">
+          <AlertTriangle className="h-4 w-4 shrink-0" />
+          <span>
+            {stats?.uncategorisedCount} entr
+            {stats?.uncategorisedCount === 1 ? "y" : "ies"} worth{" "}
+            <strong>
+              <Money value={stats?.uncategorisedAmount} />
+            </strong>{" "}
+            have no heading, so they report as "Uncategorised". Pick one from the
+            Heading column and it is fixed on the spot.
+          </span>
+          <button
+            type="button"
+            onClick={() => {
+              setOnlyLoose((value) => !value);
+              setCurrentPage(1);
+            }}
+            className="rounded border border-[#f59e0b88] bg-white px-2 py-0.5 font-semibold text-[#92400e] hover:bg-[#fff7e6]"
+          >
+            {onlyLoose ? "Show all entries" : "Show only these"}
+          </button>
+        </div>
+      )}
 
       {/* Search (left) + date filter (right) */}
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -274,6 +389,18 @@ const TransactionList: React.FC<{ type: "income" | "expense" }> = ({ type }) => 
         isPaginate={meta.totalPage > 1}
         loading={isFetching}
         rowKey="_id"
+        emptyText={
+          <TableEmpty
+            icon={isIncome ? ArrowUpCircle : ArrowDownCircle}
+            accent={isIncome ? "#10b981" : "#f43f5e"}
+            title={`No ${isIncome ? "income" : "expense"} entries`}
+            hint={
+              searchText || dateRange[0]
+                ? "Nothing matches those filters."
+                : "Anything recorded here is carried straight into the profit and loss."
+            }
+          />
+        }
       />
 
       {editRecord && (

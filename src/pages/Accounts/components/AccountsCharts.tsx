@@ -95,11 +95,9 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
 
   /** Revenue, and what is left of it after each bite. */
   const tradingOptions: ApexOptions = {
-    chart: { ...baseChart, type: "bar" },
-    colors: ["#3b82f6", "#f59e0b", "#8b5cf6", net < 0 ? "#f43f5e" : "#019532"],
-    plotOptions: {
-      bar: { borderRadius: 6, columnWidth: "55%", distributed: true },
-    },
+    chart: { ...baseChart, type: "line" },
+    colors: ["#ef4444"],
+    stroke: { curve: "smooth", width: 4 },
     dataLabels: { enabled: false },
     legend: { show: false },
     grid: { borderColor: "#f0f2f0", strokeDashArray: 4 },
@@ -123,7 +121,14 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
     dataLabels: { enabled: false },
     legend: { position: "top", horizontalAlign: "left", fontSize: "12px" },
     grid: { borderColor: "#f0f2f0", strokeDashArray: 4 },
-    xaxis: { categories: ["In", "Out"], ...moneyAxis },
+    xaxis: {
+      categories: ["In", "Out"],
+      // The value arrives as a string on a category axis, unlike the y-axis.
+      labels: {
+        formatter: (value: string) => formatCompact(Number(value)),
+        style: { colors: "#858585", fontSize: "11px" },
+      },
+    },
     yaxis: { labels: { style: { colors: "#858585", fontSize: "12px" } } },
     tooltip: moneyTooltip,
   };
@@ -166,7 +171,9 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
   };
 
   return (
-    <div className="grid gap-4 lg:grid-cols-3">
+    <div className="grid gap-4">
+      {/* The trading chart runs the full width: four bars of very different
+          heights need the room, and this is the one anybody looks at first. */}
       <ChartCard
         title="Where the money went"
         subtitle="Revenue, and what each cost takes out of it"
@@ -176,11 +183,12 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
         <ReactApexChart
           options={tradingOptions}
           series={[{ name: "Amount", data: [revenue, cogs, opex, net] }]}
-          type="bar"
-          height={260}
+          type="line"
+          height={300}
         />
       </ChartCard>
 
+      <div className="grid gap-4 lg:grid-cols-2">
       <ChartCard
         title="Cash in and out"
         subtitle="What moved through the till, and where it came from"
@@ -208,6 +216,7 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
           height={260}
         />
       </ChartCard>
+      </div>
     </div>
   );
 };

@@ -123,7 +123,7 @@ const ExpenseCategories = () => {
           {
               title: "Heading",
               key: "name",
-              render: (_: unknown, row) => (
+              render: (_: unknown, row: any) => (
                 <div className="min-w-0">
                   <p className="m-0 font-medium text-secondary-800">
                     {row.name}
@@ -145,7 +145,7 @@ const ExpenseCategories = () => {
               title: "Status",
               key: "isActive",
               width: 130,
-              render: (_: unknown, row) => (
+              render: (_: unknown, row: any) => (
                 <PermissionGate
                   module="Accounts"
                   action="Update"
@@ -178,7 +178,7 @@ const ExpenseCategories = () => {
               title: "Actions",
               key: "actions",
               width: 120,
-              render: (_: unknown, row) => (
+              render: (_: unknown, row: any) => (
                 <Space>
                   <PermissionGate module="Accounts" action="Update">
                     <Tooltip title="Edit">

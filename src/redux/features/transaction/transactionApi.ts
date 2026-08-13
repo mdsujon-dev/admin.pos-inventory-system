@@ -11,6 +11,7 @@ const transactionApi = baseApi.injectEndpoints({
         if (params?.search) q.append("search", params.search);
         if (params?.startDate) q.append("startDate", params.startDate);
         if (params?.endDate) q.append("endDate", params.endDate);
+        if (params?.uncategorised) q.append("uncategorised", "true");
         return { url: `transactions?${q.toString()}`, method: "GET" };
       },
       transformResponse: (response: { data: any[]; meta: any }) => ({

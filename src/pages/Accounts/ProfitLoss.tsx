@@ -1,10 +1,12 @@
-import { DatePicker, Table } from "antd";
+import { DatePicker } from "antd";
 import dayjs, { Dayjs } from "dayjs";
 import { Package, Percent, Receipt, TrendingUp } from "lucide-react";
 import { useState } from "react";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import Money from "../../components/shared/Money";
+import DataTable from "../../components/Table/DataTable";
+import TableEmpty from "../../components/Table/TableEmpty";
 import { useGetProfitAndLossQuery } from "../../redux/features/accounts/reportApi";
 import { SectionCard } from "../Inventory/Products/ProductFormUI";
 import { MetricCard } from "../../components/Common/MetricCard";
@@ -28,6 +30,32 @@ const ProfitLoss = () => {
   ]);
 
   const pnl = data?.data;
+
+  /**
+   * The headings, with the total as its own last row.
+   *
+   * AntD's summary row does not exist on the shared table, and a total that
+   * lives outside the table can drift from what is above it — as a row it is
+   * built from the same list the reader is looking at.
+   */
+  const expenseRows = (() => {
+    const rows = (pnl?.expenseByCategory ?? []).map((row: any) => ({
+      ...row,
+      key: row.categoryId ?? row.name,
+      isTotal: false,
+    }));
+    if (rows.length === 0) return rows;
+    return [
+      ...rows,
+      {
+        key: "__total",
+        name: "Total",
+        amount: pnl?.operatingExpense ?? 0,
+        entryCount: 0,
+        isTotal: true,
+      },
+    ];
+  })();
 
   return (
     <div>
@@ -56,20 +84,20 @@ const ProfitLoss = () => {
       />
 
       <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <MetricCard 
-          icon={Receipt} 
-          label="Revenue" 
-          accent="#10b981" 
+        <MetricCard
+          icon={Receipt}
+          label="Revenue"
+          accent="#10b981"
           hint="Total income from sales"
-          value={<Money value={pnl?.revenue ?? 0} />} 
+          value={<Money value={pnl?.revenue ?? 0} />}
           loading={isFetching}
         />
-        <MetricCard 
-          icon={Package} 
-          label="Cost of goods" 
-          accent="#64748b" 
+        <MetricCard
+          icon={Package}
+          label="Cost of goods"
+          accent="#64748b"
           hint="Direct costs for items sold"
-          value={<Money value={pnl?.costOfGoods ?? 0} />} 
+          value={<Money value={pnl?.costOfGoods ?? 0} />}
           loading={isFetching}
         />
         <MetricCard
@@ -97,7 +125,11 @@ const ProfitLoss = () => {
           subtitle="Each line takes from the one above it"
         >
           <div className="space-y-2 text-sm">
-            <Row label="Revenue (VAT excluded)" value={pnl?.revenue ?? 0} bold />
+            <Row
+              label="Revenue (VAT excluded)"
+              value={pnl?.revenue ?? 0}
+              bold
+            />
             <Row
               label="Less cost of goods sold"
               value={-(pnl?.costOfGoods ?? 0)}
@@ -144,48 +176,61 @@ const ProfitLoss = () => {
           title="Running costs"
           subtitle="By heading, largest first"
         >
-          <Table
-            dataSource={pnl?.expenseByCategory ?? []}
-            rowKey={(row) => row.categoryId ?? row.name}
+          <DataTable
+            data={expenseRows}
+            rowKey="key"
             loading={isFetching}
-            size="small"
-            pagination={false}
+            emptyText={
+              <TableEmpty
+                icon={Package}
+                title="No running costs recorded"
+                hint="Rent, salary and electricity are entered under Income & Expense, and land here under their heading."
+              />
+            }
             columns={[
               {
                 title: "Heading",
                 key: "name",
-                render: (_: unknown, row) => row.name,
+                render: (_: unknown, row: any) =>
+                  row.isTotal ? (
+                    <span className="font-bold text-secondary-800">Total</span>
+                  ) : (
+                    <span
+                      className={
+                        row.categoryId
+                          ? "text-secondary-700"
+                          : "text-[#92400e]"
+                      }
+                    >
+                      {row.name}
+                    </span>
+                  ),
               },
               {
                 title: "Entries",
                 key: "entryCount",
                 width: 90,
-                render: (_: unknown, row) => row.entryCount,
+                render: (_: unknown, row: any) =>
+                  row.isTotal ? "" : row.entryCount,
               },
               {
                 title: "Amount",
                 key: "amount",
-                width: 130,
-                render: (_: unknown, row) => (
-                  <span className="font-semibold text-secondary-800">
+                width: 140,
+                align: "right" as const,
+                render: (_: unknown, row: any) => (
+                  <span
+                    className={
+                      row.isTotal
+                        ? "text-[15px] font-bold text-primary-700"
+                        : "font-semibold text-secondary-800"
+                    }
+                  >
                     <Money value={row.amount} />
                   </span>
                 ),
               },
             ]}
-            summary={() => (
-              <Table.Summary.Row>
-                <Table.Summary.Cell index={0}>
-                  <span className="font-semibold">Total</span>
-                </Table.Summary.Cell>
-                <Table.Summary.Cell index={1} />
-                <Table.Summary.Cell index={2}>
-                  <span className="font-bold text-primary-700">
-                    <Money value={pnl?.operatingExpense ?? 0} />
-                  </span>
-                </Table.Summary.Cell>
-              </Table.Summary.Row>
-            )}
           />
         </SectionCard>
       </div>
@@ -205,7 +250,11 @@ const Row = ({
   tone?: "brand" | "danger";
 }) => (
   <div className="flex items-center justify-between">
-    <span className={bold ? "font-semibold text-secondary-800" : "text-secondary-600"}>
+    <span
+      className={
+        bold ? "font-semibold text-secondary-800" : "text-secondary-600"
+      }
+    >
       {label}
     </span>
     <span
@@ -213,10 +262,10 @@ const Row = ({
         tone === "danger"
           ? "font-bold text-danger"
           : tone === "brand"
-          ? "font-bold text-primary-700"
-          : bold
-          ? "font-semibold text-secondary-800"
-          : "text-secondary-600"
+            ? "font-bold text-primary-700"
+            : bold
+              ? "font-semibold text-secondary-800"
+              : "text-secondary-600"
       }
     >
       <Money value={value} />
