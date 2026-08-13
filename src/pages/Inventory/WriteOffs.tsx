@@ -215,6 +215,7 @@ const WriteOffs = () => {
         limit={limit}
         setLimit={setLimit}
         isPaginate={total > limit}
+        isShowSizeChanger
         emptyText={
           <TableEmpty
             icon={PackageX}

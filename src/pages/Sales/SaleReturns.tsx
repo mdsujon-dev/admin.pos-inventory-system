@@ -209,6 +209,7 @@ const SaleReturns = () => {
         limit={limit}
         setLimit={setLimit}
         isPaginate={total > limit}
+        isShowSizeChanger
         onRow={(row: ISaleReturn) => ({
           onClick: () => navigate(`/sales/invoices/${row.sale}`),
           className: "cursor-pointer",

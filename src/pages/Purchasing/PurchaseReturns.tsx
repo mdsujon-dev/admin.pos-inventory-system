@@ -184,6 +184,7 @@ const PurchaseReturns = () => {
         limit={limit}
         setLimit={setLimit}
         isPaginate={total > limit}
+        isShowSizeChanger
         onRow={(row: IPurchaseReturn) => ({
           onClick: () => navigate(`/purchases/${row.purchase}`),
           className: "cursor-pointer",
