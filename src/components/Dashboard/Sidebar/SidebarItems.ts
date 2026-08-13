@@ -287,11 +287,19 @@ const sidebarMenuRoutes: RouteItem[] = [
         icon: FileText,
         module: "Accounts",
       },
+      // Money out and money in, side by side. The cash reports are built from
+      // these two lists, so both need somewhere a person can go and check.
       {
         label: "Vendor Payments",
         address: "/accounts/vendor-payments",
         icon: Banknote,
         module: "Vendor Payments",
+      },
+      {
+        label: "Customer Payments",
+        address: "/accounts/customer-payments",
+        icon: Banknote,
+        module: "Customer Payments",
       },
       {
         label: "Staff Performance",

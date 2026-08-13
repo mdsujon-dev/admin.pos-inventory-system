@@ -44,12 +44,14 @@ import FollowUps from "../pages/Customers/FollowUps.tsx";
 import StockLots from "../pages/Inventory/StockLots.tsx";
 import PurchaseForm from "../pages/Purchasing/PurchaseForm.tsx";
 import VendorPayments from "../pages/Purchasing/VendorPayments.tsx";
+import CustomerPayments from "../pages/Accounts/CustomerPayments.tsx";
 import Purchases from "../pages/Purchasing/Purchases.tsx";
 import PurchaseView from "../pages/Purchasing/PurchaseView.tsx";
 import VendorForm from "../pages/Purchasing/VendorForm.tsx";
 import VendorProfile from "../pages/Purchasing/VendorProfile.tsx";
 import Vendors from "../pages/Purchasing/Vendors.tsx";
 import InvoiceView from "../pages/Sales/InvoiceView.tsx";
+import PhoneScanner from "../pages/Sales/PhoneScanner.tsx";
 import PointOfSale from "../pages/Sales/PointOfSale.tsx";
 import SalesList from "../pages/Sales/SalesList.tsx";
 import SaleReturns from "../pages/Sales/SaleReturns.tsx";
@@ -123,6 +125,7 @@ const routes = [
           { path: "receivables", element: <Receivables mode="receivable" /> },
           { path: "payables", element: <Receivables mode="payable" /> },
           { path: "vendor-payments", element: <VendorPayments /> },
+          { path: "customer-payments", element: <CustomerPayments /> },
           { path: "staff-performance", element: <EmployeeSales /> },
           { path: "profit-loss", element: <ProfitLoss /> },
           { path: "stock-valuation", element: <StockValuation /> },
@@ -170,6 +173,10 @@ const routes = [
         path: "sales",
         children: [
           { path: "pos", element: <PointOfSale /> },
+          // The phone half of the till. Its own address so it can be reached
+          // by pointing a camera at a QR code rather than navigating a panel
+          // built for a desk.
+          { path: "scanner", element: <PhoneScanner /> },
           { path: "invoices", element: <SalesList /> },
           { path: "invoices/:id", element: <InvoiceView /> },
           { path: "returns", element: <SaleReturns /> },

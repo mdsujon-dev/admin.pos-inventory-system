@@ -23,6 +23,9 @@ const { RangePicker } = DatePicker;
 /** What each kind of document is called, and the colour it wears. */
 const KINDS: Record<string, { label: string; tone: string }> = {
   sale: { label: "Sale", tone: "#10b981" },
+  // Cash from a customer, on the day it arrived. Its own kind, because a
+  // January invoice collected in March is two events and one of them is March's.
+  "customer-payment": { label: "Payment received", tone: "#059669" },
   "sale-return": { label: "Sales return", tone: "#f43f5e" },
   purchase: { label: "Purchase", tone: "#3b82f6" },
   "purchase-return": { label: "Purchase return", tone: "#14b8a6" },

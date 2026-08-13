@@ -175,6 +175,7 @@ export const baseApi = createApi({
     "write-offs",
     "purchase-returns",
     "customers",
+    "customer-payments",
     // The books and the customer relationship
     "expense-categories",
     "reports",

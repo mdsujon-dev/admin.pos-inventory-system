@@ -8,15 +8,18 @@ import {
   Plus,
   CheckCircle,
   ScanLine,
+  Smartphone,
   Trash2,
   X,
 } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PageMeta from "../../components/Common/PageMeta";
 import Button from "../../components/ui/Button";
 import Money from "../../components/shared/Money";
+import PhoneScannerModal from "../../components/modal/sales/PhoneScannerModal";
+import { useStoredTillCode, useTillSocket } from "../../hooks/useTillSocket";
 import { config } from "../../config";
 import { ICustomer } from "../../redux/features/sales/customerApi";
 import {
@@ -129,15 +132,60 @@ const PointOfSale = () => {
       const result = await scanCode(value).unwrap();
       const outcome = cart.addHit(result.data);
       if (!outcome.ok) setRefusal(outcome.message ?? null);
+      return outcome;
     } catch (error: any) {
       // Shown in place rather than as a toast: the cashier is looking at the
       // scan box, and a message in the corner of the screen is a message that
       // gets scanned over.
-      setRefusal(error?.data?.message || `Nothing matches "${value}"`);
+      const message = error?.data?.message || `Nothing matches "${value}"`;
+      setRefusal(message);
+      return { ok: false, message };
     } finally {
       focusScanner();
     }
   };
+
+  /**
+   * A phone in the aisle, feeding this cart.
+   *
+   * The code goes through `addByCode` like any other, so a barcode read by a
+   * camera is checked against exactly the same stock, expiry and price rules
+   * as one typed at the register. The verdict goes back down the socket
+   * because whoever is holding the phone is looking at a shelf, not at this
+   * screen, and needs to know the item did not land before they walk on.
+   */
+  const tillCode = useStoredTillCode();
+  const [pairing, setPairing] = useState(false);
+
+  /**
+   * Written after the socket exists, read only when a scan arrives.
+   *
+   * The handler needs `sendResult`, which the hook below returns, and the hook
+   * needs the handler — a knot that a ref unties without making the socket
+   * tear down and reconnect every time a line is added to the cart.
+   */
+  const remoteScanRef = useRef<(barcode: string) => void>(() => {});
+
+  const {
+    connected: tillOnline,
+    presence,
+    sendResult,
+  } = useTillSocket({
+    code: tillCode,
+    side: "till",
+    onScan: useCallback((barcode: string) => remoteScanRef.current(barcode), []),
+  });
+
+  useEffect(() => {
+    remoteScanRef.current = async (barcode: string) => {
+      const outcome = await addByCode(barcode);
+      sendResult({
+        barcode,
+        ok: !!outcome?.ok,
+        message: outcome?.ok ? "Added to the cart" : outcome?.message ?? "",
+      });
+    };
+  });
 
   const handleScan = () => {
     const value = code.trim();
@@ -333,6 +381,35 @@ const PointOfSale = () => {
             <LayoutGrid className="h-4 w-4" />
             Browse
           </Button>
+
+          {/*
+            Green while a phone is on the other end, so a cashier who walked
+            back to the register can tell at a glance whether the handset in
+            the aisle is still feeding this cart.
+          */}
+          <Tooltip
+            title={
+              presence.scanners > 0
+                ? `${presence.scanners} phone${
+                    presence.scanners === 1 ? "" : "s"
+                  } scanning into this till`
+                : "Use a phone camera as a barcode scanner"
+            }
+          >
+            <Button
+              variant="custom"
+              size="lg"
+              onClick={() => setPairing(true)}
+              className={
+                presence.scanners > 0
+                  ? "bg-primary text-white hover:bg-primary/90"
+                  : "bg-secondary-100 text-secondary-700 hover:bg-secondary-200"
+              }
+            >
+              <Smartphone className="h-4 w-4" />
+              {presence.scanners > 0 ? `Phone ×${presence.scanners}` : "Phone"}
+            </Button>
+          </Tooltip>
           <div className="flex items-center gap-4">
             <div className="text-right">
               <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-500">
@@ -745,6 +822,17 @@ const PointOfSale = () => {
         }}
         onPick={addByCode}
         selectedCodes={cart.lines.map((line) => line.barcode?.trim() || line.sku)}
+      />
+
+      <PhoneScannerModal
+        open={pairing}
+        setOpen={(value) => {
+          setPairing(value);
+          if (!value) focusScanner();
+        }}
+        code={tillCode}
+        connected={tillOnline}
+        presence={presence}
       />
     </div>
   );

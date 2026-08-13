@@ -61,9 +61,13 @@ export const routePermissions: Record<string, RoutePermission> = {
   // means ringing sales up, and a cashier who may only look at invoices has
   // no business on that screen.
   "/sales/pos": { module: "Sales", action: "Create" },
+  // Same gate as the till itself. Feeding a cart from an aisle is ringing a
+  // sale up with extra steps, and the socket enforces this again on join.
+  "/sales/scanner": { module: "Sales", action: "Create" },
   "/sales/invoices": { module: "Sales", action: "View" },
   "/sales/invoices/:id": { module: "Sales", action: "View" },
   "/accounts/receivables": { module: "Accounts", action: "View" },
+  "/accounts/customer-payments": { module: "Customer Payments", action: "View" },
 
   // Customers and the relationship around them
   "/customers": { module: "Customers", action: "View" },

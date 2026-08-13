@@ -11,8 +11,10 @@ import {
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
+import PermissionGate from "../../components/Common/PermissionGate";
 import Money from "../../components/shared/Money";
 import DataTable from "../../components/Table/DataTable";
+import CustomerPaymentModal from "../../components/modal/sales/CustomerPaymentModal";
 import {
   useGetPayablesQuery,
   useGetReceivablesQuery,
@@ -47,6 +49,31 @@ const Receivables = ({ mode }: { mode: "receivable" | "payable" }) => {
   const docCount = isOwedToUs
     ? report?.invoiceCount ?? 0
     : report?.billCount ?? 0;
+
+  /**
+   * Collecting, from the screen that says who to collect from.
+   *
+   * The modal is opened against the *customer* rather than the one invoice
+   * clicked, with their other open invoices listed beside it — somebody
+   * handing over money is settling a tab, and offering only the row that was
+   * clicked would make a person paying off three bills do it three times.
+   */
+  const [collecting, setCollecting] = useState<{
+    _id: string;
+    name: string;
+    totalDue: number;
+  } | null>(null);
+
+  const invoicesOf = (customerId: string) =>
+    (documents as any[])
+      .filter((row) => String(row.customer?._id ?? row.customer) === customerId)
+      .map((row) => ({
+        _id: row._id,
+        invoiceNo: row.invoiceNo,
+        saleDate: row.saleDate,
+        grandTotal: row.grandTotal,
+        due: row.due,
+      }));
 
   /**
    * Who owes the most, and how long the oldest debt has been sitting.
@@ -191,25 +218,68 @@ const Receivables = ({ mode }: { mode: "receivable" | "payable" }) => {
             {
               title: "",
               key: "open",
-              width: 90,
+              width: isOwedToUs ? 190 : 90,
               render: (_: unknown, row: any) => (
-                <Button
-                  size="small"
-                  onClick={() =>
-                    navigate(
-                      isOwedToUs
-                        ? `/sales/invoices/${row._id}`
-                        : `/purchases/${row._id}`
-                    )
-                  }
-                >
-                  Open
-                </Button>
+                <div className="flex justify-end gap-2">
+                  {/*
+                    Only on the money-in side. A supplier is paid from their
+                    own profile, where the bank details they gave us live.
+                  */}
+                  {isOwedToUs && (
+                    <PermissionGate module="Customer Payments" action="Create">
+                      <Button
+                        size="small"
+                        type="primary"
+                        disabled={!row.customer}
+                        title={
+                          row.customer
+                            ? undefined
+                            : "A walk-in sale has no account to collect against"
+                        }
+                        onClick={() =>
+                          setCollecting({
+                            _id: String(row.customer?._id ?? row.customer),
+                            name: row.customerName || "Customer",
+                            totalDue:
+                              people.find(
+                                (person: { _id?: string }) =>
+                                  String(person._id) ===
+                                  String(row.customer?._id ?? row.customer)
+                              )?.due ?? row.due,
+                          })
+                        }
+                      >
+                        Take payment
+                      </Button>
+                    </PermissionGate>
+                  )}
+                  <Button
+                    size="small"
+                    onClick={() =>
+                      navigate(
+                        isOwedToUs
+                          ? `/sales/invoices/${row._id}`
+                          : `/purchases/${row._id}`
+                      )
+                    }
+                  >
+                    Open
+                  </Button>
+                </div>
               ),
             },
           ]}
         />
       </div>
+
+      {collecting && (
+        <CustomerPaymentModal
+          open
+          setOpen={(value) => !value && setCollecting(null)}
+          customer={collecting}
+          invoices={invoicesOf(collecting._id)}
+        />
+      )}
 
       {(report?.totalDue ?? 0) === 0 && !loading && (
         <Tag className="!mt-4 !border-primary-200 !bg-primary-50 !text-primary-700">

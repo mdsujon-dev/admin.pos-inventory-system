@@ -122,6 +122,12 @@ export const PERMISSION_MODULES: PermissionModule[] = [
     permissions: ["View", "Create"],
     group: "Purchasing",
   },
+  // The other half of the same rule, on the money coming in.
+  {
+    module: "Customer Payments",
+    permissions: ["View", "Create"],
+    group: "Sales",
+  },
 
   // Selling. "Create" on Sales is what opens the till, so a cashier gets that
   // and a bookkeeper gets View — the two jobs are genuinely different.
