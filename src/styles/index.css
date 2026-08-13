@@ -78,8 +78,24 @@ input[type="number"] {
   .voucher-print,
   .voucher-print *,
   .register-print,
-  .register-print * {
+  .register-print *,
+  /* The label sheet prints through react-to-print, which copies this
+     stylesheet into its own document — so the blanket hide above applies
+     there too, and without this line every label came out empty. */
+  .label-print,
+  .label-print * {
     visibility: visible;
+  }
+
+  .label-print {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    /* On paper there is no scroller, so the preview's height cap has to go or
+       everything past the first screenful is cut off. */
+    max-height: none !important;
+    overflow: visible !important;
   }
 
   .voucher-print,

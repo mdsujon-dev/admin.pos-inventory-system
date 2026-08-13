@@ -18,7 +18,8 @@ export const SectionCard = ({
   extra,
   children,
 }: {
-  icon: LucideIcon;
+  /** Optional: some panels read better as a plain heading. */
+  icon?: LucideIcon;
   title: string;
   subtitle?: string;
   extra?: ReactNode;
@@ -37,9 +38,11 @@ export const SectionCard = ({
     }}
     title={
       <div className="flex items-center gap-3">
-        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-primary">
-          <Icon className="h-[18px] w-[18px]" />
-        </span>
+        {Icon && (
+          <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-gradient-to-br from-primary-500 to-primary-700 text-white shadow-primary">
+            <Icon className="h-[18px] w-[18px]" />
+          </span>
+        )}
         <span className="min-w-0">
           <span className="block truncate text-[15px] font-semibold text-secondary-800">
             {title}

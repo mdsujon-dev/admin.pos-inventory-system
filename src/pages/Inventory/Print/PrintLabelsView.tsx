@@ -1,14 +1,6 @@
 import { Button, Checkbox, Input, InputNumber, Segmented, Switch, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
-import {
-  Boxes,
-  Layers,
-  Printer,
-  ScanLine,
-  Search,
-  Sparkles,
-  Tag as TagIcon,
-} from "lucide-react";
+import { Boxes, Layers, Printer, ScanLine, Search } from "lucide-react";
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import PageHeader from "../../../components/Common/PageHeader";
@@ -403,7 +395,6 @@ const PrintLabelsView = () => {
             recognisable. */}
         <div className="xl:col-span-2">
         <SectionCard
-          icon={TagIcon}
           title="Pick what to label"
           subtitle="Every variant is its own row, with its own code"
         >
@@ -420,7 +411,6 @@ const PrintLabelsView = () => {
             />
             <Button
               size="middle"
-              icon={<Sparkles className="h-4 w-4" />}
               disabled={selectedItems.length === 0}
               onClick={copiesFromStock}
             >
@@ -481,7 +471,6 @@ const PrintLabelsView = () => {
         </div>
 
         <SectionCard
-          icon={Printer}
           title="The sheet"
           subtitle="What comes out of the printer, at roughly the printed size"
         >
@@ -507,12 +496,16 @@ const PrintLabelsView = () => {
               hint="Tick an item on the left and it appears here, ready to print."
             />
           ) : (
-            <div className="max-h-[560px] overflow-y-auto rounded-lg border border-secondary-100 bg-secondary-50 p-2">
-              {/* Only this element is handed to the printer, so the borders
-                  and the grey backing around it never reach the paper. */}
+            // A fixed height, not a max: the panel beside it is a full-page
+            // table, and a preview that grew with the sheet would drag the page
+            // down to whatever length somebody happened to ask for.
+            <div className="h-[520px] overflow-y-auto overscroll-contain rounded-lg border border-secondary-100 bg-secondary-50 p-2">
+              {/* Only this element is handed to the printer, so the border and
+                  the grey backing around it never reach the paper.
+                  `label-print` is what the global print rules un-hide. */}
               <div
                 ref={sheetRef}
-                className="flex flex-wrap justify-center gap-3 bg-white p-2"
+                className="label-print flex flex-wrap justify-center gap-3 bg-white p-2"
               >
                 {sheet.map((label) => (
                   <div
