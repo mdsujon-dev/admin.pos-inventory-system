@@ -200,7 +200,7 @@ const VendorPayments = () => {
         subtitle="Every taka handed to a supplier, and what it settled"
         breadcrumbs={[
           { title: "Dashboard", path: "/" },
-          { title: "Purchasing" },
+          { title: "Accounts", path: "/accounts" },
           { title: "Vendor Payments" },
         ]}
       />

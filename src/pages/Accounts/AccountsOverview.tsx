@@ -212,7 +212,7 @@ const AccountsOverview = () => {
             <span className="text-2xl font-bold text-danger">
               <Money value={pnl?.outstanding ?? 0} />
             </span>
-            <Link to="/sales/receivables" className="text-sm text-primary underline">
+            <Link to="/accounts/receivables" className="text-sm text-primary underline">
               Who owes what
             </Link>
           </div>
@@ -233,7 +233,7 @@ const AccountsOverview = () => {
               </p>
             </div>
             <Link
-              to="/purchases/payables"
+              to="/accounts/payables"
               className="text-sm text-primary underline"
             >
               Open the payables list

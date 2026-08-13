@@ -107,6 +107,7 @@ const saleReturnApi = baseApi.injectEndpoints({
 
 export const {
   useGetSaleReturnsQuery,
+  useLazyGetSaleReturnsQuery,
   useGetReturnableLinesQuery,
   useGetReturnsOfSaleQuery,
   useCreateSaleReturnMutation,

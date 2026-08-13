@@ -155,12 +155,6 @@ const sidebarMenuRoutes: RouteItem[] = [
         icon: Undo2,
         module: "Sales Returns",
       },
-      {
-        label: "Customer Dues",
-        address: "/sales/receivables",
-        icon: FileText,
-        module: "Accounts",
-      },
     ],
   },
   {
@@ -211,18 +205,6 @@ const sidebarMenuRoutes: RouteItem[] = [
         address: "/purchases/returns",
         icon: Undo2,
         module: "Purchase Returns",
-      },
-      {
-        label: "Vendor Payments",
-        address: "/purchases/payments",
-        icon: Banknote,
-        module: "Vendor Payments",
-      },
-      {
-        label: "Vendor Dues",
-        address: "/purchases/payables",
-        icon: FileText,
-        module: "Accounts",
       },
     ],
   },
@@ -279,18 +261,35 @@ const sidebarMenuRoutes: RouteItem[] = [
       },
       {
         label: "Income & Expense",
-        address: "/income-expense",
+        address: "/accounts/income-expense",
         icon: Wallet,
         module: "Income & Expense",
       },
+      {
+        label: "Customer Dues",
+        address: "/accounts/receivables",
+        icon: FileText,
+        module: "Accounts",
+      },
+      {
+        label: "Vendor Dues",
+        address: "/accounts/payables",
+        icon: FileText,
+        module: "Accounts",
+      },
+      {
+        label: "Vendor Payments",
+        address: "/accounts/vendor-payments",
+        icon: Banknote,
+        module: "Vendor Payments",
+      },
+      {
+        label: "Staff Performance",
+        address: "/accounts/staff-performance",
+        icon: HeartHandshake,
+        module: "CRM",
+      },
     ],
-  },
-  {
-    label: "Staff Performance",
-    address: "/reports/employee-sales",
-    icon: HeartHandshake,
-    module: "CRM",
-    section: "Accounts",
   },
 
   {

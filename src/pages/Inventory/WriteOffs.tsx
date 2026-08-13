@@ -11,9 +11,12 @@ import Money from "../../components/shared/Money";
 import DataTable from "../../components/Table/DataTable";
 import TableEmpty from "../../components/Table/TableEmpty";
 import WriteOffModal from "../../components/modal/inventory/WriteOffModal";
+import ExportMenu from "../../components/Common/ExportMenu";
+import { makeSheet } from "../../utils/tableExport";
 import {
   IWriteOff,
   useGetWriteOffsQuery,
+  useLazyGetWriteOffsQuery,
   WRITE_OFF_REASONS,
 } from "../../redux/features/inventory/writeOffApi";
 
@@ -50,6 +53,50 @@ const WriteOffs = () => {
   const rows: IWriteOff[] = data?.data?.data || [];
   const total: number = data?.data?.meta?.total || 0;
 
+  const [fetchAll] = useLazyGetWriteOffsQuery();
+
+  // Everything the filters matched, fetched on click — the page holds twenty.
+  const buildSheet = async () => {
+    const all = await fetchAll([
+      { name: "limit", value: 5000 },
+      ...(searchText ? [{ name: "keyword", value: searchText }] : []),
+      ...(reason !== "all" ? [{ name: "reason", value: reason }] : []),
+      ...(range?.[0] ? [{ name: "from", value: range[0].toISOString() }] : []),
+      ...(range?.[1] ? [{ name: "to", value: range[1].toISOString() }] : []),
+    ]).unwrap();
+
+    return makeSheet({
+      title: "Stock Write-offs",
+      unit: "write-off",
+      filters: [
+        reason !== "all" ? `Reason: ${REASON_LABEL[reason] ?? reason}` : "",
+        range?.[0] && range?.[1]
+          ? `${range[0].format("DD MMM YYYY")} to ${range[1].format("DD MMM YYYY")}`
+          : "",
+      ],
+      headers: ["Write-off", "Date", "Reason", "Items", "Units", "Loss", "By"],
+      rows: (all?.data?.data ?? []) as IWriteOff[],
+      // Every row here is money lost, so every row is marked.
+      isLow: () => true,
+      cells: (row: IWriteOff) => [
+        row.writeOffNo,
+        dayjs(row.writtenOffAt).format("DD MMM YYYY"),
+        REASON_LABEL[row.reason] ?? row.reason,
+        row.items
+          .map(
+            (item) =>
+              `${item.quantity} × ${item.name}${
+                item.variantName ? ` (${item.variantName})` : ""
+              }`
+          )
+          .join(", "),
+        row.totalQuantity,
+        row.totalCost.toLocaleString("en-BD"),
+        row.createdByName || "—",
+      ],
+    });
+  };
+
   // Off the page, and labelled as such — an honest total for a filtered set
   // needs its own aggregate, and this list is short enough to read.
   const pageCost = rows.reduce((sum, row) => sum + row.totalCost, 0);
@@ -74,12 +121,15 @@ const WriteOffs = () => {
           { title: "Write-offs" },
         ]}
         extra={
+          <div className="flex flex-wrap items-center gap-2">
+          <ExportMenu sheet={buildSheet} disabled={total === 0} />
           <PermissionGate module="Stock Write-offs" action="Create">
             <Button variant="primary" onClick={() => setWriting(true)}>
               <PackageX className="h-4 w-4" />
               Write off stock
             </Button>
           </PermissionGate>
+          </div>
         }
       />
 

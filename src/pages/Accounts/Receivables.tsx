@@ -90,7 +90,7 @@ const Receivables = ({ mode }: { mode: "receivable" | "payable" }) => {
         }
         breadcrumbs={[
           { title: "Dashboard", path: "/" },
-          { title: isOwedToUs ? "Sales" : "Purchasing" },
+          { title: "Accounts", path: "/accounts" },
           { title: isOwedToUs ? "Customer Dues" : "Vendor Dues" },
         ]}
       />

@@ -5,6 +5,7 @@ import { useState } from "react";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import Money from "../../components/shared/Money";
+import { Link } from "react-router-dom";
 import DataTable from "../../components/Table/DataTable";
 import TableEmpty from "../../components/Table/TableEmpty";
 import { useGetProfitAndLossQuery } from "../../redux/features/accounts/reportApi";
@@ -120,76 +121,102 @@ const ProfitLoss = () => {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <SectionCard
-          title="The statement"
-          subtitle="Each line takes from the one above it"
+          title="Where the money went"
+          subtitle="Read it top to bottom — each step takes from the one above"
         >
-          <div className="space-y-2 text-sm">
-            {/* Revenue arrives already net of what came back. Shown as its
-                own line anyway: "we sold 20,000 and 3,000 walked back in" is a
-                different fact from "we sold 17,000", and only the first one
-                tells anybody to go and look at why. */}
-            {(pnl?.returnedRevenue ?? 0) > 0 && (
-              <>
-                <Row
-                  label="Sales before returns"
-                  value={(pnl?.revenue ?? 0) + (pnl?.returnedRevenue ?? 0)}
-                />
-                <Row
-                  label={`Less returns (${pnl?.returnCount ?? 0})`}
-                  value={-(pnl?.returnedRevenue ?? 0)}
-                />
-              </>
-            )}
-            <Row
-              label="Revenue (VAT excluded)"
+          {/* Written as a story rather than an accountant's statement. The
+              terms of art (revenue, COGS, gross profit) are kept as the small
+              grey line under each step, so the page teaches them instead of
+              assuming them. */}
+          <div className="space-y-2.5">
+            <Step
+              order={1}
+              title="What customers paid us"
+              hint="Revenue — VAT excluded, returns already taken off"
               value={pnl?.revenue ?? 0}
-              bold
+              tone="in"
             />
-            <Row
-              label="Less cost of goods sold"
-              value={-(pnl?.costOfGoods ?? 0)}
-            />
-            <Divider />
-            <Row
-              label="Gross profit"
-              value={pnl?.grossProfit ?? 0}
-              bold
-              tone={(pnl?.grossProfit ?? 0) < 0 ? "danger" : "brand"}
-            />
-            {(pnl?.otherIncome ?? 0) > 0 && (
-              <Row label="Plus other income" value={pnl?.otherIncome ?? 0} />
+
+            {(pnl?.returnedRevenue ?? 0) > 0 && (
+              <p className="m-0 -mt-1 pl-11 text-[11px] text-secondary-400">
+                Sold <Money value={(pnl?.revenue ?? 0) + (pnl?.returnedRevenue ?? 0)} />,
+                of which <Money value={pnl?.returnedRevenue ?? 0} /> came back on{" "}
+                {pnl?.returnCount ?? 0} return
+                {pnl?.returnCount === 1 ? "" : "s"}.
+              </p>
             )}
-            <Row
-              label="Less running costs"
-              value={-(pnl?.operatingExpense ?? 0)}
+
+            <Step
+              order={2}
+              title="What those goods cost us"
+              hint="Cost of goods sold — what we paid the supplier for exactly the items that sold"
+              value={-(pnl?.costOfGoods ?? 0)}
+              tone="out"
             />
-            <Divider />
-            <Row
-              label="Net profit"
+
+            <Result
+              label="Profit on the goods"
+              hint={`${(pnl?.grossMargin ?? 0).toFixed(1)}% of what customers paid`}
+              value={pnl?.grossProfit ?? 0}
+            />
+
+            {(pnl?.otherIncome ?? 0) > 0 && (
+              <Step
+                order={3}
+                title="Money in from anything else"
+                hint="Rebates, scrap sales, pass-through deals"
+                value={pnl?.otherIncome ?? 0}
+                tone="in"
+              />
+            )}
+
+            <Step
+              order={(pnl?.otherIncome ?? 0) > 0 ? 4 : 3}
+              title="What it costs to run the shop"
+              hint="Salary, rent, electricity, stock written off — everything in the list beside this"
+              value={-(pnl?.operatingExpense ?? 0)}
+              tone="out"
+            />
+
+            <Result
+              label={(pnl?.netProfit ?? 0) < 0 ? "Loss for the period" : "Profit kept"}
+              hint={
+                (pnl?.netProfit ?? 0) < 0
+                  ? "The shop spent more than it earned"
+                  : `${(pnl?.netMargin ?? 0).toFixed(1)}% of what customers paid`
+              }
               value={pnl?.netProfit ?? 0}
-              bold
-              tone={(pnl?.netProfit ?? 0) < 0 ? "danger" : "brand"}
+              final
             />
           </div>
 
-          <div className="mt-4 space-y-1 border-t border-secondary-100 pt-3 text-xs text-secondary-500">
+          <div className="mt-4 space-y-1.5 border-t border-secondary-100 pt-3 text-[12px] text-secondary-500">
             <p className="m-0">
-              {pnl?.invoiceCount ?? 0} invoice
-              {pnl?.invoiceCount === 1 ? "" : "s"} · collected{" "}
-              <Money value={pnl?.collected ?? 0} /> · still owed{" "}
-              <Money value={pnl?.outstanding ?? 0} />
+              <strong className="text-secondary-700">
+                {pnl?.invoiceCount ?? 0} invoice
+                {pnl?.invoiceCount === 1 ? "" : "s"}
+              </strong>{" "}
+              · <Money value={pnl?.collected ?? 0} /> collected ·{" "}
+              <Money value={pnl?.outstanding ?? 0} /> still owed
             </p>
             <p className="m-0">
-              Stock bought in this period is not a cost here — it becomes one
-              when it sells.
+              <strong className="text-secondary-700">
+                Buying stock is not a cost here.
+              </strong>{" "}
+              Money spent on stock this month becomes a cost on the day that
+              stock sells — until then it is goods on the shelf, not an expense.
             </p>
-            {(pnl?.returnedRevenue ?? 0) > 0 && (
-              <p className="m-0">
-                Returns are dated to the day the goods came back, not the day
-                they were sold. Of them, <Money value={pnl?.refundedCash ?? 0} />{" "}
-                was handed back in cash; the rest came off unpaid balances.
-              </p>
-            )}
+            <p className="m-0">
+              <strong className="text-secondary-700">
+                Profit is not cash.
+              </strong>{" "}
+              A sale on credit counts as profit before the money arrives. What
+              actually moved is on the{" "}
+              <Link to="/accounts/cash-flow" className="text-primary underline">
+                cash flow
+              </Link>
+              .
+            </p>
           </div>
         </SectionCard>
 
@@ -259,41 +286,105 @@ const ProfitLoss = () => {
   );
 };
 
-const Row = ({
-  label,
+/**
+ * One step in the story, with the accounting term underneath it.
+ *
+ * The plain sentence is the heading and the jargon is the footnote, not the
+ * other way round: somebody reading this wants to know what happened, and the
+ * word "COGS" only helps once they already do.
+ */
+const Step = ({
+  order,
+  title,
+  hint,
   value,
-  bold,
   tone,
 }: {
-  label: string;
+  order: number;
+  title: string;
+  hint: string;
   value: number;
-  bold?: boolean;
-  tone?: "brand" | "danger";
+  tone: "in" | "out";
 }) => (
-  <div className="flex items-center justify-between">
+  <div className="flex items-start gap-3">
     <span
-      className={
-        bold ? "font-semibold text-secondary-800" : "text-secondary-600"
-      }
+      className={`mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded text-[12px] font-bold ${
+        tone === "in"
+          ? "bg-primary-50 text-primary-700"
+          : "bg-danger/10 text-danger"
+      }`}
     >
-      {label}
+      {order}
     </span>
+    <div className="min-w-0 flex-1">
+      <p className="m-0 text-[14px] font-semibold text-secondary-800">
+        {title}
+      </p>
+      <p className="m-0 text-[11px] leading-snug text-secondary-400">{hint}</p>
+    </div>
     <span
-      className={
-        tone === "danger"
-          ? "font-bold text-danger"
-          : tone === "brand"
-            ? "font-bold text-primary-700"
-            : bold
-              ? "font-semibold text-secondary-800"
-              : "text-secondary-600"
-      }
+      className={`shrink-0 text-[15px] font-bold ${
+        tone === "in" ? "text-secondary-800" : "text-danger"
+      }`}
     >
-      <Money value={value} />
+      {tone === "out" ? "− " : ""}
+      <Money value={Math.abs(value)} />
     </span>
   </div>
 );
 
-const Divider = () => <div className="border-t border-secondary-200" />;
+/** A subtotal, set apart so the eye can find the two figures that matter. */
+const Result = ({
+  label,
+  hint,
+  value,
+  final,
+}: {
+  label: string;
+  hint: string;
+  value: number;
+  final?: boolean;
+}) => {
+  const negative = value < 0;
+  return (
+    <div
+      className={`flex items-center justify-between gap-3 rounded-md px-3 py-2.5 ${
+        final
+          ? negative
+            ? "bg-danger/10"
+            : "bg-gradient-to-r from-primary-600 to-primary-500"
+          : "bg-secondary-50"
+      }`}
+    >
+      <div className="min-w-0">
+        <p
+          className={`m-0 text-[14px] font-bold ${
+            final && !negative ? "text-white" : "text-secondary-800"
+          }`}
+        >
+          {label}
+        </p>
+        <p
+          className={`m-0 text-[11px] ${
+            final && !negative ? "text-white/75" : "text-secondary-400"
+          }`}
+        >
+          {hint}
+        </p>
+      </div>
+      <span
+        className={`shrink-0 text-[20px] font-bold ${
+          final && !negative
+            ? "text-white"
+            : negative
+              ? "text-danger"
+              : "text-primary-700"
+        }`}
+      >
+        <Money value={value} />
+      </span>
+    </div>
+  );
+};
 
 export default ProfitLoss;

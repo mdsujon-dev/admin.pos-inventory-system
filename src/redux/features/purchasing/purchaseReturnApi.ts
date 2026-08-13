@@ -89,6 +89,7 @@ const purchaseReturnApi = baseApi.injectEndpoints({
 
 export const {
   useGetPurchaseReturnsQuery,
+  useLazyGetPurchaseReturnsQuery,
   useGetReturnableBillLinesQuery,
   useGetReturnsOfPurchaseQuery,
   useCreatePurchaseReturnMutation,

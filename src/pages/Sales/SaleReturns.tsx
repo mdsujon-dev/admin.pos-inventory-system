@@ -18,6 +18,9 @@ import {
   useGetSaleReturnsQuery,
 } from "../../redux/features/sales/saleReturnApi";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
+import ExportMenu from "../../components/Common/ExportMenu";
+import { makeSheet } from "../../utils/tableExport";
+import { useLazyGetSaleReturnsQuery } from "../../redux/features/sales/saleReturnApi";
 
 const { RangePicker } = DatePicker;
 
@@ -56,6 +59,47 @@ const SaleReturns = () => {
   const rows: ISaleReturn[] = data?.data?.data || [];
   const total: number = data?.data?.meta?.total || 0;
 
+  const [fetchAll] = useLazyGetSaleReturnsQuery();
+
+  /**
+   * Every matching return, not the page on screen.
+   *
+   * Fetched on click rather than kept in memory: a list that holds twenty rows
+   * should not carry two thousand on the chance somebody presses Export.
+   */
+  const buildSheet = async () => {
+    const all = await fetchAll([
+      { name: "limit", value: 5000 },
+      ...(searchText ? [{ name: "keyword", value: searchText }] : []),
+      ...(range?.[0] ? [{ name: "from", value: range[0].toISOString() }] : []),
+      ...(range?.[1] ? [{ name: "to", value: range[1].toISOString() }] : []),
+    ]).unwrap();
+
+    return makeSheet({
+      title: "Sales Returns",
+      unit: "return",
+      filters: [
+        range?.[0] && range?.[1]
+          ? `${range[0].format("DD MMM YYYY")} to ${range[1].format("DD MMM YYYY")}`
+          : "",
+        searchText ? `Search: "${searchText}"` : "",
+      ],
+      headers: ["Return", "Date", "Invoice", "Customer", "Units", "Settled", "Value"],
+      rows: (all?.data?.data ?? []) as ISaleReturn[],
+      cells: (row: ISaleReturn) => [
+        row.returnNo,
+        dayjs(row.returnedAt).format("DD MMM YYYY"),
+        row.invoiceNo,
+        row.customerName || "Walk-in",
+        row.items.reduce((n, i) => n + i.quantity, 0),
+        row.refundAmount > 0
+          ? `Refunded ${PAYMENT_METHOD_LABELS[row.refundMethod ?? "cash"]}`
+          : "Off their balance",
+        row.grandTotal.toLocaleString("en-BD"),
+      ],
+    });
+  };
+
   // Off the page, and labelled as such — the honest total for a filtered set
   // needs its own aggregate, and this list is short enough to read.
   const pageValue = rows.reduce((sum, row) => sum + row.grandTotal, 0);
@@ -87,12 +131,15 @@ const SaleReturns = () => {
           { title: "Returns" },
         ]}
         extra={
+          <div className="flex flex-wrap items-center gap-2">
+          <ExportMenu sheet={buildSheet} disabled={total === 0} />
           <PermissionGate module="Sales Returns" action="Create">
             <Button variant="primary" onClick={() => setChoosing(true)}>
               <Undo2 className="h-4 w-4" />
               Take a return
             </Button>
           </PermissionGate>
+          </div>
         }
       />
 

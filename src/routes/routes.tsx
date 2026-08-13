@@ -118,13 +118,21 @@ const routes = [
         children: [
           { path: "", element: <AccountsOverview /> },
           { path: "ledger", element: <Ledger /> },
+          { path: "income-expense", element: <IncomeExpense /> },
+          { path: "receivables", element: <Receivables mode="receivable" /> },
+          { path: "payables", element: <Receivables mode="payable" /> },
+          { path: "vendor-payments", element: <VendorPayments /> },
+          { path: "staff-performance", element: <EmployeeSales /> },
           { path: "profit-loss", element: <ProfitLoss /> },
           { path: "stock-valuation", element: <StockValuation /> },
           { path: "cash-flow", element: <CashFlow /> },
           { path: "expense-categories", element: <ExpenseCategories /> },
         ],
       },
-      { path: "reports/employee-sales", element: <EmployeeSales /> },
+      {
+        path: "reports/employee-sales",
+        element: <Navigate to="/accounts/staff-performance" replace />,
+      },
       // Buying — where stock comes from, and who is owed for it.
       {
         path: "vendors",
@@ -142,8 +150,14 @@ const routes = [
           { path: "", element: <Purchases /> },
           // Before ":id", or these words are read as bill ids.
           { path: "new", element: <PurchaseForm /> },
-          { path: "payables", element: <Receivables mode="payable" /> },
-          { path: "payments", element: <VendorPayments /> },
+          {
+            path: "payables",
+            element: <Navigate to="/accounts/payables" replace />,
+          },
+          {
+            path: "payments",
+            element: <Navigate to="/accounts/vendor-payments" replace />,
+          },
           { path: "returns", element: <PurchaseReturns /> },
           { path: ":id/edit", element: <PurchaseForm /> },
           { path: ":id", element: <PurchaseView /> },
@@ -157,7 +171,11 @@ const routes = [
           { path: "invoices", element: <SalesList /> },
           { path: "invoices/:id", element: <InvoiceView /> },
           { path: "returns", element: <SaleReturns /> },
-          { path: "receivables", element: <Receivables mode="receivable" /> },
+          // Moved into Accounts; kept so old links still land.
+          {
+            path: "receivables",
+            element: <Navigate to="/accounts/receivables" replace />,
+          },
         ],
       },
       // Employee Management — primary paths
@@ -173,7 +191,11 @@ const routes = [
         ],
       },
       // Daily Income & Expense
-      { path: "income-expense", element: <IncomeExpense /> },
+      // Moved into Accounts; kept so old links still land.
+      {
+        path: "income-expense",
+        element: <Navigate to="/accounts/income-expense" replace />,
+      },
       // Legacy /users/* paths kept for bookmarks / old links
       {
         path: "users",

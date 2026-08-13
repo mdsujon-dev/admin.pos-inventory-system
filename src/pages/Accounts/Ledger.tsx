@@ -14,6 +14,8 @@ import { MetricCard } from "../../components/Common/MetricCard";
 import Money from "../../components/shared/Money";
 import DataTable from "../../components/Table/DataTable";
 import TableEmpty from "../../components/Table/TableEmpty";
+import ExportMenu from "../../components/Common/ExportMenu";
+import { makeSheet } from "../../utils/tableExport";
 import { useGetLedgerQuery } from "../../redux/features/accounts/reportApi";
 
 const { RangePicker } = DatePicker;
@@ -84,6 +86,41 @@ const Ledger = () => {
   // grows without bound, and holding it lets the totals stay honest.
   const paged = entries.slice((currentPage - 1) * limit, currentPage * limit);
 
+  /**
+   * The whole period, not the page on screen.
+   *
+   * A file that only holds page one is a file that will be trusted and be
+   * wrong, so the export walks every entry the filters matched.
+   */
+  const buildSheet = () =>
+    makeSheet({
+      title: "Ledger",
+      unit: "entry",
+      filters: [
+        `${range[0].format("DD MMM YYYY")} to ${range[1].format("DD MMM YYYY")}`,
+        kind !== "all" ? `Kind: ${KINDS[kind]?.label ?? kind}` : "",
+      ],
+      headers: ["Date", "Kind", "Reference", "Who / what", "In", "Out", "Cash"],
+      rows: entries,
+      // Money leaving is the row a reader scans for, so it is the one the
+      // export marks — the same convention the other lists use.
+      isLow: (row: LedgerRow) => row.direction === "out",
+      cells: (row: LedgerRow) => [
+        dayjs(row.date).format("DD MMM YYYY"),
+        row.label,
+        row.reference || "—",
+        row.party,
+        row.direction === "in" ? row.amount.toLocaleString("en-BD") : "",
+        row.direction === "out" ? row.amount.toLocaleString("en-BD") : "",
+        row.onPaper ? "On paper" : "Cash moved",
+      ],
+      note: `Cash in ${totals.cashIn.toLocaleString(
+        "en-BD"
+      )} · Cash out ${totals.cashOut.toLocaleString(
+        "en-BD"
+      )} · Net ${totals.net.toLocaleString("en-BD")}`,
+    });
+
   return (
     <div>
       <PageMeta
@@ -118,6 +155,7 @@ const Ledger = () => {
               }}
               allowClear={false}
             />
+            <ExportMenu sheet={buildSheet} disabled={entries.length === 0} />
           </div>
         }
       />
@@ -169,6 +207,8 @@ const Ledger = () => {
         limit={limit}
         setLimit={setLimit}
         isPaginate={entries.length > limit}
+        // The rows-per-page picker: a ledger is read at 25 and audited at 100.
+        isShowSizeChanger
         onRow={(row: LedgerRow) => ({
           onClick: () => row.link && navigate(row.link),
           className: row.link ? "cursor-pointer" : "",

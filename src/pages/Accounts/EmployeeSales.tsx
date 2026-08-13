@@ -54,7 +54,7 @@ const EmployeeSales = () => {
         subtitle="Who rang up what, and what it earned"
         breadcrumbs={[
           { title: "Dashboard", path: "/" },
-          { title: "Accounts" },
+          { title: "Accounts", path: "/accounts" },
           { title: "Staff Performance" },
         ]}
         extra={

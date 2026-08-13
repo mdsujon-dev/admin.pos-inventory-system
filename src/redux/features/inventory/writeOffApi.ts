@@ -54,4 +54,8 @@ const writeOffApi = baseApi.injectEndpoints({
   overrideExisting: false,
 });
 
-export const { useGetWriteOffsQuery, useCreateWriteOffMutation } = writeOffApi;
+export const {
+  useGetWriteOffsQuery,
+  useLazyGetWriteOffsQuery,
+  useCreateWriteOffMutation,
+} = writeOffApi;

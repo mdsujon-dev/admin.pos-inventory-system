@@ -13,9 +13,12 @@ import DataTable from "../../components/Table/DataTable";
 import TableEmpty from "../../components/Table/TableEmpty";
 import PickBillModal from "../../components/modal/purchasing/PickBillModal";
 import PurchaseReturnModal from "../../components/modal/purchasing/PurchaseReturnModal";
+import ExportMenu from "../../components/Common/ExportMenu";
+import { makeSheet } from "../../utils/tableExport";
 import {
   IPurchaseReturn,
   useGetPurchaseReturnsQuery,
+  useLazyGetPurchaseReturnsQuery,
 } from "../../redux/features/purchasing/purchaseReturnApi";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
 
@@ -48,6 +51,41 @@ const PurchaseReturns = () => {
   const rows: IPurchaseReturn[] = data?.data?.data || [];
   const total: number = data?.data?.meta?.total || 0;
 
+  const [fetchAll] = useLazyGetPurchaseReturnsQuery();
+
+  const buildSheet = async () => {
+    const all = await fetchAll([
+      { name: "limit", value: 5000 },
+      ...(searchText ? [{ name: "keyword", value: searchText }] : []),
+      ...(range?.[0] ? [{ name: "from", value: range[0].toISOString() }] : []),
+      ...(range?.[1] ? [{ name: "to", value: range[1].toISOString() }] : []),
+    ]).unwrap();
+
+    return makeSheet({
+      title: "Purchase Returns",
+      unit: "return",
+      filters: [
+        range?.[0] && range?.[1]
+          ? `${range[0].format("DD MMM YYYY")} to ${range[1].format("DD MMM YYYY")}`
+          : "",
+        searchText ? `Search: "${searchText}"` : "",
+      ],
+      headers: ["Return", "Date", "Bill", "Supplier", "Units", "Settled", "Value"],
+      rows: (all?.data?.data ?? []) as IPurchaseReturn[],
+      cells: (row: IPurchaseReturn) => [
+        row.returnNo,
+        dayjs(row.returnedAt).format("DD MMM YYYY"),
+        row.purchaseNo,
+        row.vendorName,
+        row.totalQuantity,
+        row.refundAmount > 0
+          ? `Money back (${PAYMENT_METHOD_LABELS[row.refundMethod ?? "cash"]})`
+          : "Off the bill",
+        row.totalCost.toLocaleString("en-BD"),
+      ],
+    });
+  };
+
   const pageValue = rows.reduce((sum, row) => sum + row.totalCost, 0);
   const pageCash = rows.reduce((sum, row) => sum + row.refundAmount, 0);
   const pageUnits = rows.reduce((sum, row) => sum + row.totalQuantity, 0);
@@ -68,12 +106,15 @@ const PurchaseReturns = () => {
           { title: "Returns" },
         ]}
         extra={
+          <div className="flex flex-wrap items-center gap-2">
+          <ExportMenu sheet={buildSheet} disabled={total === 0} />
           <PermissionGate module="Purchase Returns" action="Create">
             <Button variant="primary" onClick={() => setChoosing(true)}>
               <Undo2 className="h-4 w-4" />
               Send goods back
             </Button>
           </PermissionGate>
+          </div>
         }
       />
 

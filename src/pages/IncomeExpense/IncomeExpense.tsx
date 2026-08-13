@@ -433,6 +433,7 @@ const IncomeExpense = () => {
         subtitle="Record daily income and expenses"
         breadcrumbs={[
           { title: "Dashboard", path: "/" },
+          { title: "Accounts", path: "/accounts" },
           { title: "Income & Expense" },
         ]}
         extra={

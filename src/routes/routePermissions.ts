@@ -31,7 +31,7 @@ export const routePermissions: Record<string, RoutePermission> = {
   "/media-library": { module: "Media Library", action: "View" },
 
   // Income & Expense
-  "/income-expense": { module: "Income & Expense", action: "View" },
+  "/accounts/income-expense": { module: "Income & Expense", action: "View" },
 
   // Inventory
   "/inventory/products": { module: "Products", action: "View" },
@@ -63,7 +63,7 @@ export const routePermissions: Record<string, RoutePermission> = {
   "/sales/pos": { module: "Sales", action: "Create" },
   "/sales/invoices": { module: "Sales", action: "View" },
   "/sales/invoices/:id": { module: "Sales", action: "View" },
-  "/sales/receivables": { module: "Accounts", action: "View" },
+  "/accounts/receivables": { module: "Accounts", action: "View" },
 
   // Customers and the relationship around them
   "/customers": { module: "Customers", action: "View" },
@@ -80,8 +80,8 @@ export const routePermissions: Record<string, RoutePermission> = {
   "/sales/returns": { module: "Sales Returns", action: "View" },
   "/purchases": { module: "Purchases", action: "View" },
   "/purchases/new": { module: "Purchases", action: "Create" },
-  "/purchases/payables": { module: "Accounts", action: "View" },
-  "/purchases/payments": { module: "Vendor Payments", action: "View" },
+  "/accounts/payables": { module: "Accounts", action: "View" },
+  "/accounts/vendor-payments": { module: "Vendor Payments", action: "View" },
   "/purchases/returns": { module: "Purchase Returns", action: "View" },
   "/purchases/:id/edit": { module: "Purchases", action: "Update" },
   "/purchases/:id": { module: "Purchases", action: "View" },
@@ -92,7 +92,7 @@ export const routePermissions: Record<string, RoutePermission> = {
   "/accounts/stock-valuation": { module: "Accounts", action: "View" },
   "/accounts/cash-flow": { module: "Accounts", action: "View" },
   "/accounts/expense-categories": { module: "Accounts", action: "View" },
-  "/reports/employee-sales": { module: "CRM", action: "View" },
+  "/accounts/staff-performance": { module: "CRM", action: "View" },
 
   // Employee Management
   "/employees": { module: "Employees", action: "View" },
