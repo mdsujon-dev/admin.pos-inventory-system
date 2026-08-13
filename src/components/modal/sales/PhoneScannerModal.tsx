@@ -1,4 +1,4 @@
-import { Modal, Tag } from "antd";
+import { Alert, Modal, Tag } from "antd";
 import { Smartphone, Wifi, WifiOff } from "lucide-react";
 import QRCode from "qrcode";
 import { useEffect, useState } from "react";
@@ -31,6 +31,23 @@ const PhoneScannerModal = ({
 }) => {
   const [qr, setQr] = useState<string | null>(null);
   const url = `${window.location.origin}/sales/scanner?till=${code}`;
+
+  /**
+   * A QR is only as useful as the address inside it.
+   *
+   * `localhost` resolves to the phone itself, and a plain-http address will
+   * open but the browser will refuse the camera on it. Both fail on the
+   * handset, minutes after the person walked away from this screen — so they
+   * are named here, while they can still be fixed.
+   */
+  const { hostname, protocol } = window.location;
+  const isLoopback = hostname === "localhost" || hostname === "127.0.0.1";
+  const isInsecure = protocol !== "https:" && !isLoopback;
+  const warning = isLoopback
+    ? "This till is open on localhost, which on a phone means the phone itself. Open the panel on the machine's network address instead."
+    : isInsecure
+      ? "This address is plain http, so a phone will open the page but refuse the camera. Codes can still be typed on the handset; serve the panel over https for scanning."
+      : null;
 
   useEffect(() => {
     if (!open) return;
@@ -112,6 +129,10 @@ const PhoneScannerModal = ({
               ? "Waiting for a phone"
               : "Till is offline"}
         </Tag>
+
+        {warning && (
+          <Alert type="warning" showIcon message={warning} className="!text-left" />
+        )}
 
         <p className="m-0 text-[11px] text-secondary-400">
           The phone must be signed in to the same shop and allowed to ring up

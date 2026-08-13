@@ -119,7 +119,10 @@ const PhoneScanner = () => {
   const [manual, setManual] = useState("");
   const [log, setLog] = useState<ScanLog[]>([]);
 
-  const detectorSupported = !!getDetectorCtor();
+  // Worked out once. Whether a camera can be used at all does not change
+  // while somebody stands in an aisle.
+  const [blocker] = useState(cameraBlocker);
+  const canScan = !blocker;
 
   const onResult = useCallback(
     (result: { barcode: string; ok: boolean; message: string }) => {
@@ -339,15 +342,13 @@ const PhoneScanner = () => {
           <div className="flex h-full flex-col items-center justify-center gap-3 px-6 text-center">
             <CameraOff className="h-10 w-10 text-white/40" />
             <p className="m-0 text-[13px] text-white/70">
-              {detectorSupported
-                ? "Camera is off"
-                : "This browser cannot read barcodes from a camera — type them below"}
+              {blocker ?? "Camera is off"}
             </p>
           </div>
         )}
       </div>
 
-      {detectorSupported && (
+      {canScan && (
         <Button
           variant={cameraOn ? "outline" : "primary"}
           size="lg"
