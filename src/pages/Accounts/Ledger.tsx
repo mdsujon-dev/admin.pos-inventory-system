@@ -25,7 +25,12 @@ const KINDS: Record<string, { label: string; tone: string }> = {
   sale: { label: "Sale", tone: "#10b981" },
   "sale-return": { label: "Sales return", tone: "#f43f5e" },
   purchase: { label: "Purchase", tone: "#3b82f6" },
+  "purchase-return": { label: "Purchase return", tone: "#14b8a6" },
   "vendor-payment": { label: "Supplier paid", tone: "#8b5cf6" },
+  // Cash arriving against a credit note written earlier — its own kind, or
+  // the day the money turned up would be invisible next to the day the goods
+  // went back.
+  "vendor-refund": { label: "Refund received", tone: "#10b981" },
   expense: { label: "Expense", tone: "#f59e0b" },
   income: { label: "Other income", tone: "#06b6d4" },
   "write-off": { label: "Written off", tone: "#64748b" },

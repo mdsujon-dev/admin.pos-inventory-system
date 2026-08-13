@@ -18,6 +18,7 @@ import ExportMenu from "../../components/Common/ExportMenu";
 import { makeSheet } from "../../utils/tableExport";
 import {
   IPurchaseReturn,
+  useGetOutstandingRefundsQuery,
   useGetPurchaseReturnsQuery,
   useLazyGetPurchaseReturnsQuery,
 } from "../../redux/features/purchasing/purchaseReturnApi";
@@ -117,6 +118,16 @@ const PurchaseReturns = () => {
   const pageOwed = rows.reduce((sum, row) => sum + (row.refundDue ?? 0), 0);
   const pageUnits = rows.reduce((sum, row) => sum + row.totalQuantity, 0);
 
+  // Unfiltered on purpose: what a supplier owes does not stop being owed
+  // because the date range on this screen has moved past it.
+  const { data: owedData, isFetching: owedLoading } =
+    useGetOutstandingRefundsQuery(undefined);
+  const outstanding: IPurchaseReturn[] = owedData?.data ?? [];
+  const totalOwed = outstanding.reduce(
+    (sum, row) => sum + (row.refundDue ?? 0),
+    0
+  );
+
   return (
     <div>
       <PageMeta
@@ -166,17 +177,30 @@ const PurchaseReturns = () => {
           icon={Wallet}
           label="Money back"
           accent="#10b981"
-          hint="The rest came off what we owe"
+          hint={`${(pageValue - pageCash - pageOwed).toLocaleString(
+            "en-BD"
+          )} came off supplier bills`}
           value={<Money value={pageCash} />}
           loading={isFetching}
         />
+        {/*
+          The tile this page was missing. A refund a supplier has promised but
+          not sent is money the shop is owed, and until it had somewhere to sit
+          it was either banked early or forgotten entirely.
+        */}
         <MetricCard
-          icon={Wallet}
-          label="Off supplier bills"
-          accent="#3b82f6"
-          hint="Credited rather than refunded"
-          value={<Money value={pageValue - pageCash} />}
-          loading={isFetching}
+          icon={Clock}
+          label="Owed by suppliers"
+          accent="#f59e0b"
+          hint={
+            totalOwed > 0
+              ? `Promised, not yet received — ${outstanding.length} return${
+                  outstanding.length === 1 ? "" : "s"
+                }`
+              : "Every refund has come in"
+          }
+          value={<Money value={totalOwed} />}
+          loading={owedLoading}
         />
       </div>
 
@@ -280,9 +304,39 @@ const PurchaseReturns = () => {
           {
             title: "Settled",
             key: "mode",
-            width: 180,
-            render: (_: unknown, row: IPurchaseReturn) =>
-              row.refundAmount > 0 ? (
+            width: 230,
+            render: (_: unknown, row: IPurchaseReturn) => {
+              // Money still owed leads, whatever else the return did: it is
+              // the only state on this page that needs somebody to act.
+              if ((row.refundDue ?? 0) > 0) {
+                return (
+                  <div className="flex flex-col items-start gap-1">
+                    <Tag className="!m-0 !border-[#f59e0b55] !bg-[#fffbeb] !text-[11px] !text-[#92400e]">
+                      <Money value={row.refundDue} /> owed by supplier
+                    </Tag>
+                    {row.refundAmount > 0 && (
+                      <span className="text-[11px] text-secondary-400">
+                        <Money value={row.refundAmount} /> received so far
+                      </span>
+                    )}
+                    <PermissionGate module="Purchase Returns" action="Create">
+                      <button
+                        type="button"
+                        // The row navigates to the bill; this must not.
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setCollecting(row);
+                        }}
+                        className="text-[11px] font-semibold text-primary-700 underline-offset-2 hover:underline"
+                      >
+                        Record refund
+                      </button>
+                    </PermissionGate>
+                  </div>
+                );
+              }
+
+              return row.refundAmount > 0 ? (
                 <span className="text-[12px] text-secondary-600">
                   <Money value={row.refundAmount} /> back in{" "}
                   {PAYMENT_METHOD_LABELS[row.refundMethod ?? "cash"]}
@@ -291,7 +345,8 @@ const PurchaseReturns = () => {
                 <Tag className="!m-0 !border-primary-200 !bg-primary-50 !text-[11px] !text-primary-700">
                   Off the bill
                 </Tag>
-              ),
+              );
+            },
           },
           {
             title: "Value",
@@ -318,6 +373,14 @@ const PurchaseReturns = () => {
           purchaseId={returning}
           open={!!returning}
           setOpen={(value) => !value && setReturning(null)}
+        />
+      )}
+
+      {collecting && (
+        <RefundReceiptModal
+          row={collecting}
+          open={!!collecting}
+          setOpen={(value) => !value && setCollecting(null)}
         />
       )}
     </div>

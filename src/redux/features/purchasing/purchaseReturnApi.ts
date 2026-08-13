@@ -65,6 +65,21 @@ const purchaseReturnApi = baseApi.injectEndpoints({
       providesTags: ["purchase-returns"],
     }),
 
+    /**
+     * Every return still waiting on its money, whatever page it is on.
+     *
+     * Its own call rather than a sum of the rows on screen: "how much are we
+     * owed" is the one figure here that somebody acts on, and a total that
+     * quietly means "of the twenty rows you can see" is worse than none.
+     */
+    getOutstandingRefunds: builder.query({
+      query: () => ({
+        url: "/purchase-returns/outstanding",
+        method: "GET",
+      }),
+      providesTags: ["purchase-returns"],
+    }),
+
     getReturnableBillLines: builder.query({
       query: (purchaseId: string) => ({
         url: `/purchase-returns/returnable/${purchaseId}`,
@@ -115,6 +130,7 @@ const purchaseReturnApi = baseApi.injectEndpoints({
 export const {
   useGetPurchaseReturnsQuery,
   useLazyGetPurchaseReturnsQuery,
+  useGetOutstandingRefundsQuery,
   useGetReturnableBillLinesQuery,
   useGetReturnsOfPurchaseQuery,
   useCreatePurchaseReturnMutation,
