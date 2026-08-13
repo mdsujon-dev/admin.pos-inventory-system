@@ -130,7 +130,7 @@ const CustomerPanel = ({
 
   if (customer) {
     return (
-      <div className="rounded-xl bg-primary-50 p-3 shadow-[0_2px_10px_-4px_rgba(1,149,50,.18)]">
+      <div className="rounded-lg border border-primary-200/70 bg-gradient-to-br from-primary-50 to-white/70 p-3.5 backdrop-blur-md">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
             <p className="m-0 flex items-center gap-2 text-sm font-semibold text-primary-700">
@@ -175,7 +175,7 @@ const CustomerPanel = ({
   }
 
   return (
-    <div className="rounded-xl bg-white p-3 shadow-[0_2px_10px_-4px_rgba(16,24,40,.1)]">
+    <div className="rounded-lg border border-white/70 bg-white/65 p-3.5 backdrop-blur-md">
       {/* Named, because a blank phone box beside a cart does not say what it
           is for — and the sentence is where the walk-in case is granted. */}
       <p className="m-0 mb-2 flex items-center gap-1.5 text-[12px] font-semibold uppercase tracking-wide text-secondary-500">

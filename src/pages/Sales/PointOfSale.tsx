@@ -1,4 +1,4 @@
-import { Button, Input, InputNumber, Select, Tooltip } from "antd";
+import { Input, InputNumber, Select, Tooltip } from "antd";
 import {
   AlertTriangle,
   LayoutGrid,
@@ -15,6 +15,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import PageMeta from "../../components/Common/PageMeta";
+import Button from "../../components/ui/Button";
 import Money from "../../components/shared/Money";
 import { config } from "../../config";
 import { ICustomer } from "../../redux/features/sales/customerApi";
@@ -38,7 +39,11 @@ interface HeldSale {
 }
 
 const imageUrl = (path?: string | null) =>
-  !path ? null : path.startsWith("http") ? path : `${config.image_access_url}${path}`;
+  !path
+    ? null
+    : path.startsWith("http")
+      ? path
+      : `${config.image_access_url}${path}`;
 
 /**
  * The till.
@@ -156,7 +161,9 @@ const PointOfSale = () => {
       return;
     }
     if (due > 0 && !customer && !draft) {
-      toast.error("An unpaid sale needs a customer — there is nobody to collect from");
+      toast.error(
+        "An unpaid sale needs a customer — there is nobody to collect from",
+      );
       return;
     }
 
@@ -211,9 +218,9 @@ const PointOfSale = () => {
       />
 
       {/* Scan bar. Full width and simple. */}
-      <div className="rounded-2xl bg-white p-3 shadow-[0_2px_10px_-4px_rgba(16,24,40,.12)] sm:p-4">
+      <div className="rounded-lg border border-white/70 bg-white/65 backdrop-blur-md p-3 sm:p-4">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary">
+          <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-primary-50 text-primary">
             <ScanLine className="h-5 w-5" />
           </span>
           <div className="min-w-[240px] flex-1">
@@ -229,16 +236,17 @@ const PointOfSale = () => {
                   <Loader2 className="h-4 w-4 animate-spin text-primary" />
                 ) : null
               }
-              className="!rounded-xl"
+              className="!rounded-md"
             />
           </div>
 
           <Button
-            size="large"
-            icon={<LayoutGrid className="h-4 w-4" />}
+            variant="custom"
+            size="lg"
             onClick={() => setPicking(true)}
-            className="!rounded-xl !border-primary-200 !text-primary-700"
+            className="bg-primary-50 text-primary-700 hover:bg-primary-100"
           >
+            <LayoutGrid className="h-4 w-4" />
             Browse · F4
           </Button>
           <div className="flex items-center gap-4">
@@ -265,29 +273,31 @@ const PointOfSale = () => {
           <div className="relative mt-2 flex items-start gap-2 rounded-lg bg-white/95 px-3 py-2">
             <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
             <p className="m-0 flex-1 text-sm text-danger">{refusal}</p>
-            <button
-              type="button"
+            <Button
+              variant="custom"
+              size="sm"
               onClick={() => setRefusal(null)}
-              className="text-secondary-400 hover:text-secondary-700"
+              className="!h-6 !w-6 !bg-transparent !px-0 !shadow-none text-secondary-400 hover:text-secondary-700"
             >
               <X className="h-4 w-4" />
-            </button>
+            </Button>
           </div>
         )}
       </div>
 
       {held.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 rounded-xl bg-white px-3 py-2 shadow-[0_2px_10px_-4px_rgba(16,24,40,.1)]">
+        <div className="flex flex-wrap items-center gap-2 rounded-lg border border-white/70 bg-white/65 backdrop-blur-md px-3 py-2">
           <span className="text-xs font-medium text-secondary-500">
             Held carts
           </span>
           {held.map((sale) => (
             <Button
               key={sale.id}
-              size="small"
-              icon={<PauseCircle className="h-3.5 w-3.5" />}
+              variant="default"
+              size="sm"
               onClick={() => resume(sale)}
             >
+              <PauseCircle className="h-3.5 w-3.5" />
               {sale.label} · {sale.lines.length}
             </Button>
           ))}
@@ -303,9 +313,11 @@ const PointOfSale = () => {
 
       <div className="grid flex-1 gap-3 xl:grid-cols-3">
         {/* Cart */}
-        <div className="flex min-h-[300px] flex-col overflow-hidden rounded-xl bg-white shadow-[0_2px_10px_-4px_rgba(16,24,40,.1)] xl:col-span-2">
-          <div className="flex items-center justify-between gap-3 bg-secondary-50/70 px-3 py-2">
-            <p className="m-0 text-[12px] font-semibold uppercase tracking-wide text-secondary-600">
+        <div className="flex min-h-[300px] flex-col overflow-hidden rounded-lg border border-white/70 bg-white/65 backdrop-blur-md xl:col-span-2">
+          {/* A tinted lid rather than another row — the same wash the tables
+              and the section cards use, so the till belongs to the app. */}
+          <div className="flex items-center justify-between gap-3 border-b border-primary-100/70 bg-gradient-to-r from-primary-50/90 via-primary-50/40 to-transparent px-4 py-2.5">
+            <p className="m-0 text-[12px] font-bold uppercase tracking-[0.08em] text-primary-800">
               Cart
               {cart.lines.length > 0 && (
                 <span className="ml-1.5 font-normal text-secondary-400">
@@ -317,7 +329,12 @@ const PointOfSale = () => {
               )}
             </p>
             {cart.lines.length > 0 && (
-              <Button size="small" type="text" onClick={resetSale}>
+              <Button
+                variant="link"
+                size="sm"
+                onClick={resetSale}
+                className="!text-[12px] !no-underline"
+              >
                 Clear all
               </Button>
             )}
@@ -326,7 +343,7 @@ const PointOfSale = () => {
           {cart.lines.length === 0 ? (
             <div className="grid flex-1 place-items-center p-8">
               <div className="text-center">
-                <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary-50 text-primary">
+                <span className="mx-auto grid h-14 w-14 place-items-center rounded-lg bg-primary-50 text-primary">
                   <ScanLine className="h-6 w-6" />
                 </span>
                 <p className="m-0 mt-3 text-[15px] font-semibold text-secondary-700">
@@ -342,46 +359,55 @@ const PointOfSale = () => {
               </div>
             </div>
           ) : (
-            <div className="flex-1 divide-y divide-secondary-50 overflow-y-auto">
+            <div className="flex-1 space-y-2 overflow-y-auto p-2.5">
               {cart.lines.map((line) => {
                 const src = imageUrl(line.image);
                 const lineTotal = round2(
-                  line.price * line.quantity - line.discount
+                  line.price * line.quantity - line.discount,
                 );
                 const onOffer = line.price < line.listPrice;
                 return (
                   <div
                     key={line.key}
-                    className="flex gap-3 px-3 py-2.5 transition-colors hover:bg-primary-50/40"
+                    className="group flex gap-3 rounded-lg border border-white/70 bg-white/70 p-2.5 shadow-[0_2px_12px_-4px_rgba(1,149,50,0.15)] backdrop-blur-sm transition-all duration-200 hover:border-primary-200 hover:bg-white hover:shadow-[0_4px_16px_-4px_rgba(1,149,50,0.25)]"
                   >
-                    {src ? (
-                      <img
-                        src={src}
-                        alt={line.name}
-                        className="h-14 w-14 shrink-0 rounded-lg bg-secondary-50 object-cover"
-                      />
-                    ) : (
-                      <div className="h-14 w-14 shrink-0 rounded-lg bg-secondary-100" />
-                    )}
+                    {/* The thumbnail sits on its own tinted plate so a product
+                        shot with a white background still reads as an object
+                        rather than bleeding into the card. */}
+                    <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-md bg-gradient-to-br from-secondary-50 to-primary-50/60 ring-1 ring-inset ring-black/[0.04]">
+                      {src ? (
+                        <img
+                          src={src}
+                          alt={line.name}
+                          className="h-full w-full object-cover"
+                        />
+                      ) : (
+                        <div className="grid h-full place-items-center text-secondary-300">
+                          <ScanLine className="h-5 w-5" />
+                        </div>
+                      )}
+                    </div>
 
                     <div className="min-w-0 flex-1">
-                      <p className="m-0 truncate text-[14px] font-semibold text-secondary-800">
-                        {line.name}
+                      <div className="flex items-start gap-2">
+                        <p className="m-0 min-w-0 flex-1 truncate text-[14px] font-semibold text-secondary-900">
+                          {line.name}
+                        </p>
                         {line.variantName && (
-                          <span className="ml-2 rounded-md bg-primary-50 px-1.5 py-0.5 text-[11px] font-medium text-primary-700">
+                          <span className="shrink-0 rounded bg-gradient-to-r from-primary-50 to-primary-100/70 px-2 py-0.5 text-[11px] font-medium text-primary-700 ring-1 ring-inset ring-primary-200/60">
                             {line.variantName}
                           </span>
                         )}
-                      </p>
-                      <p className="m-0 font-mono text-[11px] text-secondary-400">
+                      </div>
+                      <p className="m-0 font-mono text-[11px] tracking-wide text-secondary-400">
                         {line.sku}
                       </p>
 
-                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                      <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1.5">
                         {/* On offer, the ticket price stays visible beside it.
                             A cashier asked "why is it cheaper" has the answer
                             on the row rather than in the product screen. */}
-                        <span className="text-[13px] font-semibold text-secondary-700">
+                        <span className="text-[13px] font-bold text-secondary-800">
                           <Money value={line.price} />
                         </span>
                         {onOffer && (
@@ -395,7 +421,7 @@ const PointOfSale = () => {
                           </span>
                         )}
                         {onOffer && (
-                          <span className="rounded-md bg-primary-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-700">
+                          <span className="rounded bg-primary px-2 py-[1px] text-[9px] font-bold uppercase tracking-[0.08em] text-white">
                             Offer
                           </span>
                         )}
@@ -407,25 +433,26 @@ const PointOfSale = () => {
                           onChange={(value) =>
                             cart.setDiscount(line.key, Number(value) || 0)
                           }
-                          variant="filled"
-                          className="!w-24"
+                          variant="borderless"
+                          className="!w-24 !rounded-lg !bg-secondary-50/80 !px-2 hover:!bg-secondary-100"
                         />
                       </div>
                     </div>
 
                     <div className="flex shrink-0 flex-col items-end justify-between gap-2">
-                      <div className="flex items-center gap-1 rounded-lg bg-secondary-50 p-0.5">
-                        <button
-                          type="button"
+                      <div className="flex items-center gap-0.5 rounded bg-white/90 p-0.5 ring-1 ring-inset ring-black/[0.05]">
+                        <Button
+                          variant="custom"
+                          size="sm"
+                          disabled={line.quantity <= 1}
                           onClick={() =>
                             cart.setQuantity(line.key, line.quantity - 1)
                           }
-                          disabled={line.quantity <= 1}
-                          className="grid h-7 w-7 place-items-center rounded-md text-secondary-600 transition hover:bg-white disabled:opacity-35"
+                          className="!h-7 !w-7 !rounded !bg-transparent !px-0 !shadow-none text-secondary-600 hover:bg-secondary-100"
                         >
                           <Minus className="h-3.5 w-3.5" />
-                        </button>
-                        <span className="w-7 text-center text-[14px] font-bold text-secondary-800">
+                        </Button>
+                        <span className="w-7 text-center text-[14px] font-bold tabular-nums text-secondary-900">
                           {line.quantity}
                         </span>
                         <Tooltip
@@ -435,26 +462,30 @@ const PointOfSale = () => {
                               : ""
                           }
                         >
-                          <button
-                            type="button"
+                          <Button
+                            variant="custom"
+                            size="sm"
+                            disabled={line.quantity >= line.available}
                             onClick={() =>
                               cart.setQuantity(line.key, line.quantity + 1)
                             }
-                            disabled={line.quantity >= line.available}
-                            className="grid h-7 w-7 place-items-center rounded-md text-secondary-600 transition hover:bg-white disabled:opacity-35"
+                            className="!h-7 !w-7 !rounded !bg-transparent !px-0 !shadow-none text-primary-700 hover:bg-primary-50"
                           >
                             <Plus className="h-3.5 w-3.5" />
-                          </button>
+                          </Button>
                         </Tooltip>
-                        <button
-                          type="button"
+                        {/* Only on hover: a delete button that is always lit
+                            invites the accident it is there to allow. */}
+                        <Button
+                          variant="custom"
+                          size="sm"
                           onClick={() => cart.removeLine(line.key)}
-                          className="grid h-7 w-7 place-items-center rounded-md text-danger transition hover:bg-danger/10"
+                          className="!h-7 !w-7 !rounded !bg-transparent !px-0 !shadow-none text-secondary-300 hover:bg-danger/10 hover:text-danger group-hover:text-secondary-400"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
-                        </button>
+                        </Button>
                       </div>
-                      <p className="m-0 text-[15px] font-bold text-secondary-800">
+                      <p className="m-0 text-[16px] font-bold tabular-nums text-secondary-900">
                         <Money value={lineTotal} />
                       </p>
                     </div>
@@ -476,7 +507,7 @@ const PointOfSale = () => {
             onDraft={setDraft}
           />
 
-          <div className="rounded-xl bg-white p-3 shadow-[0_2px_10px_-4px_rgba(16,24,40,.1)]">
+          <div className="rounded-lg border border-white/70 bg-white/65 backdrop-blur-md p-3.5">
             <div className="space-y-1.5 text-sm">
               <Row label="Subtotal" value={cart.totals.subtotal} />
               {cart.totals.itemDiscountTotal > 0 && (
@@ -496,7 +527,7 @@ const PointOfSale = () => {
                   value={cart.billDiscount || null}
                   placeholder="0"
                   onChange={(value) => cart.setBillDiscount(Number(value) || 0)}
-                  className="!w-28"
+                  className="!w-28 !h-[22px] [&_.ant-input-number-input]:!h-[20px]"
                 />
               </div>
               <div className="flex items-center justify-between gap-2">
@@ -509,7 +540,7 @@ const PointOfSale = () => {
                   value={cart.vatPercent || null}
                   placeholder="0"
                   onChange={(value) => cart.setVatPercent(Number(value) || 0)}
-                  className="!w-28"
+                  className="!w-28 !h-[22px] [&_.ant-input-number-input]:!h-[20px]"
                 />
               </div>
               {cart.totals.vatAmount > 0 && (
@@ -517,17 +548,17 @@ const PointOfSale = () => {
               )}
             </div>
 
-            <div className="mt-3 flex items-center justify-between rounded-lg bg-primary-50 px-3 py-2">
-              <span className="text-sm font-semibold text-secondary-700">
+            <div className="mt-3 flex items-center justify-between rounded-md bg-gradient-to-r from-primary-600 to-primary-500 px-3.5 py-2">
+              <span className="text-[12px] font-semibold uppercase tracking-wide text-white/80">
                 Grand total
               </span>
-              <span className="text-2xl font-bold text-primary-700">
+              <span className="text-xl font-bold tabular-nums text-white">
                 <Money value={grand} />
               </span>
             </div>
           </div>
 
-          <div className="rounded-xl bg-white p-3 shadow-[0_2px_10px_-4px_rgba(16,24,40,.1)]">
+          <div className="rounded-lg border border-white/70 bg-white/65 backdrop-blur-md p-3.5">
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="mb-1 block text-xs font-medium text-secondary-600">
@@ -538,7 +569,7 @@ const PointOfSale = () => {
                   onChange={setPaymentMethod}
                   className="w-full"
                   options={Object.entries(PAYMENT_METHOD_LABELS).map(
-                    ([value, label]) => ({ value, label })
+                    ([value, label]) => ({ value, label }),
                   )}
                 />
               </div>
@@ -581,28 +612,27 @@ const PointOfSale = () => {
           </div>
 
           <div className="mt-auto grid grid-cols-2 gap-2">
-            <Button
-              onClick={() => setPicking(true)}
-              icon={<LayoutGrid className="h-4 w-4" />}
-            >
+            <Button variant="default" onClick={() => setPicking(true)}>
+              <LayoutGrid className="h-4 w-4" />
               Add item
             </Button>
             <Button
+              variant="default"
               onClick={hold}
               disabled={cart.lines.length === 0}
-              icon={<PauseCircle className="h-4 w-4" />}
             >
+              <PauseCircle className="h-4 w-4" />
               Hold
             </Button>
             <Button
-              type="primary"
-              size="large"
+              variant="custom"
+              size="lg"
               loading={saving}
               onClick={complete}
               disabled={cart.lines.length === 0}
-              icon={<Receipt className="h-4 w-4" />}
-              className="!col-span-2 !h-12 !border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 !text-base !font-semibold shadow-primary hover:!from-primary-700 hover:!to-primary-600"
+              className="col-span-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white hover:from-primary-700 hover:to-primary-600"
             >
+              <Receipt className="h-4 w-4" />
               Complete Sale · F9
             </Button>
           </div>
@@ -641,7 +671,11 @@ const Row = ({
 }) => (
   <div className="flex items-center justify-between">
     <span className="text-secondary-500">{label}</span>
-    <span className={muted ? "text-secondary-500" : "font-medium text-secondary-800"}>
+    <span
+      className={
+        muted ? "text-secondary-500" : "font-medium text-secondary-800"
+      }
+    >
       <Money value={value} />
     </span>
   </div>

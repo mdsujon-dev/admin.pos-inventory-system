@@ -156,7 +156,7 @@ const ProductPicker = ({
               <Loader2 className="h-4 w-4 animate-spin text-primary" />
             ) : null
           }
-          className="!rounded-xl"
+          className="!rounded-md"
         />
 
         {categories.length > 0 && (
@@ -197,10 +197,10 @@ const ProductPicker = ({
                   type="button"
                   disabled={out}
                   onClick={() => pick(row)}
-                  className={`flex flex-col overflow-hidden rounded-xl border text-left transition ${
+                  className={`flex flex-col overflow-hidden rounded-md border text-left transition ${
                     out
                       ? "cursor-not-allowed border-secondary-100 bg-secondary-50 opacity-60"
-                      : "border-secondary-200 bg-white hover:border-primary hover:shadow-[0_8px_20px_-12px_rgba(1,149,50,.6)]"
+                      : "border-secondary-200 bg-white hover:border-primary"
                   }`}
                 >
                   <div className="relative h-24 w-full bg-secondary-50">
@@ -218,7 +218,7 @@ const ProductPicker = ({
                     {/* Stock on the tile, because a cashier picking by sight
                         needs to know before the tap, not after the refusal. */}
                     <span
-                      className={`absolute right-1.5 top-1.5 rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${
+                      className={`absolute right-1.5 top-1.5 rounded px-1.5 py-0.5 text-[10px] font-semibold ${
                         out
                           ? "bg-danger/10 text-danger"
                           : "bg-white/90 text-secondary-700"

@@ -123,18 +123,18 @@ const sidebarMenuRoutes: RouteItem[] = [
 
   // Selling. Its own section rather than a corner of Inventory: the till is
   // used all day by people who never touch the catalog.
-  {
-    label: "Point of Sale",
-    address: "/sales/pos",
-    icon: ScanLine,
-    module: "Sales",
-    section: "Sales",
-  },
+
   {
     label: "Sales",
     icon: ShoppingCart,
     section: "Sales",
     submenus: [
+      {
+        label: "Point of Sale",
+        address: "/sales/pos",
+        icon: ScanLine,
+        module: "Sales",
+      },
       {
         label: "Invoices",
         address: "/sales/invoices",
