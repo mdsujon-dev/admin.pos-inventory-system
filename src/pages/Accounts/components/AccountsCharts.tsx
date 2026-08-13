@@ -95,9 +95,24 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
 
   /** Revenue, and what is left of it after each bite. */
   const tradingOptions: ApexOptions = {
-    chart: { ...baseChart, type: "line" },
-    colors: ["#ef4444"],
-    stroke: { curve: "smooth", width: 4 },
+    chart: { ...baseChart, type: "area" },
+    colors: ["#10b981"],
+    stroke: { curve: "smooth", width: 3 },
+    markers: {
+      size: 6,
+      colors: ["#10b981"],
+      strokeColors: "#fff",
+      strokeWidth: 2,
+    },
+    fill: {
+      type: "gradient",
+      gradient: {
+        shadeIntensity: 1,
+        opacityFrom: 0.4,
+        opacityTo: 0.05,
+        stops: [0, 90, 100],
+      },
+    },
     dataLabels: { enabled: false },
     legend: { show: false },
     grid: { borderColor: "#f0f2f0", strokeDashArray: 4 },
@@ -183,7 +198,7 @@ const AccountsCharts = ({ pnl, cash, stock }: AccountsChartsProps) => {
         <ReactApexChart
           options={tradingOptions}
           series={[{ name: "Amount", data: [revenue, cogs, opex, net] }]}
-          type="line"
+          type="area"
           height={300}
         />
       </ChartCard>

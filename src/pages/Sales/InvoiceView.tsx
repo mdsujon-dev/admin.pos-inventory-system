@@ -1,6 +1,6 @@
 import { Button, Tag } from "antd";
-import { ArrowLeft, Printer, Receipt } from "lucide-react";
-import { useEffect, useRef } from "react";
+import { ArrowLeft, Printer, Receipt, Undo2 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import PageMeta from "../../components/Common/PageMeta";
 import Barcode from "../../components/shared/Barcode";
@@ -8,6 +8,10 @@ import { Loading } from "../../components/shared/Loading";
 import Money from "../../components/shared/Money";
 import { ISale, useGetSaleByIdQuery } from "../../redux/features/sales/saleApi";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
+import PermissionGate from "../../components/Common/PermissionGate";
+import SaleReturnModal from "../../components/modal/sales/SaleReturnModal";
+import { useGetReturnsOfSaleQuery } from "../../redux/features/sales/saleReturnApi";
+import dayjs from "dayjs";
 
 const dateOf = (value?: string) =>
   value
@@ -37,6 +41,12 @@ const InvoiceView = () => {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const printed = useRef(false);
+  const [returning, setReturning] = useState(false);
+
+  const { data: returnData } = useGetReturnsOfSaleQuery(id as string, {
+    skip: !id,
+  });
+  const returns = returnData?.data ?? [];
 
   const { data, isFetching } = useGetSaleByIdQuery(id as string, { skip: !id });
   const sale: ISale | undefined = data?.data;
@@ -72,15 +82,59 @@ const InvoiceView = () => {
         >
           Back to invoices
         </Button>
-        <Button
-          type="primary"
-          icon={<Printer className="h-4 w-4" />}
-          onClick={() => window.print()}
-          className="!border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 shadow-primary"
-        >
-          Print
-        </Button>
+        <div className="flex gap-2">
+          <PermissionGate module="Sales Returns" action="Create">
+            <Button
+              icon={<Undo2 className="h-4 w-4" />}
+              onClick={() => setReturning(true)}
+            >
+              Take a return
+            </Button>
+          </PermissionGate>
+          <Button
+            type="primary"
+            icon={<Printer className="h-4 w-4" />}
+            onClick={() => window.print()}
+            className="!border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 shadow-primary"
+          >
+            Print
+          </Button>
+        </div>
       </div>
+
+      {/* What has already come back off this invoice. On the sheet rather than
+          behind a tab: a receipt that has been partly returned but shows its
+          original total is a receipt that will be argued over. */}
+      {returns.length > 0 && (
+        <div className="mb-4 rounded-xl border border-[#f59e0b55] bg-[#fffbeb] px-4 py-3 print:hidden">
+          <p className="m-0 mb-1 text-[12px] font-semibold uppercase tracking-wide text-[#92400e]">
+            Returned against this invoice
+          </p>
+          {returns.map((row: any) => (
+            <div
+              key={row._id}
+              className="flex flex-wrap items-center justify-between gap-2 border-t border-[#f59e0b33] py-1.5 text-[13px] first:border-0"
+            >
+              <span className="font-mono font-semibold text-secondary-800">
+                {row.returnNo}
+              </span>
+              <span className="text-secondary-500">
+                {dayjs(row.returnedAt).format("DD MMM YYYY")} ·{" "}
+                {row.items.reduce((sum: number, i: any) => sum + i.quantity, 0)}{" "}
+                unit(s)
+              </span>
+              <span className="text-secondary-500">
+                {row.refundAmount > 0
+                  ? `Refunded ${PAYMENT_METHOD_LABELS[row.refundMethod] ?? ""}`
+                  : "Taken off the balance"}
+              </span>
+              <span className="font-bold text-[#92400e]">
+                − <Money value={row.grandTotal} />
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div
         id="invoice-sheet"

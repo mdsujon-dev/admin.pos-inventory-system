@@ -171,6 +171,7 @@ export const baseApi = createApi({
     "stock-lots",
     // Selling
     "sales",
+    "sale-returns",
     "customers",
     // The books and the customer relationship
     "expense-categories",
