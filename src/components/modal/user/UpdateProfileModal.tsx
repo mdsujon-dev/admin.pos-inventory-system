@@ -1,4 +1,4 @@
-﻿import { Avatar, Button, Form, Modal, Upload, message } from "antd";
+import { Avatar, Button, Form, Modal, Upload, message } from "antd";
 import type { RcFile, UploadChangeParam } from "antd/es/upload";
 import { Camera, ImagePlus } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -179,6 +179,9 @@ const UpdateProfileModal: React.FC<UpdateProfileModalProps> = ({
             label="Phone"
             name="phone"
             placeholder="Phone number (optional)"
+            rules={[
+              { pattern: /^\d{11}$/, message: "Phone number must be exactly 11 digits" },
+            ]}
           />
         </div>
 

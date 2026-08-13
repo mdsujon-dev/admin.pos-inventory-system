@@ -21,7 +21,7 @@ export interface NewCustomerDraft {
  * ten. Below that the cashier is still typing, and a lookup on every keystroke
  * is ten wasted requests on a counter connection that is rarely good.
  */
-const LOOKUP_AT = 10;
+const LOOKUP_AT = 11;
 
 /**
  * Who is buying.
@@ -71,7 +71,7 @@ const CustomerPanel = ({
 
   const search = async (raw?: string) => {
     const digits = (raw ?? phone).replace(/\D/g, "");
-    if (digits.length < 6) return;
+    if (digits.length < 11) return;
 
     askedFor.current = digits;
     const result = await lookup(digits).unwrap().catch(() => null);
@@ -188,11 +188,15 @@ const CustomerPanel = ({
       <div className="flex gap-2">
         <Input
           value={phone}
+          maxLength={11}
           onChange={(event) => {
-            setPhone(event.target.value);
-            setSearched(false);
-            setCreating(false);
-            onDraft(null);
+            const val = event.target.value.replace(/\D/g, "");
+            if (val.length <= 11) {
+              setPhone(val);
+              setSearched(false);
+              setCreating(false);
+              onDraft(null);
+            }
           }}
           onPressEnter={() => search()}
           prefix={
@@ -211,7 +215,7 @@ const CustomerPanel = ({
         {/* Still here for the short numbers the auto-lookup does not reach. */}
         <Button
           onClick={() => search()}
-          disabled={phone.replace(/\D/g, "").length < 6 || isFetching}
+          disabled={phone.replace(/\D/g, "").length !== 11 || isFetching}
         >
           Find
         </Button>

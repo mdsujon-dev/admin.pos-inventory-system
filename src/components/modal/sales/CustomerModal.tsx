@@ -86,7 +86,10 @@ const CustomerModal = ({
           label="Phone"
           name="phone"
           tooltip="This is the customer's identity — one number, one person"
-          rules={[{ required: true, message: "A phone number is required" }]}
+          rules={[
+            { required: true, message: "A phone number is required" },
+            { pattern: /^\d{11}$/, message: "Phone number must be exactly 11 digits" },
+          ]}
           placeholder="e.g. 01711223344"
         />
       </div>

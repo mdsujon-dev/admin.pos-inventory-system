@@ -1,8 +1,7 @@
-import { Input, Modal, Segmented, Tag } from "antd";
-import { Loader2, PackageSearch, Search } from "lucide-react";
+import { Input, Modal, Select, Tag } from "antd";
+import { Check, Loader2, PackageSearch, Search } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Money from "../../components/shared/Money";
-import { config } from "../../config";
 import {
   ICategory,
   useGetCategoriesQuery,
@@ -11,67 +10,15 @@ import {
   IProduct,
   useGetProductsQuery,
 } from "../../redux/features/inventory/productApi";
-
-/** One thing that can be rung up: a product, or one variant of one. */
-interface PickRow {
-  key: string;
-  name: string;
-  variantName: string;
-  /** What the scan box would be given. */
-  code: string;
-  price: number;
-  listPrice: number;
-  stock: number;
-  image: string | null;
-}
-
-const imageUrl = (path?: string | null) =>
-  !path ? null : path.startsWith("http") ? path : `${config.image_access_url}${path}`;
-
-const offerOf = (row: { sellingPrice: number; discountPrice?: number | null }) =>
-  row.discountPrice && row.discountPrice > 0 && row.discountPrice < row.sellingPrice
-    ? row.discountPrice
-    : row.sellingPrice;
-
-const toRows = (products: IProduct[]): PickRow[] =>
-  products.flatMap((product) => {
-    if (product.type === "single") {
-      const code = product.barcode?.trim() || product.sku;
-      return code
-        ? [
-            {
-              key: product._id,
-              name: product.name,
-              variantName: "",
-              code,
-              price: offerOf(product),
-              listPrice: product.sellingPrice,
-              stock: product.quantity ?? 0,
-              image: product.images?.[0] ?? null,
-            },
-          ]
-        : [];
-    }
-
-    return (product.variants ?? [])
-      .map((variant): PickRow | null => {
-        const code = variant.barcode?.trim() || variant.sku;
-        if (!code) return null;
-        return {
-          key: `${product._id}-${variant._id ?? variant.sku}`,
-          name: product.name,
-          variantName:
-            variant.options.map((option) => option.value).join(" / ") ||
-            variant.name,
-          code,
-          price: offerOf(variant),
-          listPrice: variant.sellingPrice,
-          stock: variant.quantity ?? 0,
-          image: variant.image ?? product.images?.[0] ?? null,
-        };
-      })
-      .filter((row): row is PickRow => row !== null);
-  });
+import { imageUrl, PickRow, toPickRows } from "./pickRows";
+import {
+  ISubCategory,
+  useGetSubCategoriesQuery,
+} from "../../redux/features/inventory/subCategoryApi";
+import {
+  IBrand,
+  useGetBrandsQuery,
+} from "../../redux/features/inventory/brandApi";
 
 /**
  * Finding an item without its barcode.
@@ -89,13 +36,17 @@ const ProductPicker = ({
   open,
   setOpen,
   onPick,
+  selectedCodes = [],
 }: {
   open: boolean;
   setOpen: (value: boolean) => void;
   onPick: (code: string) => void;
+  selectedCodes?: string[];
 }) => {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState<string>("all");
+  const [subCategory, setSubCategory] = useState<string>("all");
+  const [brand, setBrand] = useState<string>("all");
   const searchRef = useRef<HTMLInputElement>(null);
 
   const { data: categoryData } = useGetCategoriesQuery(
@@ -104,23 +55,39 @@ const ProductPicker = ({
   );
   const categories: ICategory[] = categoryData?.data?.data ?? [];
 
+  const { data: subCategoryData } = useGetSubCategoriesQuery(
+    [{ name: "limit", value: 100 }, ...(category !== "all" ? [{ name: "category", value: category }] : [])],
+    { skip: !open }
+  );
+  const subCategories: ISubCategory[] = subCategoryData?.data?.data ?? [];
+
+  const { data: brandData } = useGetBrandsQuery(
+    [{ name: "limit", value: 100 }],
+    { skip: !open }
+  );
+  const brands: IBrand[] = brandData?.data?.data ?? [];
+
   const { data, isFetching } = useGetProductsQuery(
     [
-      { name: "limit", value: 60 },
+      { name: "limit", value: 50 },
       { name: "isActive", value: true },
       ...(search ? [{ name: "keyword", value: search }] : []),
       ...(category !== "all" ? [{ name: "category", value: category }] : []),
+      ...(subCategory !== "all" ? [{ name: "subCategory", value: subCategory }] : []),
+      ...(brand !== "all" ? [{ name: "brand", value: brand }] : []),
     ],
     { skip: !open }
   );
 
   const products: IProduct[] = useMemo(() => data?.data?.data ?? [], [data]);
-  const rows = useMemo(() => toRows(products), [products]);
+  const rows = useMemo(() => toPickRows(products), [products]);
 
   useEffect(() => {
     if (open) {
       setSearch("");
       setCategory("all");
+      setSubCategory("all");
+      setBrand("all");
       // The cashier opened this to type a name, so the caret starts there.
       const timer = setTimeout(() => searchRef.current?.focus(), 120);
       return () => clearTimeout(timer);
@@ -139,7 +106,7 @@ const ProductPicker = ({
       open={open}
       onCancel={() => setOpen(false)}
       footer={null}
-      width={880}
+      width={1000}
       destroyOnHidden
     >
       <div className="mb-3 flex flex-col gap-3">
@@ -159,21 +126,35 @@ const ProductPicker = ({
           className="!rounded-md"
         />
 
-        {categories.length > 0 && (
-          <div className="overflow-x-auto">
-            <Segmented
-              value={category}
-              onChange={(value) => setCategory(String(value))}
-              options={[
-                { label: "All", value: "all" },
-                ...categories.map((row) => ({
-                  label: row.name,
-                  value: row._id,
-                })),
-              ]}
-            />
-          </div>
-        )}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+          <Select
+            value={category}
+            onChange={(val) => {
+              setCategory(val);
+              setSubCategory("all"); // Reset subcategory when category changes
+            }}
+            options={[
+              { label: "All Categories", value: "all" },
+              ...categories.map((c) => ({ label: c.name, value: c._id })),
+            ]}
+          />
+          <Select
+            value={subCategory}
+            onChange={(val) => setSubCategory(val)}
+            options={[
+              { label: "All Sub-categories", value: "all" },
+              ...subCategories.map((s) => ({ label: s.name, value: s._id })),
+            ]}
+          />
+          <Select
+            value={brand}
+            onChange={(val) => setBrand(val)}
+            options={[
+              { label: "All Brands", value: "all" },
+              ...brands.map((b) => ({ label: b.name, value: b._id })),
+            ]}
+          />
+        </div>
       </div>
 
       <div className="max-h-[52vh] overflow-y-auto pr-1">
@@ -197,9 +178,11 @@ const ProductPicker = ({
                   type="button"
                   disabled={out}
                   onClick={() => pick(row)}
-                  className={`flex flex-col overflow-hidden rounded-md border text-left transition ${
+                  className={`relative flex flex-col overflow-hidden rounded-md border text-left transition ${
                     out
                       ? "cursor-not-allowed border-secondary-100 bg-secondary-50 opacity-60"
+                      : selectedCodes?.includes(row.code)
+                      ? "border-primary-500 bg-primary-50 ring-2 ring-primary-500/50"
                       : "border-secondary-200 bg-white hover:border-primary"
                   }`}
                 >
@@ -213,6 +196,13 @@ const ProductPicker = ({
                     ) : (
                       <div className="grid h-full place-items-center text-secondary-300">
                         <PackageSearch className="h-6 w-6" />
+                      </div>
+                    )}
+                    {selectedCodes?.includes(row.code) && (
+                      <div className="absolute inset-0 bg-primary-500/10 flex items-center justify-center">
+                        <div className="bg-primary text-white rounded-full p-1 shadow-sm">
+                          <Check className="h-5 w-5" />
+                        </div>
                       </div>
                     )}
                     {/* Stock on the tile, because a cashier picking by sight

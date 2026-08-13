@@ -82,7 +82,10 @@ const QuickVendorModal = ({
       <FormInput
         label="Phone"
         name="phone"
-        rules={[{ required: true, message: "A phone number is required" }]}
+        rules={[
+          { required: true, message: "A phone number is required" },
+          { pattern: /^\d{11}$/, message: "Phone number must be exactly 11 digits" },
+        ]}
         placeholder="e.g. 01711223344"
         digitsOnly
       />

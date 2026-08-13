@@ -118,6 +118,9 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
             label="Phone"
             name="phone"
             placeholder="Enter phone number (optional)"
+            rules={[
+              { pattern: /^\d{11}$/, message: "Phone number must be exactly 11 digits" },
+            ]}
           />
         </div>
     </AppFormModal>

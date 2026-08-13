@@ -6,7 +6,7 @@ import {
   Minus,
   PauseCircle,
   Plus,
-  Receipt,
+  CheckCircle,
   ScanLine,
   Trash2,
   X,
@@ -23,9 +23,11 @@ import {
   useCreateSaleMutation,
   useScanCodeMutation,
 } from "../../redux/features/sales/saleApi";
+import { useGetProductsQuery } from "../../redux/features/inventory/productApi";
 import { PAYMENT_METHOD_LABELS, round2 } from "../../utils/money";
 import CustomerPanel, { NewCustomerDraft } from "./CustomerPanel";
 import ProductPicker from "./ProductPicker";
+import { PickRow, toPickRows } from "./pickRows";
 import { CartLine, useCart } from "./useCart";
 
 /** A cart parked while another customer is served. */
@@ -73,6 +75,15 @@ const PointOfSale = () => {
   const [note, setNote] = useState("");
   const [held, setHeld] = useState<HeldSale[]>([]);
   const [picking, setPicking] = useState(false);
+  /**
+   * What the box has settled on, a beat behind what is being typed.
+   *
+   * A scanner types a whole code in milliseconds and presses Enter, so it is
+   * gone before this ever fires. A person typing gets suggestions — which is
+   * the case the box used to fail silently on: text in, nothing back, because
+   * only Enter did anything and nothing on screen said so.
+   */
+  const [term, setTerm] = useState("");
 
   const cart = useCart();
   const [scanCode, { isLoading: scanning }] = useScanCodeMutation();
@@ -80,6 +91,28 @@ const PointOfSale = () => {
 
   const focusScanner = () => scanRef.current?.focus();
   useEffect(focusScanner, []);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setTerm(code.trim()), 250);
+    return () => clearTimeout(timer);
+  }, [code]);
+
+  const { data: suggestData, isFetching: suggesting } = useGetProductsQuery(
+    [
+      { name: "limit", value: 8 },
+      { name: "isActive", value: true },
+      { name: "keyword", value: term },
+    ],
+    { skip: term.length < 2 }
+  );
+
+  // Out-of-stock rows are dropped rather than shown greyed: this list exists
+  // to be picked from, and a suggestion that cannot be chosen is noise.
+  const suggestions: PickRow[] = (
+    term.length < 2 ? [] : toPickRows(suggestData?.data?.data ?? [])
+  )
+    .filter((row) => row.stock > 0)
+    .slice(0, 6);
 
   /**
    * One way in, whether the code was scanned or picked off a tile.
@@ -110,7 +143,15 @@ const PointOfSale = () => {
     const value = code.trim();
     if (!value) return;
     setCode("");
+    setTerm("");
     addByCode(value);
+  };
+
+  /** Picked off the suggestion list rather than typed in full. */
+  const takeSuggestion = (row: PickRow) => {
+    setCode("");
+    setTerm("");
+    addByCode(row.code);
   };
 
   const grand = cart.totals.grandTotal;
@@ -160,10 +201,8 @@ const PointOfSale = () => {
       toast.error("Scan something first");
       return;
     }
-    if (due > 0 && !customer && !draft) {
-      toast.error(
-        "An unpaid sale needs a customer — there is nobody to collect from",
-      );
+    if (!customer && !draft) {
+      toast.error("Please select a customer to complete the sale");
       return;
     }
 
@@ -223,7 +262,7 @@ const PointOfSale = () => {
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-md bg-primary-50 text-primary">
             <ScanLine className="h-5 w-5" />
           </span>
-          <div className="min-w-[240px] flex-1">
+          <div className="relative min-w-[240px] flex-1">
             <Input
               ref={scanRef as never}
               size="large"
@@ -238,6 +277,51 @@ const PointOfSale = () => {
               }
               className="!rounded-md"
             />
+
+            {/* Suggestions, so typing does something on its own. Enter still
+                takes whatever is in the box verbatim — a scanner never waits
+                for a list and must not be made to. */}
+            {suggestions.length > 0 && (
+              <div className="absolute left-0 right-0 top-full z-30 mt-1 overflow-hidden rounded-md border border-secondary-100 bg-white shadow-lg">
+                {suggestions.map((row) => (
+                  <button
+                    key={row.key}
+                    type="button"
+                    onClick={() => takeSuggestion(row)}
+                    className="flex w-full items-center gap-3 px-3 py-2 text-left transition hover:bg-primary-50"
+                  >
+                    <div className="min-w-0 flex-1">
+                      <p className="m-0 truncate text-[13px] font-semibold text-secondary-800">
+                        {row.name}
+                        {row.variantName && (
+                          <span className="ml-2 rounded bg-primary-50 px-1.5 py-0.5 text-[11px] font-medium text-primary-700">
+                            {row.variantName}
+                          </span>
+                        )}
+                      </p>
+                      <p className="m-0 font-mono text-[11px] text-secondary-400">
+                        {row.code}
+                      </p>
+                    </div>
+                    <span className="shrink-0 text-[11px] text-secondary-400">
+                      {row.stock} left
+                    </span>
+                    <span className="shrink-0 text-[13px] font-bold text-primary-700">
+                      <Money value={row.price} />
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Said plainly, because "I typed it and nothing happened" is
+                exactly what this box used to do. */}
+            {term.length >= 2 && !suggesting && suggestions.length === 0 && (
+              <div className="absolute left-0 right-0 top-full z-30 mt-1 rounded-md border border-secondary-100 bg-white px-3 py-2 text-[12px] text-secondary-500 shadow-lg">
+                Nothing in stock matches &ldquo;{term}&rdquo; — press Enter to
+                try it as a code anyway.
+              </div>
+            )}
           </div>
 
           <Button
@@ -247,7 +331,7 @@ const PointOfSale = () => {
             className="bg-primary-50 text-primary-700 hover:bg-primary-100"
           >
             <LayoutGrid className="h-4 w-4" />
-            Browse · F4
+            Browse
           </Button>
           <div className="flex items-center gap-4">
             <div className="text-right">
@@ -425,13 +509,23 @@ const PointOfSale = () => {
                             Offer
                           </span>
                         )}
+                        {/* Capped at what the line is worth: the server refuses
+                            more than that, and finding out at Complete Sale —
+                            with a customer waiting — is the wrong moment. */}
                         <InputNumber
                           size="small"
                           min={0}
+                          max={round2(line.price * line.quantity)}
                           value={line.discount || null}
                           placeholder="Discount"
                           onChange={(value) =>
-                            cart.setDiscount(line.key, Number(value) || 0)
+                            cart.setDiscount(
+                              line.key,
+                              Math.min(
+                                Number(value) || 0,
+                                round2(line.price * line.quantity)
+                              )
+                            )
                           }
                           variant="borderless"
                           className="!w-24 !rounded-lg !bg-secondary-50/80 !px-2 hover:!bg-secondary-100"
@@ -527,7 +621,7 @@ const PointOfSale = () => {
                   value={cart.billDiscount || null}
                   placeholder="0"
                   onChange={(value) => cart.setBillDiscount(Number(value) || 0)}
-                  className="!w-28 !h-[22px] [&_.ant-input-number-input]:!h-[20px]"
+                  className="!w-28"
                 />
               </div>
               <div className="flex items-center justify-between gap-2">
@@ -540,7 +634,7 @@ const PointOfSale = () => {
                   value={cart.vatPercent || null}
                   placeholder="0"
                   onChange={(value) => cart.setVatPercent(Number(value) || 0)}
-                  className="!w-28 !h-[22px] [&_.ant-input-number-input]:!h-[20px]"
+                  className="!w-28"
                 />
               </div>
               {cart.totals.vatAmount > 0 && (
@@ -603,8 +697,13 @@ const PointOfSale = () => {
               </div>
             )}
 
-            <Input
+            {/* A textarea, because the notes written here — a delivery
+                instruction, why a discount was given — rarely fit on one line,
+                and a single-line box hides the rest of what was typed. */}
+            <Input.TextArea
               className="!mt-2"
+              rows={3}
+              autoSize={{ minRows: 3, maxRows: 6 }}
               value={note}
               onChange={(event) => setNote(event.target.value)}
               placeholder="Note on this sale (optional)"
@@ -632,8 +731,8 @@ const PointOfSale = () => {
               disabled={cart.lines.length === 0}
               className="col-span-2 bg-gradient-to-r from-primary-600 to-primary-500 text-white hover:from-primary-700 hover:to-primary-600"
             >
-              <Receipt className="h-4 w-4" />
-              Complete Sale · F9
+              <CheckCircle className="h-4 w-4" />
+              Complete Sale
             </Button>
           </div>
         </div>
@@ -645,6 +744,7 @@ const PointOfSale = () => {
           if (!value) focusScanner();
         }}
         onPick={addByCode}
+        selectedCodes={cart.lines.map((line) => line.barcode?.trim() || line.sku)}
       />
     </div>
   );
