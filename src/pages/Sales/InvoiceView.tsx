@@ -323,6 +323,10 @@ const InvoiceView = () => {
           }
         }
       `}</style>
+
+      {returning && id && (
+        <SaleReturnModal saleId={id} open={returning} setOpen={setReturning} />
+      )}
     </div>
   );
 };
