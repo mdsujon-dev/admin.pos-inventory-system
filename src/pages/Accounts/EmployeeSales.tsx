@@ -7,7 +7,6 @@ import PageMeta from "../../components/Common/PageMeta";
 import { MetricCard } from "../../components/Common/MetricCard";
 import Money from "../../components/shared/Money";
 import DataTable from "../../components/Table/DataTable";
-import TableEmpty from "../../components/Table/TableEmpty";
 import { useGetEmployeeSalesQuery } from "../../redux/features/crm/crmApi";
 import { SectionCard } from "../Inventory/Products/ProductFormUI";
 

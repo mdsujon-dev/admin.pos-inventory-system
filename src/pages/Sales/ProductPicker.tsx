@@ -54,7 +54,7 @@ const toRows = (products: IProduct[]): PickRow[] =>
     }
 
     return (product.variants ?? [])
-      .map((variant) => {
+      .map((variant): PickRow | null => {
         const code = variant.barcode?.trim() || variant.sku;
         if (!code) return null;
         return {

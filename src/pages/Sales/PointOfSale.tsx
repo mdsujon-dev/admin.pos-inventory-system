@@ -1,4 +1,4 @@
-import { Button, Empty, Input, InputNumber, Select, Tag, Tooltip } from "antd";
+import { Button, Input, InputNumber, Select, Tooltip } from "antd";
 import {
   AlertTriangle,
   LayoutGrid,
@@ -211,7 +211,7 @@ const PointOfSale = () => {
       />
 
       {/* Scan bar. Full width and simple. */}
-      <div className="rounded-2xl border border-secondary-200 bg-white p-3 shadow-sm sm:p-4">
+      <div className="rounded-2xl bg-white p-3 shadow-[0_2px_10px_-4px_rgba(16,24,40,.12)] sm:p-4">
         <div className="flex flex-wrap items-center gap-3">
           <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary-50 text-primary">
             <ScanLine className="h-5 w-5" />
@@ -277,7 +277,7 @@ const PointOfSale = () => {
       </div>
 
       {held.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-secondary-100 bg-white px-3 py-2">
+        <div className="flex flex-wrap items-center gap-2 rounded-xl bg-white px-3 py-2 shadow-[0_2px_10px_-4px_rgba(16,24,40,.1)]">
           <span className="text-xs font-medium text-secondary-500">
             Held carts
           </span>
@@ -294,9 +294,35 @@ const PointOfSale = () => {
         </div>
       )}
 
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 px-1 text-[11px] text-secondary-400">
+        <Shortcut keys="F2" label="back to scan" />
+        <Shortcut keys="F4" label="browse items" />
+        <Shortcut keys="F9" label="complete sale" />
+        <span>Enter is the scanner&rsquo;s own key</span>
+      </div>
+
       <div className="grid flex-1 gap-3 xl:grid-cols-3">
         {/* Cart */}
-        <div className="flex min-h-[300px] flex-col rounded-xl border border-secondary-100 bg-white xl:col-span-2">
+        <div className="flex min-h-[300px] flex-col overflow-hidden rounded-xl bg-white shadow-[0_2px_10px_-4px_rgba(16,24,40,.1)] xl:col-span-2">
+          <div className="flex items-center justify-between gap-3 bg-secondary-50/70 px-3 py-2">
+            <p className="m-0 text-[12px] font-semibold uppercase tracking-wide text-secondary-600">
+              Cart
+              {cart.lines.length > 0 && (
+                <span className="ml-1.5 font-normal text-secondary-400">
+                  {cart.totals.lineCount} line
+                  {cart.totals.lineCount === 1 ? "" : "s"} ·{" "}
+                  {cart.totals.unitCount} item
+                  {cart.totals.unitCount === 1 ? "" : "s"}
+                </span>
+              )}
+            </p>
+            {cart.lines.length > 0 && (
+              <Button size="small" type="text" onClick={resetSale}>
+                Clear all
+              </Button>
+            )}
+          </div>
+
           {cart.lines.length === 0 ? (
             <div className="grid flex-1 place-items-center p-8">
               <div className="text-center">
@@ -316,48 +342,64 @@ const PointOfSale = () => {
               </div>
             </div>
           ) : (
-            <div className="divide-y divide-secondary-100">
+            <div className="flex-1 divide-y divide-secondary-50 overflow-y-auto">
               {cart.lines.map((line) => {
                 const src = imageUrl(line.image);
                 const lineTotal = round2(
                   line.price * line.quantity - line.discount
                 );
+                const onOffer = line.price < line.listPrice;
                 return (
-                  <div key={line.key} className="flex gap-3 p-3">
+                  <div
+                    key={line.key}
+                    className="flex gap-3 px-3 py-2.5 transition-colors hover:bg-primary-50/40"
+                  >
                     {src ? (
                       <img
                         src={src}
                         alt={line.name}
-                        className="h-14 w-14 shrink-0 rounded-lg border border-secondary-200 object-cover"
+                        className="h-14 w-14 shrink-0 rounded-lg bg-secondary-50 object-cover"
                       />
                     ) : (
                       <div className="h-14 w-14 shrink-0 rounded-lg bg-secondary-100" />
                     )}
 
                     <div className="min-w-0 flex-1">
-                      <p className="m-0 truncate text-sm font-semibold text-secondary-800">
+                      <p className="m-0 truncate text-[14px] font-semibold text-secondary-800">
                         {line.name}
                         {line.variantName && (
-                          <Tag className="!ml-2 !border-primary-200 !bg-primary-50 !text-[11px] !text-primary-700">
+                          <span className="ml-2 rounded-md bg-primary-50 px-1.5 py-0.5 text-[11px] font-medium text-primary-700">
                             {line.variantName}
-                          </Tag>
+                          </span>
                         )}
                       </p>
                       <p className="m-0 font-mono text-[11px] text-secondary-400">
                         {line.sku}
                       </p>
-                      <div className="mt-1 flex flex-wrap items-center gap-2">
-                        <span className="text-xs text-secondary-500">
+
+                      <div className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        {/* On offer, the ticket price stays visible beside it.
+                            A cashier asked "why is it cheaper" has the answer
+                            on the row rather than in the product screen. */}
+                        <span className="text-[13px] font-semibold text-secondary-700">
                           <Money value={line.price} />
-                          {line.unit ? ` / ${line.unit}` : ""}
                         </span>
-                        {line.price < line.listPrice && (
-                          <Tag className="!m-0 !border-primary-200 !bg-primary-50 !text-[10px] !text-primary-700">
+                        {onOffer && (
+                          <span className="text-[11px] text-secondary-400 line-through">
+                            <Money value={line.listPrice} />
+                          </span>
+                        )}
+                        {line.unit && (
+                          <span className="text-[11px] text-secondary-400">
+                            / {line.unit}
+                          </span>
+                        )}
+                        {onOffer && (
+                          <span className="rounded-md bg-primary-50 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-primary-700">
                             Offer
-                          </Tag>
+                          </span>
                         )}
                         <InputNumber
-                          type="number"
                           size="small"
                           min={0}
                           value={line.discount || null}
@@ -365,22 +407,25 @@ const PointOfSale = () => {
                           onChange={(value) =>
                             cart.setDiscount(line.key, Number(value) || 0)
                           }
+                          variant="filled"
                           className="!w-24"
                         />
                       </div>
                     </div>
 
-                    <div className="flex shrink-0 flex-col items-end justify-between">
-                      <div className="flex items-center gap-1">
-                        <Button
-                          size="small"
-                          icon={<Minus className="h-3 w-3" />}
+                    <div className="flex shrink-0 flex-col items-end justify-between gap-2">
+                      <div className="flex items-center gap-1 rounded-lg bg-secondary-50 p-0.5">
+                        <button
+                          type="button"
                           onClick={() =>
                             cart.setQuantity(line.key, line.quantity - 1)
                           }
                           disabled={line.quantity <= 1}
-                        />
-                        <span className="w-8 text-center text-sm font-semibold">
+                          className="grid h-7 w-7 place-items-center rounded-md text-secondary-600 transition hover:bg-white disabled:opacity-35"
+                        >
+                          <Minus className="h-3.5 w-3.5" />
+                        </button>
+                        <span className="w-7 text-center text-[14px] font-bold text-secondary-800">
                           {line.quantity}
                         </span>
                         <Tooltip
@@ -390,24 +435,26 @@ const PointOfSale = () => {
                               : ""
                           }
                         >
-                          <Button
-                            size="small"
-                            icon={<Plus className="h-3 w-3" />}
+                          <button
+                            type="button"
                             onClick={() =>
                               cart.setQuantity(line.key, line.quantity + 1)
                             }
                             disabled={line.quantity >= line.available}
-                          />
+                            className="grid h-7 w-7 place-items-center rounded-md text-secondary-600 transition hover:bg-white disabled:opacity-35"
+                          >
+                            <Plus className="h-3.5 w-3.5" />
+                          </button>
                         </Tooltip>
-                        <Button
-                          size="small"
-                          danger
-                          type="text"
-                          icon={<Trash2 className="h-3.5 w-3.5" />}
+                        <button
+                          type="button"
                           onClick={() => cart.removeLine(line.key)}
-                        />
+                          className="grid h-7 w-7 place-items-center rounded-md text-danger transition hover:bg-danger/10"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
-                      <p className="m-0 text-sm font-semibold text-secondary-800">
+                      <p className="m-0 text-[15px] font-bold text-secondary-800">
                         <Money value={lineTotal} />
                       </p>
                     </div>
@@ -418,8 +465,10 @@ const PointOfSale = () => {
           )}
         </div>
 
-        {/* Customer, money, and the button that ends it */}
-        <div className="flex flex-col gap-3">
+        {/* Customer, money, and the button that ends it. Sticky, so a long
+            cart never pushes the total and the Complete button off screen —
+            the two things the cashier is reaching for. */}
+        <div className="flex flex-col gap-3 xl:sticky xl:top-3 xl:self-start">
           <CustomerPanel
             customer={customer}
             onPick={setCustomer}
@@ -427,7 +476,7 @@ const PointOfSale = () => {
             onDraft={setDraft}
           />
 
-          <div className="rounded-xl border border-secondary-100 bg-white p-3">
+          <div className="rounded-xl bg-white p-3 shadow-[0_2px_10px_-4px_rgba(16,24,40,.1)]">
             <div className="space-y-1.5 text-sm">
               <Row label="Subtotal" value={cart.totals.subtotal} />
               {cart.totals.itemDiscountTotal > 0 && (
@@ -468,7 +517,7 @@ const PointOfSale = () => {
               )}
             </div>
 
-            <div className="mt-3 flex items-center justify-between border-t border-primary/15 pt-3">
+            <div className="mt-3 flex items-center justify-between rounded-lg bg-primary-50 px-3 py-2">
               <span className="text-sm font-semibold text-secondary-700">
                 Grand total
               </span>
@@ -478,7 +527,7 @@ const PointOfSale = () => {
             </div>
           </div>
 
-          <div className="rounded-xl border border-secondary-100 bg-white p-3">
+          <div className="rounded-xl bg-white p-3 shadow-[0_2px_10px_-4px_rgba(16,24,40,.1)]">
             <div className="grid grid-cols-2 gap-2">
               <div>
                 <label className="mb-1 block text-xs font-medium text-secondary-600">
@@ -531,9 +580,12 @@ const PointOfSale = () => {
             />
           </div>
 
-          <div className="mt-auto grid grid-cols-3 gap-2">
-            <Button onClick={resetSale} disabled={cart.lines.length === 0}>
-              Clear
+          <div className="mt-auto grid grid-cols-2 gap-2">
+            <Button
+              onClick={() => setPicking(true)}
+              icon={<LayoutGrid className="h-4 w-4" />}
+            >
+              Add item
             </Button>
             <Button
               onClick={hold}
@@ -549,7 +601,7 @@ const PointOfSale = () => {
               onClick={complete}
               disabled={cart.lines.length === 0}
               icon={<Receipt className="h-4 w-4" />}
-              className="!col-span-3 !h-12 !border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 !text-base !font-semibold shadow-primary hover:!from-primary-700 hover:!to-primary-600"
+              className="!col-span-2 !h-12 !border-0 !bg-gradient-to-r !from-primary-600 !to-primary-500 !text-base !font-semibold shadow-primary hover:!from-primary-700 hover:!to-primary-600"
             >
               Complete Sale · F9
             </Button>
@@ -567,6 +619,16 @@ const PointOfSale = () => {
     </div>
   );
 };
+
+/** A keyboard hint, spelled out — a till is driven by keys, not by clicks. */
+const Shortcut = ({ keys, label }: { keys: string; label: string }) => (
+  <span className="inline-flex items-center gap-1.5">
+    <kbd className="rounded border border-secondary-200 bg-white px-1.5 py-0.5 font-mono text-[10px] text-secondary-600">
+      {keys}
+    </kbd>
+    {label}
+  </span>
+);
 
 const Row = ({
   label,
