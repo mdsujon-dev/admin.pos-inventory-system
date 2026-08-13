@@ -120,7 +120,6 @@ const ProfitLoss = () => {
 
       <div className="grid gap-4 lg:grid-cols-2">
         <SectionCard
-          icon={TrendingUp}
           title="The statement"
           subtitle="Each line takes from the one above it"
         >
@@ -172,7 +171,6 @@ const ProfitLoss = () => {
         </SectionCard>
 
         <SectionCard
-          icon={Package}
           title="Running costs"
           subtitle="By heading, largest first"
         >

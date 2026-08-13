@@ -84,7 +84,6 @@ const AccountsOverview = () => {
 
       {/* Trading */}
       <SectionCard
-        icon={TrendingUp}
         title="Trading"
         subtitle="Revenue less what the goods cost, then less what the shop costs to run"
       >
@@ -135,7 +134,6 @@ const AccountsOverview = () => {
       {/* Cash */}
       <div className="mt-4">
         <SectionCard
-          icon={Wallet}
           title="Cash"
           subtitle="What actually moved — a profitable month can still be a tight one"
         >
@@ -167,7 +165,6 @@ const AccountsOverview = () => {
       {/* What is on the shelf */}
       <div className="mt-4">
         <SectionCard
-          icon={Package}
           title="On the shelf"
           subtitle="What the stock cost, and what it would earn if it all sold today"
         >
@@ -208,7 +205,6 @@ const AccountsOverview = () => {
       {/* Owed both ways */}
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         <SectionCard
-          icon={ArrowDownLeft}
           title="Customers owe us"
           subtitle="Sales left unpaid"
         >
@@ -223,7 +219,6 @@ const AccountsOverview = () => {
         </SectionCard>
 
         <SectionCard
-          icon={ArrowUpRight}
           title="We owe vendors"
           subtitle="Bills not yet settled"
         >

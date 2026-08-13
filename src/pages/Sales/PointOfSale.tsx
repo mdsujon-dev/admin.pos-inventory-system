@@ -1,6 +1,7 @@
 import { Button, Empty, Input, InputNumber, Select, Tag, Tooltip } from "antd";
 import {
   AlertTriangle,
+  LayoutGrid,
   Loader2,
   Minus,
   PauseCircle,
@@ -23,6 +24,7 @@ import {
 } from "../../redux/features/sales/saleApi";
 import { PAYMENT_METHOD_LABELS, round2 } from "../../utils/money";
 import CustomerPanel, { NewCustomerDraft } from "./CustomerPanel";
+import ProductPicker from "./ProductPicker";
 import { CartLine, useCart } from "./useCart";
 
 /** A cart parked while another customer is served. */
@@ -47,9 +49,11 @@ const imageUrl = (path?: string | null) =>
  * a scanner fires wherever the caret happens to be, and a cashier will not
  * notice it landed in the discount field until the numbers are wrong.
  *
- * There is deliberately no product picker. Everything on this screen arrives
- * by its code, so nothing expired, switched off or out of stock can be rung
- * up — the server refuses those on the scan and says why.
+ * The picker beside it exists for the cases a scanner cannot cover: a peeled
+ * label, loose goods, a customer changing their mind mid-queue. It does not
+ * take a shortcut around the checks — it hands back a code and that code goes
+ * through the same scan call, so expired, switched-off and out-of-stock items
+ * are refused whichever way they were reached.
  */
 const PointOfSale = () => {
   const navigate = useNavigate();
@@ -63,6 +67,7 @@ const PointOfSale = () => {
   const [tendered, setTendered] = useState<number | null>(null);
   const [note, setNote] = useState("");
   const [held, setHeld] = useState<HeldSale[]>([]);
+  const [picking, setPicking] = useState(false);
 
   const cart = useCart();
   const [scanCode, { isLoading: scanning }] = useScanCodeMutation();
@@ -71,11 +76,15 @@ const PointOfSale = () => {
   const focusScanner = () => scanRef.current?.focus();
   useEffect(focusScanner, []);
 
-  const handleScan = async () => {
-    const value = code.trim();
+  /**
+   * One way in, whether the code was scanned or picked off a tile.
+   *
+   * Keeping a single path means there is one place where stock, expiry and
+   * price are decided, and no chance of the picker quietly becoming the
+   * lenient one.
+   */
+  const addByCode = async (value: string) => {
     if (!value) return;
-
-    setCode("");
     setRefusal(null);
 
     try {
@@ -90,6 +99,13 @@ const PointOfSale = () => {
     } finally {
       focusScanner();
     }
+  };
+
+  const handleScan = () => {
+    const value = code.trim();
+    if (!value) return;
+    setCode("");
+    addByCode(value);
   };
 
   const grand = cart.totals.grandTotal;
@@ -177,6 +193,10 @@ const PointOfSale = () => {
         event.preventDefault();
         focusScanner();
       }
+      if (event.key === "F4") {
+        event.preventDefault();
+        setPicking(true);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -212,6 +232,15 @@ const PointOfSale = () => {
               className="!rounded-xl"
             />
           </div>
+
+          <Button
+            size="large"
+            icon={<LayoutGrid className="h-4 w-4" />}
+            onClick={() => setPicking(true)}
+            className="!rounded-xl !border-primary-200 !text-primary-700"
+          >
+            Browse · F4
+          </Button>
           <div className="flex items-center gap-4">
             <div className="text-right">
               <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-500">
@@ -270,13 +299,21 @@ const PointOfSale = () => {
         <div className="flex min-h-[300px] flex-col rounded-xl border border-secondary-100 bg-white xl:col-span-2">
           {cart.lines.length === 0 ? (
             <div className="grid flex-1 place-items-center p-8">
-              <Empty
-                description={
-                  <span className="text-secondary-500">
-                    Nothing scanned yet. The cart fills from the box above.
-                  </span>
-                }
-              />
+              <div className="text-center">
+                <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-primary-50 text-primary">
+                  <ScanLine className="h-6 w-6" />
+                </span>
+                <p className="m-0 mt-3 text-[15px] font-semibold text-secondary-700">
+                  Ready when you are
+                </p>
+                <p className="m-0 mt-1 text-[13px] text-secondary-500">
+                  Scan an item, or press{" "}
+                  <kbd className="rounded border border-secondary-200 bg-secondary-50 px-1.5 py-0.5 font-mono text-[11px]">
+                    F4
+                  </kbd>{" "}
+                  to browse the shelf.
+                </p>
+              </div>
             </div>
           ) : (
             <div className="divide-y divide-secondary-100">
@@ -519,6 +556,14 @@ const PointOfSale = () => {
           </div>
         </div>
       </div>
+      <ProductPicker
+        open={picking}
+        setOpen={(value) => {
+          setPicking(value);
+          if (!value) focusScanner();
+        }}
+        onPick={addByCode}
+      />
     </div>
   );
 };

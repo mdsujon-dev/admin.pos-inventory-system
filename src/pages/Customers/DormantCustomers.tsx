@@ -100,7 +100,6 @@ const DormantCustomers = () => {
       </div>
 
       <SectionCard
-        icon={Phone}
         title="The call list"
         subtitle="Biggest former spenders first"
       >

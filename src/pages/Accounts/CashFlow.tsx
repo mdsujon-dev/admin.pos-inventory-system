@@ -94,7 +94,6 @@ const columns = [
  * other where it was.
  */
 const FlowSection = ({
-  icon: Icon,
   title,
   subtitle,
   total,
@@ -103,7 +102,6 @@ const FlowSection = ({
   loading,
   empty,
 }: {
-  icon: React.ElementType;
   title: string;
   subtitle: string;
   total: number;
@@ -118,12 +116,6 @@ const FlowSection = ({
   return (
     <section>
       <div className="mb-3 flex items-center gap-2.5">
-        <span
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-white"
-          style={{ background: accent }}
-        >
-          <Icon className="h-[18px] w-[18px]" />
-        </span>
         <div className="min-w-0">
           <p className="m-0 flex items-baseline gap-2 leading-tight">
             <span className="text-[15px] font-bold text-secondary-800">
@@ -262,7 +254,6 @@ const CashFlow = () => {
 
       <div className="flex flex-col gap-6">
         <FlowSection
-          icon={ArrowDownLeft}
           title="In"
           subtitle="Sales receipts and anything logged as income"
           total={cash?.inflow ?? 0}
@@ -279,7 +270,6 @@ const CashFlow = () => {
           }
         />
         <FlowSection
-          icon={ArrowUpRight}
           title="Out"
           subtitle="Paid to suppliers, and the running costs of the shop"
           total={cash?.outflow ?? 0}

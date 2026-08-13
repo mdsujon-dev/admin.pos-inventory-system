@@ -107,7 +107,6 @@ const EmployeeSales = () => {
       </div>
 
       <SectionCard
-        icon={Users}
         title="By employee"
         subtitle="Revenue first, with what it actually earned beside it"
       >
@@ -130,13 +129,6 @@ const EmployeeSales = () => {
           limit={limit}
           setLimit={setLimit}
           isPaginate={rows.length > limit}
-          emptyText={
-            <TableEmpty
-              icon={Users}
-              title="Nobody sold anything"
-              hint="No invoice was saved in this date range."
-            />
-          }
           columns={[
             {
               title: "Employee",
