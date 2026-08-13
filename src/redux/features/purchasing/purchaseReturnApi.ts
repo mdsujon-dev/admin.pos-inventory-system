@@ -15,6 +15,16 @@ export interface IReturnableBillLine {
   stillOnShelf: number;
 }
 
+/** One instalment of a refund the supplier owed us. */
+export interface IRefundReceipt {
+  amount: number;
+  method: PaymentMethod;
+  reference?: string;
+  receivedAt: string;
+  note?: string;
+  createdByName?: string;
+}
+
 export interface IPurchaseReturn {
   _id: string;
   returnNo: string;
@@ -31,10 +41,14 @@ export interface IPurchaseReturn {
   }[];
   totalCost: number;
   totalQuantity: number;
-  mode: "cash" | "credit";
+  mode: "cash" | "credit" | "pending";
+  /** Money actually in hand. Grows as receipts land on a pending return. */
   refundAmount: number;
   refundMethod?: PaymentMethod;
   creditedToDue: number;
+  /** Still owed to us by the supplier. */
+  refundDue: number;
+  receipts?: IRefundReceipt[];
   reason?: string;
   returnedAt: string;
   createdByName?: string;
@@ -83,6 +97,17 @@ const purchaseReturnApi = baseApi.injectEndpoints({
         "reports",
       ],
     }),
+
+    recordRefundReceipt: builder.mutation({
+      query: ({ id, ...body }: { id: string } & Record<string, unknown>) => ({
+        url: `/purchase-returns/${id}/refund`,
+        method: "PATCH",
+        body,
+      }),
+      // No stock moves here, only money — but the vendor balance and every
+      // cash report shift the moment it lands.
+      invalidatesTags: ["purchase-returns", "vendors", "reports"],
+    }),
   }),
   overrideExisting: false,
 });
@@ -93,4 +118,5 @@ export const {
   useGetReturnableBillLinesQuery,
   useGetReturnsOfPurchaseQuery,
   useCreatePurchaseReturnMutation,
+  useRecordRefundReceiptMutation,
 } = purchaseReturnApi;

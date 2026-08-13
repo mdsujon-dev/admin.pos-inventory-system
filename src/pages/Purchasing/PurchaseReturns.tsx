@@ -1,6 +1,6 @@
 import { DatePicker, Input, Tag } from "antd";
 import dayjs, { Dayjs } from "dayjs";
-import { Boxes, Search, Undo2, Wallet } from "lucide-react";
+import { Boxes, Clock, Search, Undo2, Wallet } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PageHeader from "../../components/Common/PageHeader";
@@ -13,6 +13,7 @@ import DataTable from "../../components/Table/DataTable";
 import TableEmpty from "../../components/Table/TableEmpty";
 import PickBillModal from "../../components/modal/purchasing/PickBillModal";
 import PurchaseReturnModal from "../../components/modal/purchasing/PurchaseReturnModal";
+import RefundReceiptModal from "../../components/modal/purchasing/RefundReceiptModal";
 import ExportMenu from "../../components/Common/ExportMenu";
 import { makeSheet } from "../../utils/tableExport";
 import {
@@ -23,6 +24,29 @@ import {
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
 
 const { RangePicker } = DatePicker;
+
+/**
+ * What a return did to the money, in one line.
+ *
+ * Three outcomes rather than the two this page used to show: money still owed
+ * by the supplier reads as neither cash nor credit, and folding it into either
+ * is what let a promised refund pass for one that arrived.
+ */
+const settledLabel = (row: IPurchaseReturn) => {
+  const owed = row.refundDue ?? 0;
+  const back = row.refundAmount ?? 0;
+  const method = PAYMENT_METHOD_LABELS[row.refundMethod ?? "cash"];
+
+  if (owed > 0) {
+    return back > 0
+      ? `${owed.toLocaleString("en-BD")} still owed (${back.toLocaleString(
+          "en-BD"
+        )} received)`
+      : `${owed.toLocaleString("en-BD")} owed by supplier`;
+  }
+  if (back > 0) return `Money back (${method})`;
+  return "Off the bill";
+};
 
 /**
  * Goods sent back to a supplier.
@@ -39,6 +63,7 @@ const PurchaseReturns = () => {
   const [range, setRange] = useState<[Dayjs | null, Dayjs | null] | null>(null);
   const [choosing, setChoosing] = useState(false);
   const [returning, setReturning] = useState<string | null>(null);
+  const [collecting, setCollecting] = useState<IPurchaseReturn | null>(null);
 
   const { data, isFetching } = useGetPurchaseReturnsQuery([
     { name: "page", value: currentPage },
@@ -72,15 +97,16 @@ const PurchaseReturns = () => {
       ],
       headers: ["Return", "Date", "Bill", "Supplier", "Units", "Settled", "Value"],
       rows: (all?.data?.data ?? []) as IPurchaseReturn[],
+      // A return still waiting on its money is the row the reader is looking
+      // for, so it is the one the export marks.
+      isLow: (row: IPurchaseReturn) => (row.refundDue ?? 0) > 0,
       cells: (row: IPurchaseReturn) => [
         row.returnNo,
         dayjs(row.returnedAt).format("DD MMM YYYY"),
         row.purchaseNo,
         row.vendorName,
         row.totalQuantity,
-        row.refundAmount > 0
-          ? `Money back (${PAYMENT_METHOD_LABELS[row.refundMethod ?? "cash"]})`
-          : "Off the bill",
+        settledLabel(row),
         row.totalCost.toLocaleString("en-BD"),
       ],
     });
@@ -88,6 +114,7 @@ const PurchaseReturns = () => {
 
   const pageValue = rows.reduce((sum, row) => sum + row.totalCost, 0);
   const pageCash = rows.reduce((sum, row) => sum + row.refundAmount, 0);
+  const pageOwed = rows.reduce((sum, row) => sum + (row.refundDue ?? 0), 0);
   const pageUnits = rows.reduce((sum, row) => sum + row.totalQuantity, 0);
 
   return (

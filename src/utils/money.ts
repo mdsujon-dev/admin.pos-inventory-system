@@ -56,3 +56,31 @@ export const PAYMENT_METHOD_LABELS: Record<string, string> = {
 };
 
 export const PAYMENT_METHODS = Object.keys(PAYMENT_METHOD_LABELS);
+
+/**
+ * What the one "proof" field is called, per method.
+ *
+ * The same field every time — one string that settles "did this money really
+ * move" — but nobody calls a bKash trx id a reference, so the label follows
+ * the method rather than making the cashier translate. Shared because money
+ * arriving and money leaving ask for the same proof.
+ */
+export const PAYMENT_REFERENCE_LABELS: Record<string, string> = {
+  cash: "Voucher no",
+  bkash: "Transaction ID",
+  nagad: "Transaction ID",
+  rocket: "Transaction ID",
+  bank: "Cheque / transfer no",
+  card: "Approval code",
+  other: "Reference",
+};
+
+export const PAYMENT_REFERENCE_HINTS: Record<string, string> = {
+  cash: "e.g. VCH-1042",
+  bkash: "e.g. 9F2K7XQ1PL",
+  nagad: "e.g. 9F2K7XQ1PL",
+  rocket: "e.g. 9F2K7XQ1PL",
+  bank: "e.g. 004512 or the transfer id",
+  card: "e.g. 013422",
+  other: "Optional",
+};

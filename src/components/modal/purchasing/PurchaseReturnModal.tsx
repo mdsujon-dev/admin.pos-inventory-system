@@ -11,6 +11,16 @@ import {
 import { PAYMENT_METHOD_LABELS } from "../../../utils/money";
 
 /**
+ * How the supplier settles up — the three things that actually happen.
+ *
+ * "pending" exists because the other two both lie about the common case: a
+ * paid bill whose goods went back while the supplier said they would send the
+ * money on. Calling that "cash" puts money in the ledger that is not in the
+ * drawer; calling it "credit" clears a debt that was never there.
+ */
+type Mode = "credit" | "cash" | "pending";
+
+/**
  * Sending goods back to the supplier.
  *
  * Line by line, against the bill they arrived on — a return needs to know
@@ -40,7 +50,7 @@ const PurchaseReturnModal = ({
   const lines: IReturnableBillLine[] = useMemo(() => bill?.lines ?? [], [bill]);
 
   const [picked, setPicked] = useState<Record<number, number>>({});
-  const [mode, setMode] = useState<"cash" | "credit">("credit");
+  const [mode, setMode] = useState<Mode>("credit");
   const [refundMethod, setRefundMethod] = useState("cash");
   const [reason, setReason] = useState("");
 
@@ -59,8 +69,14 @@ const PurchaseReturnModal = ({
   );
   const units = Object.values(picked).reduce((sum, n) => sum + (n || 0), 0);
 
-  const creditable = Math.min(bill?.due ?? 0, total);
-  const cashBack = mode === "credit" ? total - creditable : total;
+  /**
+   * The same three-way split the server does, mirrored so the box on the right
+   * says what will be saved rather than something close to it.
+   */
+  const creditable = mode === "credit" ? Math.min(bill?.due ?? 0, total) : 0;
+  const owedBack = total - creditable;
+  const cashBack = mode === "pending" ? 0 : owedBack;
+  const pendingBack = mode === "pending" ? owedBack : 0;
 
   const onSubmit = async () => {
     const items = Object.entries(picked)
@@ -186,21 +202,31 @@ const PurchaseReturnModal = ({
               <Segmented
                 block
                 value={mode}
-                onChange={(value) => setMode(value as "cash" | "credit")}
+                onChange={(value) => setMode(value as Mode)}
                 options={[
                   {
                     label: "Take off what we owe",
                     value: "credit",
                     disabled: (bill?.due ?? 0) <= 0,
                   },
-                  { label: "Money back", value: "cash" },
+                  { label: "Money back now", value: "cash" },
+                  { label: "They'll pay later", value: "pending" },
                 ]}
               />
-              {(bill?.due ?? 0) > 0 && (
-                <p className="m-0 mt-1.5 text-[11px] text-secondary-400">
-                  This bill still has <Money value={bill?.due} /> unpaid.
-                </p>
-              )}
+              {/*
+                Why the first option is greyed out is the question this modal
+                gets asked most, so it answers it either way rather than only
+                when there is a balance to report.
+              */}
+              <p className="m-0 mt-1.5 text-[11px] text-secondary-400">
+                {(bill?.due ?? 0) > 0 ? (
+                  <>
+                    This bill still has <Money value={bill?.due} /> unpaid.
+                  </>
+                ) : (
+                  "This bill is paid in full, so there is nothing left to take it off."
+                )}
+              </p>
 
               {cashBack > 0 && (
                 <Select
@@ -222,26 +248,51 @@ const PurchaseReturnModal = ({
               />
             </div>
 
-            <div className="rounded-md border border-primary-200 bg-primary-50 p-3">
+            {/*
+              Amber rather than the usual green when the money is only
+              promised: the two outcomes are one click apart and read almost
+              the same, and the colour is what stops a shop banking a figure
+              that has not arrived.
+            */}
+            <div
+              className={`rounded-md border p-3 ${
+                pendingBack > 0
+                  ? "border-[#f59e0b55] bg-[#fffbeb]"
+                  : "border-primary-200 bg-primary-50"
+              }`}
+            >
               <Line label="Units going back" value={String(units)} />
               <Line label="Value at landed cost" value={<Money value={total} />} />
-              {mode === "credit" && (
+              {creditable > 0 && (
                 <Line
                   label="Off what we owe"
                   value={<Money value={creditable} />}
                 />
               )}
-              <div className="mt-2 flex items-center justify-between border-t border-primary-200 pt-2">
-                <span className="text-[12px] font-semibold uppercase tracking-wide text-primary-700">
-                  Money back
+              <div
+                className={`mt-2 flex items-center justify-between border-t pt-2 ${
+                  pendingBack > 0 ? "border-[#f59e0b55]" : "border-primary-200"
+                }`}
+              >
+                <span
+                  className={`text-[12px] font-semibold uppercase tracking-wide ${
+                    pendingBack > 0 ? "text-[#92400e]" : "text-primary-700"
+                  }`}
+                >
+                  {pendingBack > 0 ? "Supplier owes us" : "Money back"}
                 </span>
-                <span className="text-[17px] font-bold text-primary-700">
-                  <Money value={cashBack} />
+                <span
+                  className={`text-[17px] font-bold ${
+                    pendingBack > 0 ? "text-[#92400e]" : "text-primary-700"
+                  }`}
+                >
+                  <Money value={pendingBack > 0 ? pendingBack : cashBack} />
                 </span>
               </div>
               <p className="m-0 mt-2 text-[11px] text-secondary-500">
-                Valued at landed cost — the freight paid to bring these in is
-                part of what the shelf is giving up.
+                {pendingBack > 0
+                  ? "Nothing is counted as cash until you record the refund arriving — until then it sits on the ledger as owed to us."
+                  : "Valued at landed cost — the freight paid to bring these in is part of what the shelf is giving up."}
               </p>
             </div>
           </div>

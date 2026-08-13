@@ -4,36 +4,14 @@ import { useMemo, useState } from "react";
 import { toast } from "react-toastify";
 import { IVendor } from "../../../redux/features/purchasing/vendorApi";
 import { useCreateVendorPaymentMutation } from "../../../redux/features/purchasing/vendorPaymentApi";
-import { PAYMENT_METHOD_LABELS, round2 } from "../../../utils/money";
+import {
+  PAYMENT_METHOD_LABELS,
+  PAYMENT_REFERENCE_HINTS,
+  PAYMENT_REFERENCE_LABELS,
+  round2,
+} from "../../../utils/money";
 import Money from "../../shared/Money";
 import AppFormModal from "../shared/AppFormModal";
-
-/**
- * What the one "proof" field is called, per method.
- *
- * The same field every time — one string that settles "did this really go
- * out" — but nobody calls a bKash trx id a reference, so the label follows
- * the method rather than making the cashier translate.
- */
-const REFERENCE_LABEL: Record<string, string> = {
-  cash: "Voucher no",
-  bkash: "Transaction ID",
-  nagad: "Transaction ID",
-  rocket: "Transaction ID",
-  bank: "Cheque / transfer no",
-  card: "Approval code",
-  other: "Reference",
-};
-
-const REFERENCE_HINT: Record<string, string> = {
-  cash: "e.g. VCH-1042",
-  bkash: "e.g. 9F2K7XQ1PL",
-  nagad: "e.g. 9F2K7XQ1PL",
-  rocket: "e.g. 9F2K7XQ1PL",
-  bank: "e.g. 004512 or the transfer id",
-  card: "e.g. 013422",
-  other: "Optional",
-};
 
 const WALLETS = ["bkash", "nagad", "rocket"];
 
@@ -197,11 +175,11 @@ const VendorPaymentModal = ({
           <DatePicker className="w-full" allowClear={false} />
         </Form.Item>
         <Form.Item
-          label={REFERENCE_LABEL[method] ?? "Reference"}
+          label={PAYMENT_REFERENCE_LABELS[method] ?? "Reference"}
           name="reference"
           tooltip="Whatever single thing proves this money moved"
         >
-          <Input placeholder={REFERENCE_HINT[method] ?? "Optional"} />
+          <Input placeholder={PAYMENT_REFERENCE_HINTS[method] ?? "Optional"} />
         </Form.Item>
 
         {/*

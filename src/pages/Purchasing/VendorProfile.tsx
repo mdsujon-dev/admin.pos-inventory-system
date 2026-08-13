@@ -1,9 +1,8 @@
-import { Button, Tag } from "antd";
+import { Button, Tag, Card } from "antd";
 import dayjs from "dayjs";
 import {
   ArrowLeft,
   Banknote,
-  Boxes,
   Edit,
   Package,
   Phone,
@@ -24,7 +23,8 @@ import Money from "../../components/shared/Money";
 import { MetricCard } from "../../components/Common/MetricCard";
 import { useGetVendorLedgerQuery } from "../../redux/features/purchasing/purchaseApi";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
-import { SectionCard } from "../Inventory/Products/ProductFormUI";
+import ExportMenu from "../../components/Common/ExportMenu";
+import { makeSheet } from "../../utils/tableExport";
 
 /**
  * A table on this page, with its own page number.
@@ -236,11 +236,11 @@ const VendorProfile = () => {
 
       {/* Who they are, and what they carry */}
       <div className="mb-4 grid gap-4 lg:grid-cols-2">
-        <SectionCard
-          icon={Boxes}
-          title="What they supply"
-          subtitle="The headings to reach for when something runs out"
-        >
+        <Card className="!rounded-xl !border-secondary-100 shadow-card" styles={{ body: { padding: '20px' } }}>
+          <div className="mb-4">
+            <h3 className="m-0 text-[16px] font-semibold text-secondary-800">What they supply</h3>
+            <p className="m-0 mt-1 text-xs text-secondary-500">The headings to reach for when something runs out</p>
+          </div>
           {supplies.length === 0 ? (
             <p className="m-0 text-sm text-secondary-500">
               Nothing recorded yet — edit the vendor and tick what they carry.
@@ -273,13 +273,13 @@ const VendorProfile = () => {
               <p className="m-0 pt-1 text-secondary-600">{vendor.note}</p>
             )}
           </div>
-        </SectionCard>
+        </Card>
 
-        <SectionCard
-          icon={Banknote}
-          title="How they get paid"
-          subtitle="Written down once instead of asked for every time"
-        >
+        <Card className="!rounded-xl !border-secondary-100 shadow-card" styles={{ body: { padding: '20px' } }}>
+          <div className="mb-4">
+            <h3 className="m-0 text-[16px] font-semibold text-secondary-800">How they get paid</h3>
+            <p className="m-0 mt-1 text-xs text-secondary-500">Written down once instead of asked for every time</p>
+          </div>
           {terms.length === 0 && methods.length === 0 ? (
             <p className="m-0 text-sm text-secondary-500">
               No payment details saved yet — edit the vendor to add them.
@@ -373,15 +373,34 @@ const VendorProfile = () => {
               )}
             </div>
           )}
-        </SectionCard>
+        </Card>
       </div>
 
       <div className="grid gap-4 xl:grid-cols-2">
-        <SectionCard
-          icon={Receipt}
-          title="Bills"
-          subtitle="Newest first, with what is still owed on each"
-        >
+        <Card className="!rounded-xl !border-secondary-100 shadow-card" styles={{ body: { padding: '20px' } }}>
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <h3 className="m-0 text-[16px] font-semibold text-secondary-800">Bills</h3>
+              <p className="m-0 mt-1 text-xs text-secondary-500">Newest first, with what is still owed on each</p>
+            </div>
+            <ExportMenu
+              size="small"
+              sheet={() =>
+                makeSheet({
+                  title: `${vendor.name} - Bills`,
+                  unit: "bill",
+                  headers: ["Bill No", "Date", "Total", "Due"],
+                  rows: purchases ?? [],
+                  cells: (r: any) => [
+                    r.purchaseNo + (r.billNo ? ` (${r.billNo})` : ""),
+                    dayjs(r.purchaseDate).format("DD MMM YYYY"),
+                    r.grandTotal,
+                    r.due,
+                  ],
+                })
+              }
+            />
+          </div>
           <ProfileTable
             data={purchases}
             rowKey="_id"
@@ -446,13 +465,32 @@ const VendorProfile = () => {
               },
             ]}
           />
-        </SectionCard>
+        </Card>
 
-        <SectionCard
-          icon={Wallet}
-          title="Payments"
-          subtitle="Every taka handed over, and what it settled"
-        >
+        <Card className="!rounded-xl !border-secondary-100 shadow-card" styles={{ body: { padding: '20px' } }}>
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <h3 className="m-0 text-[16px] font-semibold text-secondary-800">Payments</h3>
+              <p className="m-0 mt-1 text-xs text-secondary-500">Every taka handed over, and what it settled</p>
+            </div>
+            <ExportMenu
+              size="small"
+              sheet={() =>
+                makeSheet({
+                  title: `${vendor.name} - Payments`,
+                  unit: "payment",
+                  headers: ["Payment No", "Date", "Method", "Amount"],
+                  rows: payments ?? [],
+                  cells: (r: any) => [
+                    r.paymentNo,
+                    dayjs(r.paidAt).format("DD MMM YYYY"),
+                    PAYMENT_METHOD_LABELS[r.method] ?? r.method,
+                    r.amount,
+                  ],
+                })
+              }
+            />
+          </div>
           <ProfileTable
             data={payments}
             rowKey="_id"
@@ -543,15 +581,35 @@ const VendorProfile = () => {
                 },
               ]}
           />
-        </SectionCard>
+        </Card>
       </div>
 
       <div className="mt-4">
-        <SectionCard
-          icon={Package}
-          title="What we buy from them"
-          subtitle="With the last price paid — no need to open five bills"
-        >
+        <Card className="!rounded-xl !border-secondary-100 shadow-card" styles={{ body: { padding: '20px' } }}>
+          <div className="mb-4 flex items-start justify-between gap-4">
+            <div>
+              <h3 className="m-0 text-[16px] font-semibold text-secondary-800">What we buy from them</h3>
+              <p className="m-0 mt-1 text-xs text-secondary-500">With the last price paid — no need to open five bills</p>
+            </div>
+            <ExportMenu
+              size="small"
+              sheet={() =>
+                makeSheet({
+                  title: `${vendor.name} - Supplied Products`,
+                  unit: "product",
+                  headers: ["Item", "SKU", "Qty", "Last Cost", "Spent"],
+                  rows: byProduct ?? [],
+                  cells: (r: any) => [
+                    r.name + (r.variantName ? ` — ${r.variantName}` : ""),
+                    r.sku,
+                    r.quantity,
+                    r.lastUnitCost,
+                    r.spent,
+                  ],
+                })
+              }
+            />
+          </div>
           <ProfileTable
             data={byProduct}
             pageSize={10}
@@ -608,7 +666,7 @@ const VendorProfile = () => {
               },
             ]}
           />
-        </SectionCard>
+        </Card>
       </div>
 
       {paying && (

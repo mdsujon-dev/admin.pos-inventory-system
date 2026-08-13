@@ -1,20 +1,32 @@
-import { Button, Table, Tag } from "antd";
+import { Button, Tag, Card } from "antd";
 import dayjs from "dayjs";
-import { ArrowLeft, Edit, Layers, Receipt, Truck, Wallet } from "lucide-react";
+import {
+  ArrowLeft,
+  Edit,
+  Layers,
+  Receipt,
+  Truck,
+  Undo2,
+  Wallet,
+} from "lucide-react";
 import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
 import PermissionGate from "../../components/Common/PermissionGate";
 import VendorPaymentModal from "../../components/modal/purchasing/VendorPaymentModal";
+import PurchaseReturnModal from "../../components/modal/purchasing/PurchaseReturnModal";
+import { useGetReturnsOfPurchaseQuery } from "../../redux/features/purchasing/purchaseReturnApi";
 import { Loading } from "../../components/shared/Loading";
+import DataTable from "../../components/Table/DataTable";
 import Money from "../../components/shared/Money";
 import {
   IPurchase,
+  IPurchaseItem,
   useGetPurchaseByIdQuery,
 } from "../../redux/features/purchasing/purchaseApi";
 import { PAYMENT_METHOD_LABELS } from "../../utils/money";
-import { SectionCard, StatTile } from "../Inventory/Products/ProductFormUI";
+import { MetricCard } from "../../components/Common/MetricCard";
 
 /**
  * One supplier bill, and the batches it put on the shelf.
@@ -28,6 +40,12 @@ const PurchaseView = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [paying, setPaying] = useState(false);
+  const [returning, setReturning] = useState(false);
+
+  const { data: returnData } = useGetReturnsOfPurchaseQuery(id as string, {
+    skip: !id,
+  });
+  const returns = returnData?.data ?? [];
 
   const { data, isFetching } = useGetPurchaseByIdQuery(id as string, {
     skip: !id,
@@ -75,6 +93,16 @@ const PurchaseView = () => {
                 Edit
               </Button>
             </PermissionGate>
+            {/* The natural door: somebody looking at a faulty delivery is
+                already on the bill it came in on. */}
+            <PermissionGate module="Purchase Returns" action="Create">
+              <Button
+                icon={<Undo2 className="h-4 w-4" />}
+                onClick={() => setReturning(true)}
+              >
+                Send goods back
+              </Button>
+            </PermissionGate>
             {purchase.due > 0 && (
               <PermissionGate module="Purchases" action="Update">
                 <Button
@@ -91,47 +119,81 @@ const PurchaseView = () => {
         }
       />
 
+      {/* What has already gone back off this bill. On the sheet rather than a
+          tab away: a bill showing its original total while half of it was
+          returned is a bill that will be argued over. */}
+      {returns.length > 0 && (
+        <div className="mb-4 rounded-md border border-[#f59e0b55] bg-[#fffbeb] px-4 py-3">
+          <p className="m-0 mb-1 text-[12px] font-semibold uppercase tracking-wide text-[#92400e]">
+            Sent back to the supplier
+          </p>
+          {returns.map((row: any) => (
+            <div
+              key={row._id}
+              className="flex flex-wrap items-center justify-between gap-2 border-t border-[#f59e0b33] py-1.5 text-[13px] first:border-0"
+            >
+              <span className="font-mono font-semibold text-secondary-800">
+                {row.returnNo}
+              </span>
+              <span className="text-secondary-500">
+                {dayjs(row.returnedAt).format("DD MMM YYYY")} ·{" "}
+                {row.totalQuantity} unit(s)
+              </span>
+              <span className="text-secondary-500">
+                {row.refundAmount > 0 ? "Money back" : "Taken off the bill"}
+              </span>
+              <span className="font-bold text-[#92400e]">
+                − <Money value={row.totalCost} />
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+
       <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <StatTile icon={Receipt} label="Bill total" tone="brand">
-          <Money value={purchase.grandTotal} />
-        </StatTile>
-        <StatTile icon={Wallet} label="Paid" tone="brand">
-          <Money value={purchase.paid} />
-        </StatTile>
-        <StatTile
+        <MetricCard
+          icon={Receipt}
+          label="Bill total"
+          accent="#10b981"
+          value={<Money value={purchase.grandTotal} />}
+        />
+        <MetricCard
+          icon={Wallet}
+          label="Paid"
+          accent="#3b82f6"
+          value={<Money value={purchase.paid} />}
+        />
+        <MetricCard
           icon={Truck}
           label="Owing"
-          tone={purchase.due > 0 ? "danger" : "muted"}
-        >
-          <Money value={purchase.due} />
-        </StatTile>
-        <StatTile
+          accent={purchase.due > 0 ? "#f43f5e" : "#10b981"}
+          value={<Money value={purchase.due} />}
+        />
+        <MetricCard
           icon={Layers}
           label="Units received"
-          tone="muted"
-          note={dayjs(purchase.purchaseDate).format("DD MMM YYYY")}
-        >
-          {purchase.items.reduce((sum, item) => sum + item.quantity, 0)}
-        </StatTile>
+          accent="#8b5cf6"
+          hint={dayjs(purchase.purchaseDate).format("DD MMM YYYY")}
+          value={purchase.items.reduce((sum, item) => sum + item.quantity, 0)}
+        />
       </div>
 
       <div className="grid gap-4 xl:grid-cols-3">
         <div className="xl:col-span-2">
-          <SectionCard
-            icon={Layers}
-            title="Items received"
-            subtitle="Landed cost includes this line's share of the freight"
-          >
-            <Table
-              dataSource={purchase.items}
-              rowKey={(row) => row._id ?? row.sku}
-              pagination={false}
-              size="small"
+          <Card className="!rounded-xl !border-secondary-100 shadow-card" styles={{ body: { padding: '20px' } }}>
+            <div className="mb-4">
+              <h3 className="m-0 text-[16px] font-semibold text-secondary-800">Items received</h3>
+              <p className="m-0 mt-1 text-xs text-secondary-500">Landed cost includes this line's share of the freight</p>
+            </div>
+            <DataTable
+              data={purchase.items}
+              rowKey={(row: IPurchaseItem) => row._id ?? row.sku}
+              isPaginate={false}
               columns={[
                 {
                   title: "Item",
                   key: "name",
-                  render: (_: unknown, row) => (
+                  render: (_: unknown, row: IPurchaseItem) => (
                     <div className="min-w-0">
                       <p className="m-0 truncate text-sm font-medium text-secondary-800">
                         {row.name}
@@ -151,19 +213,19 @@ const PurchaseView = () => {
                   title: "Qty",
                   key: "quantity",
                   width: 70,
-                  render: (_: unknown, row) => row.quantity,
+                  render: (_: unknown, row: IPurchaseItem) => row.quantity,
                 },
                 {
                   title: "Unit cost",
                   key: "unitCost",
                   width: 110,
-                  render: (_: unknown, row) => <Money value={row.unitCost} />,
+                  render: (_: unknown, row: IPurchaseItem) => <Money value={row.unitCost} />,
                 },
                 {
                   title: "Landed",
                   key: "landed",
                   width: 120,
-                  render: (_: unknown, row) => (
+                  render: (_: unknown, row: IPurchaseItem) => (
                     <div>
                       <Money value={row.unitCost + row.landedExtra} />
                       {row.landedExtra > 0 && (
@@ -178,7 +240,7 @@ const PurchaseView = () => {
                   title: "Expiry",
                   key: "expiryDate",
                   width: 110,
-                  render: (_: unknown, row) =>
+                  render: (_: unknown, row: IPurchaseItem) =>
                     row.expiryDate ? (
                       dayjs(row.expiryDate).format("DD MMM YYYY")
                     ) : (
@@ -189,7 +251,7 @@ const PurchaseView = () => {
                   title: "Total",
                   key: "lineTotal",
                   width: 110,
-                  render: (_: unknown, row) => (
+                  render: (_: unknown, row: IPurchaseItem) => (
                     <span className="font-semibold">
                       <Money value={row.lineTotal} />
                     </span>
@@ -197,10 +259,14 @@ const PurchaseView = () => {
                 },
               ]}
             />
-          </SectionCard>
+          </Card>
         </div>
 
-        <SectionCard icon={Wallet} title="Bill" subtitle="How the total was reached">
+        <Card className="!rounded-xl !border-secondary-100 shadow-card" styles={{ body: { padding: '20px' } }}>
+          <div className="mb-4">
+            <h3 className="m-0 text-[16px] font-semibold text-secondary-800">Bill</h3>
+            <p className="m-0 mt-1 text-xs text-secondary-500">How the total was reached</p>
+          </div>
           <div className="space-y-1.5 text-sm">
             <Row label="Subtotal" value={purchase.subtotal} />
             {purchase.discount > 0 && (
@@ -240,7 +306,7 @@ const PurchaseView = () => {
             )}
             {purchase.note && <p className="m-0 pt-1">{purchase.note}</p>}
           </div>
-        </SectionCard>
+        </Card>
       </div>
 
       {/*
@@ -268,6 +334,14 @@ const PurchaseView = () => {
               due: purchase.due,
             },
           ]}
+        />
+      )}
+
+      {returning && id && (
+        <PurchaseReturnModal
+          purchaseId={id}
+          open={returning}
+          setOpen={setReturning}
         />
       )}
     </div>
