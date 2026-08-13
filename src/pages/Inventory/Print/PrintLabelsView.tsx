@@ -775,6 +775,16 @@ const PrintLabelsView = () => {
                     }}
                     className="pos-label flex break-inside-avoid flex-col items-center justify-center overflow-hidden rounded border border-dashed border-secondary-300 bg-white px-[1.5mm] py-[1mm]"
                   >
+                    {/* Brand first, small — a shelf label is read top down,
+                        and the maker narrows the search before the name does. */}
+                    {showBrand && label.brand && (
+                      <p
+                        className="m-0 w-full truncate text-center uppercase tracking-[0.08em] text-black"
+                        style={{ fontSize: `${TYPE.brand}mm`, lineHeight: 1.2 }}
+                      >
+                        {label.brand}
+                      </p>
+                    )}
                     {showName && (
                       <p
                         className="m-0 w-full overflow-hidden text-center font-semibold text-black"
@@ -789,20 +799,38 @@ const PrintLabelsView = () => {
                           WebkitLineClamp: box.nameLines,
                         }}
                       >
-                        {label.productName}
-                        {label.variantLabel ? ` · ${label.variantLabel}` : ""}
+                        {/* The variant is the thing being sold, so it is named
+                            as such rather than appended as an afterthought. */}
+                        {label.variantLabel || label.productName}
                       </p>
                     )}
                     {renderCode(label.code, box)}
                     {showPrice && (
                       <p
-                        className="m-0 font-bold text-black"
-                        style={{
-                          fontSize: `${TYPE.price}mm`,
-                          lineHeight: 1.15,
-                        }}
+                        className="m-0 flex items-baseline justify-center gap-[1mm] font-bold text-black"
+                        style={{ fontSize: `${TYPE.price}mm`, lineHeight: 1.15 }}
                       >
-                        {label.price}
+                        {/* On offer the old price stays, struck through: a
+                            label showing only the new one hides the saving,
+                            and one showing only the old one is wrong at the
+                            till. */}
+                        {label.offerPrice !== null && (
+                          <span
+                            className="font-normal line-through"
+                            style={{ fontSize: `${TYPE.wasPrice}mm` }}
+                          >
+                            {label.price}
+                          </span>
+                        )}
+                        <span>{label.offerPrice ?? label.price}</span>
+                        {label.unit && (
+                          <span
+                            className="font-normal"
+                            style={{ fontSize: `${TYPE.wasPrice}mm` }}
+                          >
+                            /{label.unit}
+                          </span>
+                        )}
                       </p>
                     )}
                   </div>
