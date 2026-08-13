@@ -28,15 +28,12 @@ const DormantCustomers = () => {
     { name: "limit", value: 200 },
   ]);
 
-  const rows = data?.data ?? [];
-  const lostValue = rows.reduce(
-    (sum: number, row: any) => sum + (row.totalSpent ?? 0),
-    0
-  );
-  const totalOwed = rows.reduce(
-    (sum: number, row: any) => sum + (row.totalDue ?? 0),
-    0
-  );
+  const rows = data?.data?.items ?? [];
+  const summary = data?.data?.summary ?? {
+    count: 0,
+    totalSpent: 0,
+    totalDue: 0,
+  };
 
   return (
     <div>
@@ -74,7 +71,7 @@ const DormantCustomers = () => {
           icon={UserRoundX}
           label="Gone quiet"
           accent="#64748b"
-          value={rows.length}
+          value={summary.count}
           loading={isFetching}
         />
         <MetricCard
@@ -82,7 +79,7 @@ const DormantCustomers = () => {
           label="They used to spend"
           accent="#10b981"
           hint="Across all their purchases"
-          value={<Money value={lostValue} />}
+          value={<Money value={summary.totalSpent} />}
           loading={isFetching}
         />
         <MetricCard
@@ -97,7 +94,7 @@ const DormantCustomers = () => {
           label="Still owed"
           accent="#ef4444"
           hint="Total unpaid balances"
-          value={<Money value={totalOwed} />}
+          value={<Money value={summary.totalDue} />}
           loading={isFetching}
         />
       </div>

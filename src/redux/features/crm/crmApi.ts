@@ -102,9 +102,17 @@ const crmApi = baseApi.injectEndpoints({
     }),
 
     completeFollowUp: builder.mutation({
-      query: (id: string) => ({
+      // The body carries what came of the call, and optionally the next one.
+      query: ({
+        id,
+        data,
+      }: {
+        id: string;
+        data?: Record<string, unknown>;
+      }) => ({
         url: `/crm/activity/${id}/done`,
         method: "PATCH",
+        body: data ?? {},
       }),
       invalidatesTags: ["crm"],
     }),
