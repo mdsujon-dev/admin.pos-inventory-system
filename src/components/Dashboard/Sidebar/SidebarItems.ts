@@ -20,6 +20,7 @@ import {
   Tags,
   Truck,
   TrendingDown,
+  Undo2,
   UserRoundX,
   Users,
   Wallet,
@@ -141,6 +142,12 @@ const sidebarMenuRoutes: RouteItem[] = [
         icon: Receipt,
         module: "Sales",
         exactMatch: true,
+      },
+      {
+        label: "Returns",
+        address: "/sales/returns",
+        icon: Undo2,
+        module: "Sales Returns",
       },
       {
         label: "Customer Dues",

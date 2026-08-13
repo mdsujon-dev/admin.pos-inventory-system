@@ -116,7 +116,7 @@ const AdminMenu = () => {
                     />
                     {!isCollapsed && (
                       <Tooltip title={route.label} placement="right">
-                        <span className="text-[14px] md:text-[15px] lg:text-[16px] font-semibold truncate whitespace-nowrap">
+                        <span className="text-[14px] md:text-[15px] lg:text-[16px] font-medium truncate whitespace-nowrap">
                           {route.label}
                         </span>
                       </Tooltip>

@@ -50,6 +50,7 @@ import Vendors from "../pages/Purchasing/Vendors.tsx";
 import InvoiceView from "../pages/Sales/InvoiceView.tsx";
 import PointOfSale from "../pages/Sales/PointOfSale.tsx";
 import SalesList from "../pages/Sales/SalesList.tsx";
+import SaleReturns from "../pages/Sales/SaleReturns.tsx";
 import RolePermissions from "../pages/Users/RolePermissions.tsx";
 import Roles from "../pages/Users/Roles.tsx";
 import Users from "../pages/Users/Users.tsx";
@@ -149,6 +150,7 @@ const routes = [
           { path: "pos", element: <PointOfSale /> },
           { path: "invoices", element: <SalesList /> },
           { path: "invoices/:id", element: <InvoiceView /> },
+          { path: "returns", element: <SaleReturns /> },
           { path: "receivables", element: <Receivables mode="receivable" /> },
         ],
       },

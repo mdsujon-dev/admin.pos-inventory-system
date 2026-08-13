@@ -97,6 +97,13 @@ export const PERMISSION_MODULES: PermissionModule[] = [
   // Buying — where stock comes from, and who is owed for it.
   { module: "Vendors", permissions: CRUD, group: "Purchasing" },
   { module: "Purchases", permissions: ["View", "Create", "Update"], group: "Purchasing" },
+  // Returns cannot be edited or deleted either — taking one back wrongly is
+  // corrected by a second document, never by rewriting the first.
+  {
+    module: "Sales Returns",
+    permissions: ["View", "Create"],
+    group: "Sales",
+  },
   // Payments cannot be edited or deleted — a correction is a second entry.
   {
     module: "Vendor Payments",
