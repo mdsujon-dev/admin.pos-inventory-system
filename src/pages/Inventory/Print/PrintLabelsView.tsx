@@ -1,4 +1,13 @@
-import { Button, Checkbox, Input, InputNumber, Segmented, Switch, Tag } from "antd";
+import {
+  Button,
+  Checkbox,
+  Input,
+  InputNumber,
+  Segmented,
+  Select,
+  Switch,
+  Tag,
+} from "antd";
 import { ColumnsType } from "antd/es/table";
 import { Boxes, Layers, Printer, ScanLine, Search } from "lucide-react";
 import { ReactNode, useMemo, useRef, useState } from "react";
@@ -23,6 +32,10 @@ export interface LabelItem {
   productName: string;
   /** "Red / S" for a variant, empty for a single product. */
   variantLabel: string;
+  /** Who makes it. Small, above the name — the way a shelf label reads. */
+  brand: string;
+  /** "kg", "pcs" — printed beside the price so the price means something. */
+  unit: string;
   code: string;
   /**
    * Where the code came from. A label printed from the SKU still scans, but
@@ -31,6 +44,14 @@ export interface LabelItem {
    */
   codeSource: "barcode" | "sku";
   price: number;
+  /**
+   * What it sells for today, if that is less than the ticket price.
+   *
+   * A label that shows only the offer price hides the saving, and a label that
+   * shows only the ticket price is wrong at the till. Both, with the old one
+   * struck through, is what a shopper is used to reading.
+   */
+  offerPrice: number | null;
   /**
    * How many are on the shelf.
    *
@@ -48,8 +69,28 @@ export interface LabelItem {
  * item with its own code and price, and printing the parent would give every
  * size the same barcode.
  */
+/** A populated reference, or nothing readable. */
+const nameOf = (ref: unknown) =>
+  ref && typeof ref === "object" ? ((ref as { name?: string }).name ?? "") : "";
+
+const shortUnit = (ref: unknown) =>
+  ref && typeof ref === "object"
+    ? ((ref as { shortName?: string; name?: string }).shortName ??
+      (ref as { name?: string }).name ??
+      "")
+    : "";
+
+/** The offer price, but only when it is actually an offer. */
+const offerOf = (row: { sellingPrice: number; discountPrice?: number | null }) =>
+  row.discountPrice && row.discountPrice > 0 && row.discountPrice < row.sellingPrice
+    ? row.discountPrice
+    : null;
+
 const toLabelItems = (products: IProduct[]): LabelItem[] =>
   products.flatMap((product) => {
+    const brand = nameOf(product.brand);
+    const unit = shortUnit(product.unit);
+
     if (product.type === "single") {
       const own = product.barcode?.trim();
       const code = own || product.sku;
@@ -59,9 +100,12 @@ const toLabelItems = (products: IProduct[]): LabelItem[] =>
               key: product._id,
               productName: product.name,
               variantLabel: "",
+              brand,
+              unit,
               code,
               codeSource: own ? ("barcode" as const) : ("sku" as const),
               price: product.sellingPrice,
+              offerPrice: offerOf(product),
               stock: product.quantity ?? 0,
             },
           ]
@@ -79,9 +123,14 @@ const toLabelItems = (products: IProduct[]): LabelItem[] =>
           variantLabel:
             variant.options.map((option) => option.value).join(" / ") ||
             variant.name,
+          brand,
+          unit,
           code,
           codeSource: own ? ("barcode" as const) : ("sku" as const),
+          // The variant's own money, not the parent's — that is the whole
+          // point of a variant having a price field.
           price: variant.sellingPrice,
+          offerPrice: offerOf(variant),
           stock: variant.quantity ?? 0,
         };
       })
@@ -90,28 +139,163 @@ const toLabelItems = (products: IProduct[]): LabelItem[] =>
 
 type LabelFormat = "barcode" | "qr";
 
+/** CSS millimetres to pixels at the 96dpi the browser lays out in. */
+const MM = 3.779527559;
+
 /**
- * How each format is drawn, and how wide its label needs to be. A QR code is
- * square and a Code 128 barcode is a wide strip, so one width cannot serve
- * both without wasting half the sheet.
+ * The stock a label is printed on.
+ *
+ * Retail shelf labels come off small thermal roll printers, not off A4 — the
+ * printer holds one size of die-cut roll and every label is its own page. So
+ * the size is the page size, and picking it here is what makes the output line
+ * up with the physical roll instead of landing somewhere on a sheet of paper.
+ *
+ * `roll: false` is the fallback for printing onto plain paper on an ordinary
+ * office printer, where the labels tile across the sheet and get cut by hand.
  */
+interface LabelSize {
+  label: string;
+  hint: string;
+  /** Millimetres, as the roll is sold. */
+  width: number;
+  height: number;
+  roll: boolean;
+}
+
+const SIZES: Record<string, LabelSize> = {
+  "38x25": {
+    label: "38 × 25",
+    hint: "The common shelf label",
+    width: 38,
+    height: 25,
+    roll: true,
+  },
+  "50x25": {
+    label: "50 × 25",
+    hint: "Wider — fits a long barcode",
+    width: 50,
+    height: 25,
+    roll: true,
+  },
+  "50x30": {
+    label: "50 × 30",
+    hint: "Room for name and price",
+    width: 50,
+    height: 30,
+    roll: true,
+  },
+  "40x30": {
+    label: "40 × 30",
+    hint: "Squarer, good for QR",
+    width: 40,
+    height: 30,
+    roll: true,
+  },
+  "32x19": {
+    label: "32 × 19",
+    hint: "Small items and pharmacy",
+    width: 32,
+    height: 19,
+    roll: true,
+  },
+  "58mm": {
+    label: "58 mm roll",
+    hint: "Receipt-width thermal printers",
+    width: 58,
+    height: 40,
+    roll: true,
+  },
+  a4: {
+    label: "A4 sheet",
+    hint: "Plain paper, cut by hand",
+    width: 48,
+    height: 30,
+    roll: false,
+  },
+};
+
+/**
+ * Type sized in millimetres, not pixels.
+ *
+ * A label is a physical object and the only question about its text is whether
+ * a person can read it across a shelf. Millimetres survive the trip to the
+ * printer unchanged; a pixel size set for the screen comes out at whatever the
+ * printer's own resolution makes of it.
+ *
+ * 2.6mm is roughly 7.5pt — small, but this is a shelf label, and it is the
+ * same height as the digits already printed under the bars.
+ */
+const TYPE = {
+  brand: 1.9,
+  name: 2.6,
+  nameLead: 1.15,
+  price: 3.4,
+  /** The struck-through ticket price sits beside the offer, so it is smaller. */
+  wasPrice: 2.2,
+};
+
+/**
+ * How much room the symbol gets once the text has taken its share.
+ *
+ * Worked out per size rather than fixed, because a 19mm label and a 40mm one
+ * are not the same label with different margins — on the short one the bars
+ * have to give way or there is nothing left to scan.
+ *
+ * Taller labels give the name two lines. Most product names do not fit on one
+ * at this width, and a name cut off after three words is not a name.
+ */
+const codeBox = (
+  size: LabelSize,
+  showName: boolean,
+  showPrice: boolean,
+  showBrand: boolean
+) => {
+  const nameLines = size.height >= 24 ? 2 : 1;
+  const innerWidth = size.width - 3;
+  const used =
+    (showBrand ? TYPE.brand * 1.2 : 0) +
+    (showName ? TYPE.name * TYPE.nameLead * nameLines : 0) +
+    (showPrice ? TYPE.price * 1.15 : 0) +
+    2;
+  const innerHeight = Math.max(size.height - used, 5);
+  return { innerWidth, innerHeight, nameLines };
+};
+
+/** What gets drawn in the middle of the label. */
 const FORMATS: Record<
   LabelFormat,
-  { label: string; width: number; render: (value: string) => ReactNode }
+  {
+    label: string;
+    render: (
+      value: string,
+      box: { innerWidth: number; innerHeight: number }
+    ) => ReactNode;
+  }
 > = {
   barcode: {
     label: "Barcode",
-    width: 210,
-    // `maxWidth` is the label minus its padding. Without it a long SKU draws a
-    // strip wider than the label it sits in and runs over the neighbour.
-    render: (value) => (
-      <Barcode value={value} moduleWidth={1.6} height={46} maxWidth={186} />
+    render: (value, box) => (
+      <Barcode
+        value={value}
+        moduleWidth={1.6}
+        height={Math.max(box.innerHeight * MM - 9, 16)}
+        maxWidth={box.innerWidth * MM}
+      />
     ),
   },
   qr: {
     label: "QR Code",
-    width: 130,
-    render: (value) => <QRCodeImage value={value} size={96} />,
+    render: (value, box) => (
+      <QRCodeImage
+        value={value}
+        // Square, so the smaller of the two dimensions is the one that binds.
+        size={Math.max(
+          Math.min(box.innerWidth, box.innerHeight) * MM - 6,
+          32
+        )}
+        showValue={false}
+      />
+    ),
   },
 };
 
@@ -129,7 +313,9 @@ const FORMATS: Record<
  */
 const PrintLabelsView = () => {
   const [format, setFormat] = useState<LabelFormat>("barcode");
-  const { width: labelWidth, render: renderCode } = FORMATS[format];
+  const [sizeKey, setSizeKey] = useState<string>("38x25");
+  const size = SIZES[sizeKey];
+  const { render: renderCode } = FORMATS[format];
 
   const title = "Print Labels";
   const subtitle = "Build a sheet of shelf labels — barcode or QR — and print it";
@@ -140,6 +326,7 @@ const PrintLabelsView = () => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [showName, setShowName] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
+  const [showBrand, setShowBrand] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const [limit, setLimit] = useState(10);
   /**
@@ -151,14 +338,51 @@ const PrintLabelsView = () => {
    */
   const [includeOutOfStock, setIncludeOutOfStock] = useState(false);
 
+  const box = codeBox(size, showName, showPrice, showBrand);
+
   const sheetRef = useRef<HTMLDivElement>(null);
+
+  /**
+   * The page is the label.
+   *
+   * On a roll printer the paper is already cut to size, so every label has to
+   * be its own page with no margin — anything else and the content creeps a
+   * little further off the sticker with each one. On plain paper the labels
+   * tile instead, and the page is an ordinary sheet with a margin to cut in.
+   */
   const handlePrint = useReactToPrint({
     contentRef: sheetRef,
     documentTitle: title,
-    pageStyle: `
-      @page { margin: 8mm; }
+    pageStyle: size.roll
+      ? `
+      @page { size: ${size.width}mm ${size.height}mm; margin: 0; }
+      @media print {
+        body { -webkit-print-color-adjust: exact; print-color-adjust: exact; margin: 0; }
+        /* The global print rules position this absolutely, which is right for
+           printing the live page but fatal here: absolutely positioned content
+           does not paginate, so every label after the first was dropped. */
+        .label-print {
+          display: block !important;
+          position: static !important;
+          padding: 0 !important;
+        }
+        .pos-label {
+          width: ${size.width}mm;
+          height: ${size.height}mm;
+          border: 0 !important;
+          border-radius: 0 !important;
+          break-after: page;
+          page-break-after: always;
+        }
+        .pos-label:last-child { break-after: auto; page-break-after: auto; }
+      }
+    `
+      : `
+      @page { size: A4; margin: 8mm; }
       @media print {
         body { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+        /* Same reason as above — a sheet of labels runs past one page. */
+        .label-print { position: static !important; }
       }
     `,
   });
@@ -321,6 +545,27 @@ const PrintLabelsView = () => {
         ]}
         extra={
           <div className="flex flex-wrap items-center gap-3">
+            <Select
+              value={sizeKey}
+              onChange={setSizeKey}
+              className="min-w-[180px]"
+              // The size a printer is loaded with is the first thing to pick,
+              // because it decides how much room the rest of the label has.
+              options={Object.entries(SIZES).map(([value, row]) => ({
+                value,
+                label: (
+                  <span className="flex items-center justify-between gap-3">
+                    <span>
+                      {row.label}
+                      {row.roll ? " mm" : ""}
+                    </span>
+                    <span className="text-[11px] text-secondary-400">
+                      {row.hint}
+                    </span>
+                  </span>
+                ),
+              }))}
+            />
             <Segmented
               value={format}
               onChange={(value) => setFormat(value as LabelFormat)}
@@ -371,7 +616,9 @@ const PrintLabelsView = () => {
           icon={Printer}
           label="Labels to print"
           accent="#019532"
-          hint={`${FORMATS[format].label} format`}
+          hint={`${FORMATS[format].label} · ${
+            size.roll ? `${size.width}×${size.height} mm` : "A4 sheet"
+          }`}
           value={sheet.length}
           loading={isFetching}
         />
@@ -472,7 +719,11 @@ const PrintLabelsView = () => {
 
         <SectionCard
           title="The sheet"
-          subtitle="What comes out of the printer, at roughly the printed size"
+          subtitle={
+            size.roll
+              ? `${size.width} × ${size.height} mm — one label per page`
+              : "Tiled on an A4 sheet, to be cut by hand"
+          }
         >
           <div className="mb-3 flex flex-wrap items-center gap-4">
             <Checkbox
@@ -486,6 +737,12 @@ const PrintLabelsView = () => {
               onChange={(e) => setShowPrice(e.target.checked)}
             >
               <span className="text-[13px]">Price</span>
+            </Checkbox>
+            <Checkbox
+              checked={showBrand}
+              onChange={(e) => setShowBrand(e.target.checked)}
+            >
+              <span className="text-[13px]">Brand</span>
             </Checkbox>
           </div>
 
@@ -510,18 +767,41 @@ const PrintLabelsView = () => {
                 {sheet.map((label) => (
                   <div
                     key={label.copyKey}
-                    style={{ width: labelWidth }}
-                    className="flex max-w-full break-inside-avoid flex-col items-center overflow-hidden rounded border border-dashed border-secondary-300 p-2"
+                    // Sized in millimetres, the unit the roll is sold in, so
+                    // what is on screen is what comes off the printer.
+                    style={{
+                      width: `${size.width}mm`,
+                      height: `${size.height}mm`,
+                    }}
+                    className="pos-label flex break-inside-avoid flex-col items-center justify-center overflow-hidden rounded border border-dashed border-secondary-300 bg-white px-[1.5mm] py-[1mm]"
                   >
                     {showName && (
-                      <p className="m-0 mb-1 w-full truncate text-center text-[11px] font-semibold text-black">
+                      <p
+                        className="m-0 w-full overflow-hidden text-center font-semibold text-black"
+                        style={{
+                          fontSize: `${TYPE.name}mm`,
+                          lineHeight: TYPE.nameLead,
+                          // Two lines then stop, rather than one line cut mid
+                          // word — the second line is usually where the size or
+                          // the colour lives.
+                          display: "-webkit-box",
+                          WebkitBoxOrient: "vertical",
+                          WebkitLineClamp: box.nameLines,
+                        }}
+                      >
                         {label.productName}
                         {label.variantLabel ? ` · ${label.variantLabel}` : ""}
                       </p>
                     )}
-                    {renderCode(label.code)}
+                    {renderCode(label.code, box)}
                     {showPrice && (
-                      <p className="m-0 mt-1 text-[12px] font-bold text-black">
+                      <p
+                        className="m-0 font-bold text-black"
+                        style={{
+                          fontSize: `${TYPE.price}mm`,
+                          lineHeight: 1.15,
+                        }}
+                      >
                         {label.price}
                       </p>
                     )}
