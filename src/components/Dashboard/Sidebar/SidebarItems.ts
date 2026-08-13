@@ -12,7 +12,6 @@ import {
   Package,
   PhoneCall,
   PieChart,
-  Receipt,
   Ruler,
   ScanLine,
   ShieldCheck,
@@ -139,7 +138,7 @@ const sidebarMenuRoutes: RouteItem[] = [
       {
         label: "Invoices",
         address: "/sales/invoices",
-        icon: Receipt,
+        icon: FileText,
         module: "Sales",
         exactMatch: true,
       },

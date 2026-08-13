@@ -4,10 +4,10 @@ import {
   Input,
   Modal,
   Select,
-  Table,
   Tag,
   Timeline,
 } from "antd";
+import DataTable from "../../components/Table/DataTable";
 import dayjs, { Dayjs } from "dayjs";
 import {
   ArrowLeft,
@@ -57,6 +57,11 @@ const CustomerProfile = () => {
   const [summary, setSummary] = useState("");
   const [detail, setDetail] = useState("");
   const [followUpAt, setFollowUpAt] = useState<Dayjs | null>(null);
+
+  const [invoicesPage, setInvoicesPage] = useState(1);
+  const [invoicesLimit, setInvoicesLimit] = useState(10);
+  const [favouritesPage, setFavouritesPage] = useState(1);
+  const [favouritesLimit, setFavouritesLimit] = useState(8);
 
   const { data, isFetching } = useGetCustomerProfileQuery(id as string, {
     skip: !id,
@@ -166,11 +171,15 @@ const CustomerProfile = () => {
             title="Purchases"
             subtitle="Newest first"
           >
-            <Table
-              dataSource={invoices}
+            <DataTable
+              data={invoices}
               rowKey="_id"
-              size="small"
-              pagination={{ pageSize: 10, hideOnSinglePage: true }}
+              isPaginate={invoices.length > invoicesLimit}
+              currentPage={invoicesPage}
+              setCurrentPage={setInvoicesPage}
+              limit={invoicesLimit}
+              setLimit={setInvoicesLimit}
+              total={invoices.length}
               columns={[
                 {
                   title: "Invoice",
@@ -241,13 +250,17 @@ const CustomerProfile = () => {
             title="What they come in for"
             subtitle="Their own top items — not the shop's"
           >
-            <Table
-              dataSource={favourites}
+            <DataTable
+              data={favourites}
               rowKey={(row: any) =>
                 `${row._id.product}-${row._id.variantId ?? "none"}`
               }
-              size="small"
-              pagination={{ pageSize: 8, hideOnSinglePage: true }}
+              isPaginate={favourites.length > favouritesLimit}
+              currentPage={favouritesPage}
+              setCurrentPage={setFavouritesPage}
+              limit={favouritesLimit}
+              setLimit={setFavouritesLimit}
+              total={favourites.length}
               columns={[
                 {
                   title: "Item",

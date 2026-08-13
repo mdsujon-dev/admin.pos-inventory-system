@@ -1,27 +1,29 @@
-import {
-  Button,
-  Card,
-  Checkbox,
-  Empty,
-  Input,
-  InputNumber,
-  Segmented,
-  Switch,
-  Table,
-  Tag,
-} from "antd";
+import { Button, Checkbox, Input, InputNumber, Segmented, Switch, Tag } from "antd";
 import { ColumnsType } from "antd/es/table";
-import { Printer, Search } from "lucide-react";
+import {
+  Boxes,
+  Layers,
+  Printer,
+  ScanLine,
+  Search,
+  Sparkles,
+  Tag as TagIcon,
+} from "lucide-react";
 import { ReactNode, useMemo, useRef, useState } from "react";
 import { useReactToPrint } from "react-to-print";
 import PageHeader from "../../../components/Common/PageHeader";
 import PageMeta from "../../../components/Common/PageMeta";
+import { MetricCard } from "../../../components/Common/MetricCard";
 import Barcode from "../../../components/shared/Barcode";
+import Money from "../../../components/shared/Money";
 import QRCodeImage from "../../../components/shared/QRCodeImage";
+import DataTable from "../../../components/Table/DataTable";
+import TableEmpty from "../../../components/Table/TableEmpty";
 import {
   IProduct,
   useGetProductsQuery,
 } from "../../../redux/features/inventory/productApi";
+import { SectionCard } from "../Products/ProductFormUI";
 
 /** One printable label: a thing with its own code, price and name. */
 export interface LabelItem {
@@ -107,8 +109,12 @@ const FORMATS: Record<
 > = {
   barcode: {
     label: "Barcode",
-    width: 200,
-    render: (value) => <Barcode value={value} moduleWidth={1.6} height={48} />,
+    width: 210,
+    // `maxWidth` is the label minus its padding. Without it a long SKU draws a
+    // strip wider than the label it sits in and runs over the neighbour.
+    render: (value) => (
+      <Barcode value={value} moduleWidth={1.6} height={46} maxWidth={186} />
+    ),
   },
   qr: {
     label: "QR Code",
@@ -142,6 +148,8 @@ const PrintLabelsView = () => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [showName, setShowName] = useState(true);
   const [showPrice, setShowPrice] = useState(true);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [limit, setLimit] = useState(10);
   /**
    * Out-of-stock rows are hidden by default.
    *
@@ -177,13 +185,14 @@ const PrintLabelsView = () => {
 
   const labelItems = useMemo(
     () =>
-      includeOutOfStock
-        ? allItems
-        : allItems.filter((item) => item.stock > 0),
+      includeOutOfStock ? allItems : allItems.filter((item) => item.stock > 0),
     [allItems, includeOutOfStock]
   );
 
   const hiddenCount = allItems.length - labelItems.length;
+  const noBarcode = labelItems.filter(
+    (item) => item.codeSource === "sku"
+  ).length;
 
   const selectedItems = useMemo(
     () => labelItems.filter((item) => selectedKeys.includes(item.key)),
@@ -203,17 +212,33 @@ const PrintLabelsView = () => {
     [selectedItems, copies]
   );
 
+  /**
+   * One label per unit on the shelf.
+   *
+   * The usual reason for opening this screen is a delivery that has just been
+   * put out, and the copy count anybody wants is the count already on the row
+   * beside it — typing it in twenty times is work the screen can do.
+   */
+  const copiesFromStock = () =>
+    setCopies((previous) => {
+      const next = { ...previous };
+      selectedItems.forEach((item) => {
+        next[item.key] = Math.min(Math.max(item.stock, 1), 200);
+      });
+      return next;
+    });
+
   const columns: ColumnsType<LabelItem> = [
     {
       title: "Product",
       key: "product",
       render: (_, record) => (
-        <div>
-          <p className="m-0 font-medium text-secondary-800">
+        <div className="min-w-0">
+          <p className="m-0 truncate font-medium text-secondary-800">
             {record.productName}
           </p>
           {record.variantLabel && (
-            <Tag color="var(--primary)" className="mt-1">
+            <Tag className="!m-0 !mt-1 !border-primary-200 !bg-primary-50 !text-[11px] !text-primary-700">
               {record.variantLabel}
             </Tag>
           )}
@@ -223,26 +248,37 @@ const PrintLabelsView = () => {
     {
       title: "Code",
       key: "code",
-      width: 190,
+      width: 200,
       render: (_, record) => (
-        <div>
-          <span className="font-mono text-xs">{record.code}</span>
+        <div className="min-w-0">
+          <p className="m-0 truncate font-mono text-[12px] text-secondary-700">
+            {record.code}
+          </p>
           {record.codeSource === "sku" && (
-            <Tag className="!ml-1.5 !m-0 !px-1.5 !text-[10px]">from SKU</Tag>
+            // Not an error — it scans fine. It just means nobody gave this
+            // item a barcode of its own, which is worth knowing before a
+            // hundred labels go out.
+            <Tag className="!m-0 !mt-0.5 !border-[#f59e0b55] !bg-[#fffbeb] !px-1.5 !text-[10px] !text-[#92400e]">
+              from SKU
+            </Tag>
           )}
         </div>
       ),
     },
     {
       title: "Price",
-      dataIndex: "price",
       key: "price",
-      width: 100,
+      width: 110,
+      render: (_, record) => (
+        <span className="font-semibold text-secondary-800">
+          <Money value={record.price} />
+        </span>
+      ),
     },
     {
       title: "In stock",
       key: "stock",
-      width: 90,
+      width: 100,
       render: (_, record) =>
         record.stock > 0 ? (
           <span className="font-medium text-secondary-800">{record.stock}</span>
@@ -258,6 +294,7 @@ const PrintLabelsView = () => {
       width: 110,
       render: (_, record) => (
         <InputNumber
+          size="small"
           min={1}
           max={200}
           precision={0}
@@ -291,7 +328,7 @@ const PrintLabelsView = () => {
           { title },
         ]}
         extra={
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-3">
             <Segmented
               value={format}
               onChange={(value) => setFormat(value as LabelFormat)}
@@ -313,98 +350,194 @@ const PrintLabelsView = () => {
         }
       />
 
-      <div className="grid gap-4 lg:grid-cols-2">
-        <Card title="Select Items">
-          <Input
-            placeholder="Search by name, SKU or barcode..."
-            prefix={<Search className="w-4 h-4 text-secondary-400" />}
-            value={searchText}
-            onChange={(e) => setSearchText(e.target.value)}
-            allowClear
-            className="mb-3"
-          />
+      <div className="mb-5 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <MetricCard
+          icon={Boxes}
+          label="Labelable items"
+          accent="#3b82f6"
+          hint={
+            hiddenCount > 0
+              ? `${hiddenCount} hidden — nothing on the shelf`
+              : "Every variant counts on its own"
+          }
+          value={labelItems.length}
+          loading={isFetching}
+        />
+        <MetricCard
+          icon={Layers}
+          label="Selected"
+          accent="#8b5cf6"
+          hint={
+            selectedItems.length === 0
+              ? "Tick rows to build the sheet"
+              : "Selection survives paging"
+          }
+          value={selectedItems.length}
+          loading={isFetching}
+        />
+        <MetricCard
+          icon={Printer}
+          label="Labels to print"
+          accent="#019532"
+          hint={`${FORMATS[format].label} format`}
+          value={sheet.length}
+          loading={isFetching}
+        />
+        <MetricCard
+          icon={ScanLine}
+          label="Without a barcode"
+          accent={noBarcode > 0 ? "#f59e0b" : "#64748b"}
+          hint={
+            noBarcode > 0
+              ? "Printing their SKU instead — still scans"
+              : "Every item has its own code"
+          }
+          value={noBarcode}
+          loading={isFetching}
+        />
+      </div>
+
+      <div className="grid gap-4 xl:grid-cols-3">
+        {/* Two thirds for the picking, one for the sheet: choosing what to
+            label is where the work is, and the preview only has to be
+            recognisable. */}
+        <div className="xl:col-span-2">
+        <SectionCard
+          icon={TagIcon}
+          title="Pick what to label"
+          subtitle="Every variant is its own row, with its own code"
+        >
+          <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center">
+            <Input
+              placeholder="Search by name, SKU or barcode..."
+              prefix={<Search className="w-4 h-4 text-secondary-400" />}
+              value={searchText}
+              onChange={(e) => {
+                setSearchText(e.target.value);
+                setCurrentPage(1);
+              }}
+              allowClear
+            />
+            <Button
+              size="middle"
+              icon={<Sparkles className="h-4 w-4" />}
+              disabled={selectedItems.length === 0}
+              onClick={copiesFromStock}
+            >
+              Copies = stock
+            </Button>
+          </div>
 
           <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
-            <label className="flex items-center gap-2 text-sm text-secondary-600">
+            <label className="flex items-center gap-2 text-[13px] text-secondary-600">
               <Switch
                 size="small"
                 checked={includeOutOfStock}
-                onChange={setIncludeOutOfStock}
+                onChange={(value) => {
+                  setIncludeOutOfStock(value);
+                  setCurrentPage(1);
+                }}
               />
               Include out of stock
             </label>
-            {!includeOutOfStock && hiddenCount > 0 && (
-              <span className="text-xs text-secondary-400">
-                {hiddenCount} item{hiddenCount === 1 ? "" : "s"} hidden — nothing
-                on the shelf to label
-              </span>
+            {selectedKeys.length > 0 && (
+              <Button size="small" onClick={() => setSelectedKeys([])}>
+                Clear {selectedKeys.length} selected
+              </Button>
             )}
           </div>
-          <Table
-            dataSource={labelItems}
+
+          <DataTable
+            data={labelItems}
             columns={columns}
             rowKey="key"
-            size="small"
             loading={isFetching}
-            pagination={{ pageSize: 10, showSizeChanger: false }}
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              onChange: (keys) => setSelectedKeys(keys as string[]),
-            }}
-            locale={{
-              emptyText: hiddenCount > 0
-                ? "Nothing in stock to label. Turn on 'Include out of stock' to print ahead of a delivery."
-                : "No printable items. A product needs a SKU or barcode to produce a label.",
-            }}
+            total={labelItems.length}
+            currentPage={currentPage}
+            setCurrentPage={setCurrentPage}
+            limit={limit}
+            setLimit={setLimit}
+            isPaginate={labelItems.length > limit}
+            selectRow
+            selectedRowKeys={selectedKeys}
+            setSelectedRowKeys={setSelectedKeys}
+            emptyText={
+              <TableEmpty
+                icon={ScanLine}
+                title={
+                  hiddenCount > 0
+                    ? "Nothing in stock to label"
+                    : "No printable items"
+                }
+                hint={
+                  hiddenCount > 0
+                    ? "Turn on “Include out of stock” to print ahead of a delivery."
+                    : "A product needs a SKU or barcode before it can produce a label."
+                }
+              />
+            }
           />
-        </Card>
+        </SectionCard>
+        </div>
 
-        <Card
-          title="Preview"
-          extra={
-            <div className="flex items-center gap-4">
-              <Checkbox
-                checked={showName}
-                onChange={(e) => setShowName(e.target.checked)}
-              >
-                Name
-              </Checkbox>
-              <Checkbox
-                checked={showPrice}
-                onChange={(e) => setShowPrice(e.target.checked)}
-              >
-                Price
-              </Checkbox>
-            </div>
-          }
+        <SectionCard
+          icon={Printer}
+          title="The sheet"
+          subtitle="What comes out of the printer, at roughly the printed size"
         >
+          <div className="mb-3 flex flex-wrap items-center gap-4">
+            <Checkbox
+              checked={showName}
+              onChange={(e) => setShowName(e.target.checked)}
+            >
+              <span className="text-[13px]">Product name</span>
+            </Checkbox>
+            <Checkbox
+              checked={showPrice}
+              onChange={(e) => setShowPrice(e.target.checked)}
+            >
+              <span className="text-[13px]">Price</span>
+            </Checkbox>
+          </div>
+
           {sheet.length === 0 ? (
-            <Empty description="Select items on the left to build the label sheet" />
+            <TableEmpty
+              icon={Printer}
+              title="Nothing on the sheet yet"
+              hint="Tick an item on the left and it appears here, ready to print."
+            />
           ) : (
-            <div ref={sheetRef} className="flex flex-wrap gap-3 bg-white p-2">
-              {sheet.map((label) => (
-                <div
-                  key={label.copyKey}
-                  style={{ width: labelWidth }}
-                  className="flex flex-col items-center border border-dashed border-secondary-300 rounded p-2 break-inside-avoid"
-                >
-                  {showName && (
-                    <p className="m-0 mb-1 w-full truncate text-center text-[11px] font-semibold text-black">
-                      {label.productName}
-                      {label.variantLabel ? ` · ${label.variantLabel}` : ""}
-                    </p>
-                  )}
-                  {renderCode(label.code)}
-                  {showPrice && (
-                    <p className="m-0 mt-1 text-[12px] font-bold text-black">
-                      {label.price}
-                    </p>
-                  )}
-                </div>
-              ))}
+            <div className="max-h-[560px] overflow-y-auto rounded-lg border border-secondary-100 bg-secondary-50 p-2">
+              {/* Only this element is handed to the printer, so the borders
+                  and the grey backing around it never reach the paper. */}
+              <div
+                ref={sheetRef}
+                className="flex flex-wrap justify-center gap-3 bg-white p-2"
+              >
+                {sheet.map((label) => (
+                  <div
+                    key={label.copyKey}
+                    style={{ width: labelWidth }}
+                    className="flex max-w-full break-inside-avoid flex-col items-center overflow-hidden rounded border border-dashed border-secondary-300 p-2"
+                  >
+                    {showName && (
+                      <p className="m-0 mb-1 w-full truncate text-center text-[11px] font-semibold text-black">
+                        {label.productName}
+                        {label.variantLabel ? ` · ${label.variantLabel}` : ""}
+                      </p>
+                    )}
+                    {renderCode(label.code)}
+                    {showPrice && (
+                      <p className="m-0 mt-1 text-[12px] font-bold text-black">
+                        {label.price}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
           )}
-        </Card>
+        </SectionCard>
       </div>
     </div>
   );

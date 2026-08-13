@@ -195,7 +195,7 @@ const SalesList = () => {
           <MetricCard
             icon={Receipt}
             label="Invoices"
-            accent="#64748b"
+            accent="#8b5cf6"
             value={summary.saleCount}
             loading={isFetching}
           />
@@ -209,14 +209,14 @@ const SalesList = () => {
           <MetricCard
             icon={TrendingUp}
             label="Profit"
-            accent={summary.profit < 0 ? "#ef4444" : "#10b981"}
+            accent={summary.profit < 0 ? "#ef4444" : "#3b82f6"}
             value={<Money value={summary.profit} />}
             loading={isFetching}
           />
           <MetricCard
             icon={Percent}
             label="Outstanding"
-            accent={summary.outstanding > 0 ? "#ef4444" : "#64748b"}
+            accent={summary.outstanding > 0 ? "#f43f5e" : "#f59e0b"}
             hint={summary.outstanding > 0 ? "Still to collect" : undefined}
             value={<Money value={summary.outstanding} />}
             loading={isFetching}

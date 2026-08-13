@@ -61,6 +61,16 @@ interface BarcodeProps {
   height?: number;
   /** Show the human-readable value under the bars. */
   showValue?: boolean;
+  /**
+   * The widest the symbol may be drawn, in px.
+   *
+   * A Code 128 symbol is as wide as its content is long, so a 20-character SKU
+   * is twice the strip of a 10-character one. Left unbounded it simply spills
+   * out of whatever it was placed in; bounded, it is squeezed to fit instead.
+   * The bar-to-space ratios are what a scanner reads, and those are preserved
+   * under the squeeze — a narrower symbol is still a valid one.
+   */
+  maxWidth?: number;
   className?: string;
 }
 
@@ -75,6 +85,7 @@ const Barcode = ({
   moduleWidth = 2,
   height = 56,
   showValue = true,
+  maxWidth,
   className,
 }: BarcodeProps) => {
   const runs = useMemo(() => encode(value ?? ""), [value]);
@@ -83,6 +94,10 @@ const Barcode = ({
 
   const totalModules = runs.reduce((sum, run) => sum + run, 0);
   const width = totalModules * moduleWidth;
+  // Drawn at its natural size unless that overflows, then scaled down on the
+  // x axis only — the height of a barcode carries no information, so squashing
+  // it as well would just make it harder to aim a scanner at.
+  const drawnWidth = maxWidth ? Math.min(width, maxWidth) : width;
 
   const bars: { x: number; width: number }[] = [];
   let cursor = 0;
@@ -95,11 +110,14 @@ const Barcode = ({
   });
 
   return (
-    <div className={`inline-flex flex-col items-center ${className ?? ""}`}>
+    <div
+      className={`inline-flex max-w-full flex-col items-center ${className ?? ""}`}
+    >
       <svg
-        width={width}
+        width={drawnWidth}
         height={height}
         viewBox={`0 0 ${width} ${height}`}
+        preserveAspectRatio="none"
         role="img"
         aria-label={`Barcode ${value}`}
         shapeRendering="crispEdges"
@@ -117,7 +135,10 @@ const Barcode = ({
         ))}
       </svg>
       {showValue && (
-        <span className="mt-1 font-mono text-[11px] tracking-[0.12em] text-black">
+        <span
+          className="mt-1 max-w-full truncate font-mono text-[10px] tracking-[0.08em] text-black"
+          style={{ width: drawnWidth }}
+        >
           {value}
         </span>
       )}
