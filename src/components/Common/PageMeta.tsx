@@ -14,8 +14,8 @@ interface PageMetaProps {
 
 const PageMeta: React.FC<PageMetaProps> = ({
   title = "POS & Inventory Admin Panel",
-  description = "POS & Inventory Admin Panel - Manage your content, services, and projects",
-  keywords = "POS & Inventory, Admin Panel, Content Management",
+  description = "POS & Inventory Admin Panel - Manage sales, stock, purchases and accounts",
+  keywords = "POS, Inventory, Admin Panel, Sales, Stock, Accounts",
   canonicalUrl,
   ogImage,
   ogType = "website",

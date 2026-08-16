@@ -24,8 +24,7 @@ const UpdateUserModal: React.FC<UpdateUserModalProps> = ({
   const { data: rolesData, isFetching: rolesLoading } = useGetRolesQuery({
     limit: 100,
   });
-  // Employee designations only — a trainer's belong to the faculty form, and the
-  // student one is issued by the system and never listed.
+  // Employee designations only — the ones staff accounts can actually hold.
   const { data: designationsData, isFetching: designationsLoading } =
     useGetDesignationsQuery();
   // Exclude the protected SUPER_ADMIN role — it can never be assigned here.

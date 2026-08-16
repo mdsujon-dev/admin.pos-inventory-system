@@ -1,5 +1,5 @@
-﻿import { motion } from "framer-motion";
-import { BarChart3, ImageIcon, ShieldCheck, Wallet } from "lucide-react";
+import { motion } from "framer-motion";
+import { Boxes, ScanBarcode, Store, Wallet } from "lucide-react";
 import type { ReactNode } from "react";
 
 import { logoLight } from "../../data";
@@ -9,24 +9,26 @@ type AuthLayoutProps = {
   subheading: string;
   children: ReactNode;
   footer?: ReactNode;
+  /** Shown as "Step 1 of 2" above the heading — used by the reset flow. */
+  step?: { current: number; total: number };
 };
 
 // What the panel actually covers today — keeps the marketing honest.
 const highlights = [
   {
-    icon: ShieldCheck,
-    title: "Employees & access",
-    copy: "Add staff, assign roles and control what each one can reach.",
+    icon: ScanBarcode,
+    title: "Point of sale",
+    copy: "Scan, bill and take payment at the counter — invoice and receipt print themselves.",
+  },
+  {
+    icon: Boxes,
+    title: "Live stock",
+    copy: "Every sale, purchase and return moves the shelf count, with low-stock and expiry watched for you.",
   },
   {
     icon: Wallet,
-    title: "Income & expense",
-    copy: "Record every entry and watch the profit line move in real time.",
-  },
-  {
-    icon: ImageIcon,
-    title: "Media & enquiries",
-    copy: "One library for your files, one inbox for every enquiry.",
+    title: "Money that adds up",
+    copy: "Ledger, receivables, payables and profit — each one traced back to the entry it came from.",
   },
 ];
 
@@ -37,18 +39,32 @@ export function AuthLayout({
   subheading,
   children,
   footer,
+  step,
 }: AuthLayoutProps) {
   return (
     <div className="flex min-h-screen flex-col bg-secondary-50 lg:flex-row">
       {/* Brand panel — desktop only */}
       <aside className="relative hidden overflow-hidden bg-gradient-to-br from-primary-900 via-primary-800 to-primary lg:flex lg:min-h-screen lg:w-[46%] xl:w-1/2">
-        {/* Depth: one soft wash plus two drifting orbs. Decorative only. */}
+        {/* Depth: one soft wash, a faint grid, plus two drifting orbs. Decorative only. */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-0"
           style={{
             background:
               "radial-gradient(ellipse at 25% 15%, rgba(1,149,50,0.28) 0%, transparent 60%)",
+          }}
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 opacity-[0.07]"
+          style={{
+            backgroundImage:
+              "linear-gradient(to right, #fff 1px, transparent 1px), linear-gradient(to bottom, #fff 1px, transparent 1px)",
+            backgroundSize: "56px 56px",
+            maskImage:
+              "radial-gradient(ellipse at 50% 40%, #000 30%, transparent 78%)",
+            WebkitMaskImage:
+              "radial-gradient(ellipse at 50% 40%, #000 30%, transparent 78%)",
           }}
         />
         <motion.div
@@ -86,19 +102,25 @@ export function AuthLayout({
             className="max-w-lg py-10"
           >
             <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[12px] font-semibold uppercase tracking-[0.14em] text-white/80">
-              <BarChart3 className="h-3.5 w-3.5" aria-hidden="true" />
+              <Store className="h-3.5 w-3.5" aria-hidden="true" />
               Admin Panel
             </span>
 
             <h1 className="mt-6 text-[clamp(2rem,3.2vw,2.75rem)] font-semibold leading-[1.12] tracking-tight text-white">
-              Everything your institute
+              From the counter to the
               <br />
-              runs on, in one place.
+              closing balance, in one place.
             </h1>
 
-            <ul className="mt-9 space-y-5">
-              {highlights.map(({ icon: Icon, title, copy }) => (
-                <li key={title} className="flex gap-4">
+            <ul className="mt-9 space-y-3">
+              {highlights.map(({ icon: Icon, title, copy }, i) => (
+                <motion.li
+                  key={title}
+                  initial={{ x: -12, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  transition={{ duration: 0.5, delay: 0.3 + i * 0.1, ease }}
+                  className="flex gap-4 rounded-2xl border border-white/10 bg-white/[0.06] p-4 backdrop-blur-sm transition-colors duration-300 hover:border-white/25 hover:bg-white/[0.11]"
+                >
                   <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl border border-white/15 bg-white/10 text-white">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
@@ -110,14 +132,14 @@ export function AuthLayout({
                       {copy}
                     </p>
                   </div>
-                </li>
+                </motion.li>
               ))}
             </ul>
           </motion.div>
 
           <p className="text-[13px] text-white/50">
-            © {new Date().getFullYear()} POS & Inventory.
-            All rights reserved.
+            © {new Date().getFullYear()} POS &amp; Inventory. All rights
+            reserved.
           </p>
         </div>
       </aside>
@@ -141,6 +163,23 @@ export function AuthLayout({
 
           <div className="rounded-xl border border-secondary-100 bg-white p-6 shadow-card sm:p-8">
             <div className="mb-7">
+              {/* Multi-screen flows say where you are, so nobody wonders how
+                  many more forms are coming. */}
+              {step && (
+                <span className="mb-3 inline-flex items-center gap-2 rounded-full bg-primary-50 px-2.5 py-1 text-[12px] font-semibold text-primary-700">
+                  <span className="flex gap-1" aria-hidden="true">
+                    {Array.from({ length: step.total }, (_, i) => (
+                      <span
+                        key={i}
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          i < step.current ? "bg-primary" : "bg-primary-200"
+                        }`}
+                      />
+                    ))}
+                  </span>
+                  Step {step.current} of {step.total}
+                </span>
+              )}
               <h2 className="text-[26px] font-semibold tracking-tight text-secondary-900">
                 {heading}
               </h2>

@@ -19,13 +19,10 @@ const CreateUserModal: React.FC<CreateUserModalProps> = ({ open, setOpen }) => {
   const { data: rolesData, isFetching: rolesLoading } = useGetRolesQuery({
     limit: 100,
   });
-  // Employee designations only. A trainer's designations belong to the faculty
-  // form, and the student one is issued by the system and never listed.
+  // Employee designations only — the ones staff accounts can actually hold.
   const { data: designationsData, isFetching: designationsLoading } =
     useGetDesignationsQuery();
   // Exclude the protected SUPER_ADMIN role — it can never be assigned here.
-  // FACULTY and STUDENT are already absent: the API does not return them,
-  // because those accounts are issued from their own profile forms.
   const roles: any[] = (rolesData?.result || []).filter(
     (r: any) =>
       r.isActive !== false && r.role?.toUpperCase() !== "SUPER_ADMIN"

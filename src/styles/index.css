@@ -132,7 +132,7 @@ input[type="number"] {
     print-color-adjust: exact;
   }
 
-  /* A student's row must not be split across two sheets. */
+  /* A single row must not be split across two sheets. */
   .register-print tr {
     break-inside: avoid;
   }

@@ -13,9 +13,9 @@ import { useAppDispatch } from "../../redux/features/hooks";
 /**
  * Offered while an account is still on the password it was issued with.
  *
- * Trainer and student accounts are created from a profile form with no password
- * box — they start on a shared institute default that every colleague can
- * guess. This dialog is how that gets replaced.
+ * Staff accounts can be created from a profile form with no password box — they
+ * start on a shared company default that every colleague can guess. This dialog
+ * is how that gets replaced.
  *
  * Two deliberate choices:
  *

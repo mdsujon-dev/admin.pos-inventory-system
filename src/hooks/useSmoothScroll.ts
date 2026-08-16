@@ -14,7 +14,7 @@ import { useLocation } from "react-router-dom";
  *
  * - **Touch is left alone.** `syncTouch` stays off, so a phone keeps its native
  *   momentum scrolling. Lenis's touch mode replaces that with an interpolation
- *   that feels close but never quite right, and this panel's students are on
+ *   that feels close but never quite right, and this panel's users are on
  *   phones. Smoothing is a mouse-wheel nicety here, nothing more.
  *
  * - **Nested scrollers opt out** via `data-lenis-prevent`, which Lenis reads

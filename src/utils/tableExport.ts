@@ -14,8 +14,8 @@ type DocxModule = typeof import("docx");
 /**
  * One shape, three files.
  *
- * Any list in the panel — the attendance register, the student list, a batch
- * roster — hands this module the same plain grid rather than each building its
+ * Any list in the panel — the invoice list, a stock report, a customer ledger
+ * — hands this module the same plain grid rather than each building its
  * own Excel, PDF and Word writer. Which rows are exceptional is decided by
  * whoever builds the grid and arrives already flagged, so an exported file can
  * never disagree with the screen it came from.

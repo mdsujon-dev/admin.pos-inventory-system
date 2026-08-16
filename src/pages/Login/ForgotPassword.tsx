@@ -32,6 +32,7 @@ const ForgotPassword = () => {
 
   return (
     <AuthLayout
+      step={{ current: 1, total: 2 }}
       heading="Forgot password"
       subheading="Enter your account email — we'll send a 6-digit reset code."
       footer={

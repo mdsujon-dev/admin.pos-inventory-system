@@ -41,7 +41,7 @@ const RolePermissions = () => {
     distinctActions: DISTINCT_PERMISSION_ACTIONS,
   } = usePermissionModules();
 
-  // Flat ids: ["Students-View", "Students-Create", ...]
+  // Flat ids: ["Products-View", "Products-Create", ...]
   const [selected, setSelected] = useState<string[]>([]);
   const [search, setSearch] = useState("");
   const [hydrated, setHydrated] = useState(false);
