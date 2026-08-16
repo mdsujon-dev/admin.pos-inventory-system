@@ -5,14 +5,7 @@ import {
   Select,
   Switch,
 } from "antd";
-import {
-  Banknote,
-  Boxes,
-  Handshake,
-  Plus,
-  Trash2,
-  Warehouse,
-} from "lucide-react";
+import { Plus, Trash2 } from "lucide-react";
 import { useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
@@ -218,16 +211,12 @@ const VendorForm = () => {
       >
         <div className="flex flex-1 flex-col gap-4">
           <SectionCard
-            icon={Warehouse}
             title="Vendor Information"
             subtitle="Complete the vendor profile by filling in the details below"
           >
             {/* --- Section 1: Who they are --- */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
-                <div className="bg-primary/10 p-2 rounded-lg text-primary">
-                  <Warehouse className="w-5 h-5" />
-                </div>
                 <div>
                   <h3 className="text-base font-semibold text-secondary-900 leading-tight">Who they are</h3>
                   <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">The phone number is the identity — one number, one supplier</p>
@@ -325,9 +314,6 @@ const VendorForm = () => {
             {/* --- Section 2: What they supply --- */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
-                <div className="bg-primary/10 p-2 rounded-lg text-primary">
-                  <Boxes className="w-5 h-5" />
-                </div>
                 <div>
                   <h3 className="text-base font-semibold text-secondary-900 leading-tight">What they supply</h3>
                   <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">Headings rather than a product list — this is what answers 'who do we call for this'</p>
@@ -372,9 +358,6 @@ const VendorForm = () => {
             {/* --- Section 3: Terms --- */}
             <div className="mb-8">
               <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
-                <div className="bg-primary/10 p-2 rounded-lg text-primary">
-                  <Handshake className="w-5 h-5" />
-                </div>
                 <div>
                   <h3 className="text-base font-semibold text-secondary-900 leading-tight">Terms</h3>
                   <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">What we promised them, and what they promised us — kept apart so a dispute has an answer</p>
@@ -440,9 +423,6 @@ const VendorForm = () => {
             {/* --- Section 4: How they get paid --- */}
             <div className="mb-4">
               <div className="flex items-center gap-3 mb-5 pb-3 border-b border-secondary-100">
-                <div className="bg-primary/10 p-2 rounded-lg text-primary">
-                  <Banknote className="w-5 h-5" />
-                </div>
                 <div>
                   <h3 className="text-base font-semibold text-secondary-900 leading-tight">How they get paid</h3>
                   <p className="text-[13px] text-secondary-500 leading-tight mt-0.5">Written down once instead of asked for every time</p>
