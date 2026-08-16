@@ -8,7 +8,7 @@ import {
   Plus,
   CheckCircle,
   ScanLine,
-  Smartphone,
+  // Smartphone, // ← with the Phone button below
   Trash2,
   X,
 } from "lucide-react";
@@ -77,7 +77,7 @@ const PointOfSale = () => {
   const [tendered, setTendered] = useState<number | null>(null);
   const [note, setNote] = useState("");
   const [held, setHeld] = useState<HeldSale[]>([]);
-  const [picking, setPicking] = useState(false);
+  const [picking, setPickingState] = useState(false);
   /**
    * What the box has settled on, a beat behind what is being typed.
    *
@@ -103,6 +103,13 @@ const PointOfSale = () => {
   const focusScanner = () => {
     if (pickingRef.current) return;
     scanRef.current?.focus();
+  };
+
+  // Every open and close goes through here, so the ref above cannot drift out
+  // of step with the state — including the F4 shortcut.
+  const setPicking = (value: boolean) => {
+    pickingRef.current = value;
+    setPickingState(value);
   };
   useEffect(focusScanner, []);
 
@@ -394,10 +401,16 @@ const PointOfSale = () => {
           </Button>
 
           {/*
+            Phone-as-scanner: hidden for now, kept whole.
+
+            The socket, the pairing modal and the remote-scan handler all stay
+            wired below — only the way in is off the toolbar. Put this block
+            back to return the feature; nothing else needs changing.
+
             Green while a phone is on the other end, so a cashier who walked
             back to the register can tell at a glance whether the handset in
             the aisle is still feeding this cart.
-          */}
+
           <Tooltip
             title={
               presence.scanners > 0
@@ -421,6 +434,7 @@ const PointOfSale = () => {
               {presence.scanners > 0 ? `Phone ×${presence.scanners}` : "Phone"}
             </Button>
           </Tooltip>
+          */}
           <div className="flex items-center gap-4">
             <div className="text-right">
               <p className="m-0 text-[11px] uppercase tracking-wide text-secondary-500">
@@ -828,8 +842,7 @@ const PointOfSale = () => {
       <ProductPicker
         open={picking}
         setOpen={(value) => {
-          // Set before the focus call below, so closing hands the caret back.
-          pickingRef.current = value;
+          // Clears pickingRef first, so closing hands the caret back.
           setPicking(value);
           if (!value) focusScanner();
         }}
