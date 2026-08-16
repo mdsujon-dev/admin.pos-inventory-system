@@ -109,7 +109,6 @@ const AllMediaLibraryList = () => {
     useState(false);
   const [uploadKind, setUploadKind] =
     useState<MediaLibraryUploadKind>("image");
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const canDeleteMedia = useHasPermission("Media Library", "Delete");
 
   const handleCopy = (relativeOrFullUrl: string) => {
@@ -130,7 +129,6 @@ const AllMediaLibraryList = () => {
     newParams.set("folder", folder._id);
     newParams.set("b", encodeURIComponent(JSON.stringify(newBreadcrumb)));
     setSearchParams(newParams);
-    setSelectedItems([]);
     setPage(1);
   };
 
@@ -146,7 +144,6 @@ const AllMediaLibraryList = () => {
       newParams.set("b", encodeURIComponent(JSON.stringify(newBreadcrumb)));
     }
     setSearchParams(newParams);
-    setSelectedItems([]);
     setPage(1);
   };
 
@@ -196,7 +193,6 @@ const AllMediaLibraryList = () => {
     try {
       await moveMedia({ key, folder: folderId }).unwrap();
       message.success(folderId ? "Moved into folder" : "Moved to root");
-      setSelectedItems([]);
     } catch (e: any) {
       message.error(e?.data?.message || "Failed to move");
     }
@@ -217,22 +213,21 @@ const AllMediaLibraryList = () => {
   const images = data?.data?.data || [];
   const meta = data?.data?.meta || {};
 
-  const {
-    isDeleting,
-    handleDelete,
-    handleBulkDelete,
-    searchAndDeleteControls,
-    selectionCheckbox,
-  } = MediaSearchAndDelete({
-    images,
-    data,
-    selectedItems,
-    mode: "multiple",
-    setSelectedItems,
-    onAddNew: () => openUpload("image"),
-    onRefetch: refetch,
-    showAddButton: false,
-  });
+  // Media cards carry no selection checkbox, so this screen never holds a
+  // selection: `mode: "single"` keeps the shared Select All out of the toolbar
+  // and the empty list keeps the bulk path unreachable. Deleting here is one
+  // file at a time, from the card's own bin icon.
+  const { handleDelete, searchAndDeleteControls } =
+    MediaSearchAndDelete({
+      images,
+      data,
+      selectedItems: [],
+      mode: "single",
+      setSelectedItems: () => {},
+      onAddNew: () => openUpload("image"),
+      onRefetch: refetch,
+      showAddButton: false,
+    });
 
   return (
     <div>
@@ -249,20 +244,6 @@ const AllMediaLibraryList = () => {
         breadcrumbs={[{ title: "Dashboard", path: "/" }, { title: "Media" }]}
         extra={
           <Space>
-            {selectedItems.length > 0 && (
-              <PermissionGate module="Media Library" action="Delete">
-                <Popconfirm
-                  title={`Delete ${selectedItems.length} selected file(s)?`}
-                  onConfirm={handleBulkDelete}
-                  okText="Yes"
-                  cancelText="No"
-                >
-                  <Button danger loading={isDeleting} className="font-semibold">
-                    <DeleteOutlined /> Delete Selected ({selectedItems.length})
-                  </Button>
-                </Popconfirm>
-              </PermissionGate>
-            )}
             <PermissionGate module="Media Library" action="Create">
               <Button
                 icon={<FolderPlus className="w-4 h-4" />}
@@ -434,19 +415,9 @@ const AllMediaLibraryList = () => {
                 onDragEnd={() => (dragKeyRef.current = null)}
                 styles={{ body: { padding: '12px' } }}
                 bodyStyle={{ padding: '12px' }}
-                className={`overflow-hidden w-full transition-all duration-300 shadow-md shadow-primary/20 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-1 border !border-primary/10 hover:!border-primary-100 cursor-grab active:cursor-grabbing ${
-                  selectedItems.includes(img.path)
-                    ? "ring-[1px] ring-primary !border-primary"
-                    : ""
-                }`}
+                className="overflow-hidden w-full transition-all duration-300 shadow-md shadow-primary/20 hover:shadow-xl hover:shadow-primary/40 hover:-translate-y-1 border !border-primary/10 hover:!border-primary-100 cursor-grab active:cursor-grabbing"
                 cover={
                   <div className="relative w-full h-[170px] overflow-hidden">
-                    <div className="absolute top-2 left-2 z-20">
-                      {selectionCheckbox(
-                        img.path,
-                        selectedItems.includes(img.path)
-                      )}
-                    </div>
                     <div className="w-full h-full flex items-center justify-center">
                       <MediaLibraryItemPreview
                         item={{

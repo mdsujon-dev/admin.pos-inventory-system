@@ -1,5 +1,12 @@
 import { Input, Modal, Select } from "antd";
-import { Check, Loader2, PackageSearch, Search, X } from "lucide-react";
+import {
+  AlertTriangle,
+  Check,
+  Loader2,
+  PackageSearch,
+  Search,
+  X,
+} from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import Button from "../../components/ui/Button";
 import Money from "../../components/shared/Money";
@@ -34,7 +41,16 @@ const ALL = "all";
  * What this returns is a *code*, not a cart line. The picked item then goes
  * through the same scan call as everything else, so the server's checks —
  * expired, inactive, nothing left on the shelf — apply either way.
+ *
+ * It stays open across picks. A basket is filled a few items at a time, and
+ * reopening the grid — losing the search term and the filters with it — for
+ * every one of them is the slow way to do the common thing. The caller's
+ * verdict is reported here rather than behind the modal, because a refusal the
+ * cashier cannot see is a refusal they will not notice until the total is
+ * wrong.
  */
+export type PickOutcome = { ok: boolean; message?: string };
+
 const ProductPicker = ({
   open,
   setOpen,
@@ -43,7 +59,7 @@ const ProductPicker = ({
 }: {
   open: boolean;
   setOpen: (value: boolean) => void;
-  onPick: (code: string) => void;
+  onPick: (code: string) => void | PickOutcome | Promise<void | PickOutcome>;
   selectedCodes?: string[];
 }) => {
   const [search, setSearch] = useState("");
@@ -53,6 +69,12 @@ const ProductPicker = ({
   const [subCategory, setSubCategory] = useState<string>(ALL);
   const [brand, setBrand] = useState<string>(ALL);
   const searchRef = useRef<HTMLInputElement>(null);
+  /** How many landed in the cart this visit — the reason to keep tapping. */
+  const [added, setAdded] = useState(0);
+  /** The caller's last "no", shown here because the till is behind the modal. */
+  const [refusal, setRefusal] = useState<string | null>(null);
+  /** Guards a double-tap on the same tile while the scan call is in flight. */
+  const [busy, setBusy] = useState<string | null>(null);
 
   // One request per pause, not one per keystroke. On a counter connection the
   // difference between those two is whether the grid feels alive or stuck.
@@ -110,16 +132,39 @@ const ProductPicker = ({
     if (!open) return;
     setSearch("");
     setTerm("");
+    setAdded(0);
+    setRefusal(null);
+    setBusy(null);
     reset();
     // The cashier opened this to type a name, so the caret starts there.
     const timer = setTimeout(() => searchRef.current?.focus(), 120);
     return () => clearTimeout(timer);
   }, [open]);
 
-  const pick = (row: PickRow) => {
-    if (row.stock <= 0) return;
-    onPick(row.code);
-    setOpen(false);
+  /**
+   * Adds one item and stays put.
+   *
+   * The caller may answer — out of stock, expired, nothing matched — and that
+   * answer is worth more than the tap that caused it, so it replaces the last
+   * one rather than queueing behind it.
+   */
+  const pick = async (row: PickRow) => {
+    if (row.stock <= 0 || busy) return;
+    setBusy(row.key);
+    setRefusal(null);
+    try {
+      const outcome = await onPick(row.code);
+      if (outcome && !outcome.ok) {
+        setRefusal(outcome.message ?? `Could not add ${row.name}`);
+        return;
+      }
+      setAdded((count) => count + 1);
+    } finally {
+      setBusy(null);
+      // The caller pulls focus back to its own scanner box on every add; the
+      // modal is on top, so the caret belongs in the search field.
+      searchRef.current?.focus();
+    }
   };
 
   /**
@@ -127,11 +172,14 @@ const ProductPicker = ({
    *
    * Typing a name and pressing Enter is how a till is used when both hands are
    * busy; making the cashier reach for the mouse to confirm the one obvious
-   * match is the slowest possible ending to a fast search.
+   * match is the slowest possible ending to a fast search. The box is cleared
+   * afterwards so the next name can be typed straight over it.
    */
-  const takeFirst = () => {
+  const takeFirst = async () => {
     const first = rows.find((row) => row.stock > 0);
-    if (first) pick(first);
+    if (!first) return;
+    await pick(first);
+    setSearch("");
   };
 
   return (
@@ -148,7 +196,18 @@ const ProductPicker = ({
       }
       open={open}
       onCancel={() => setOpen(false)}
-      footer={null}
+      footer={
+        <div className="flex items-center justify-between gap-3">
+          <span className="text-[13px] text-secondary-500">
+            {added === 0
+              ? "Tap an item to add it — the list stays open."
+              : `${added} item${added === 1 ? "" : "s"} added to the cart`}
+          </span>
+          <Button variant="primary" size="sm" onClick={() => setOpen(false)}>
+            Done
+          </Button>
+        </div>
+      }
       width={1000}
       destroyOnHidden
     >
@@ -220,6 +279,23 @@ const ProductPicker = ({
             </Button>
           )}
         </div>
+
+        {/* The till's own refusal banner sits behind this modal, so a rejected
+            tap has to say so here or it says nothing at all. */}
+        {refusal && (
+          <div className="mt-2 flex items-start gap-2 rounded-lg border border-danger/20 bg-danger/5 px-3 py-2">
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-danger" />
+            <p className="m-0 flex-1 text-[13px] text-danger">{refusal}</p>
+            <button
+              type="button"
+              onClick={() => setRefusal(null)}
+              className="text-secondary-400 transition-colors hover:text-secondary-700"
+              aria-label="Dismiss"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       <div className="max-h-[52vh] overflow-y-auto pr-1">
@@ -251,7 +327,7 @@ const ProductPicker = ({
                 <button
                   key={row.key}
                   type="button"
-                  disabled={out}
+                  disabled={out || busy !== null}
                   onClick={() => pick(row)}
                   className={`group relative flex flex-col overflow-hidden rounded-md border text-left transition ${
                     out
@@ -272,6 +348,12 @@ const ProductPicker = ({
                       <div className="grid h-full place-items-center text-secondary-300">
                         <PackageSearch className="h-6 w-6" />
                       </div>
+                    )}
+
+                    {busy === row.key && (
+                      <span className="absolute inset-0 grid place-items-center bg-white/70">
+                        <Loader2 className="h-5 w-5 animate-spin text-primary" />
+                      </span>
                     )}
 
                     {/* Already in the cart: a corner mark, not a veil over the
