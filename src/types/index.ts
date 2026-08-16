@@ -342,7 +342,12 @@ export interface IBrands {
   address?: string;
 }
 
-export interface IReview {
+/**
+ * A video or image testimonial. Named apart from `IReview` above: the two
+ * describe different things and merely shared a name, which made TypeScript
+ * merge them and then object that their `avatar` fields disagreed.
+ */
+export interface IVideoTestimonial {
   _id?: string;
   quote: string;
   name: string;

@@ -1,20 +1,15 @@
 import dayjs from "dayjs";
-import jsPDF from "jspdf";
-import * as XLSX from "xlsx";
-import {
-  AlignmentType,
-  BorderStyle,
-  Document,
-  HeadingLevel,
-  PageOrientation,
-  Packer,
-  Paragraph,
-  Table,
-  TableCell,
-  TableRow,
-  TextRun,
-  WidthType,
-} from "docx";
+
+/*
+  SheetJS, jsPDF and docx are loaded when a file is actually written, not when
+  the panel starts. Between them they are ~1.4 MB of JavaScript that exists to
+  serve one button, and importing them at the top of this module put all of it
+  in front of the login screen — this file is pulled in by nineteen list pages.
+
+  `ExportMenu` already awaits these functions behind its "Preparing..." state,
+  so the download waits on the import and nothing else has to change.
+*/
+type DocxModule = typeof import("docx");
 
 /**
  * One shape, three files.
@@ -158,7 +153,9 @@ const saveBlob = (blob: Blob, name: string) => {
 
 /* ── Excel ──────────────────────────────────────────────────────────────── */
 
-export const exportToExcel = (sheet: ExportSheet) => {
+export const exportToExcel = async (sheet: ExportSheet) => {
+  const XLSX = await import("xlsx");
+
   const body = [
     [sheet.title],
     ...(sheet.subtitle ? [[sheet.subtitle]] : []),
@@ -194,7 +191,9 @@ const PDF_ROW_HEIGHT = 16;
 const PDF_HEADER_HEIGHT = 18;
 const PDF_PAD = 4;
 
-export const exportToPdf = (sheet: ExportSheet) => {
+export const exportToPdf = async (sheet: ExportSheet) => {
+  const { default: jsPDF } = await import("jspdf");
+
   // Landscape: a register is far wider than it is tall once the dates are in.
   const doc = new jsPDF({ orientation: "landscape", unit: "pt", format: "a4" });
   const margin = 32;
@@ -341,47 +340,73 @@ export const exportToPdf = (sheet: ExportSheet) => {
 
 /* ── Word ───────────────────────────────────────────────────────────────── */
 
-/** Grey hairlines on every edge, so the table reads as a table on paper too. */
-const WORD_BORDER = { style: BorderStyle.SINGLE, size: 2, color: "CBD5E1" };
-const WORD_BORDERS = {
-  top: WORD_BORDER,
-  bottom: WORD_BORDER,
-  left: WORD_BORDER,
-  right: WORD_BORDER,
+/**
+ * The cell builder, bound to a loaded `docx`.
+ *
+ * A factory rather than a plain function because `BorderStyle`, `TableCell` and
+ * the rest are values on a module that no longer exists until the export is
+ * asked for. Built once per file, then used for every cell in it.
+ */
+const makeWordCell = (docx: DocxModule) => {
+  const { AlignmentType, BorderStyle, Paragraph, TableCell, TextRun } = docx;
+
+  /** Grey hairlines on every edge, so the table reads as a table on paper too. */
+  const border = { style: BorderStyle.SINGLE, size: 2, color: "CBD5E1" };
+  const borders = {
+    top: border,
+    bottom: border,
+    left: border,
+    right: border,
+  };
+
+  return (
+    text: string,
+    opts?: { head?: boolean; low?: boolean; first?: boolean }
+  ) =>
+    new TableCell({
+      borders,
+      // Word packs text against the cell edge by default; a register with this
+      // many columns needs the breathing room to stay readable.
+      margins: { top: 40, bottom: 40, left: 80, right: 80 },
+      shading: opts?.head
+        ? { fill: "F3F4F6" }
+        : opts?.low
+        ? { fill: "FEE2E2" }
+        : undefined,
+      children: [
+        new Paragraph({
+          // Names range left, everything else — marks, dates, amounts —
+          // centres, matching the on-screen table and the PDF.
+          alignment: opts?.first ? AlignmentType.LEFT : AlignmentType.CENTER,
+          children: [
+            new TextRun({
+              text,
+              bold: opts?.head,
+              color: opts?.head ? "334155" : opts?.low ? "B91C1C" : "1F2937",
+              size: 18, // half-points, so 9pt — a register has a lot of columns
+            }),
+          ],
+        }),
+      ],
+    });
 };
 
-const wordCell = (
-  text: string,
-  opts?: { head?: boolean; low?: boolean; first?: boolean }
-) =>
-  new TableCell({
-    borders: WORD_BORDERS,
-    // Word packs text against the cell edge by default; a register with this
-    // many columns needs the breathing room to stay readable.
-    margins: { top: 40, bottom: 40, left: 80, right: 80 },
-    shading: opts?.head
-      ? { fill: "F3F4F6" }
-      : opts?.low
-      ? { fill: "FEE2E2" }
-      : undefined,
-    children: [
-      new Paragraph({
-        // Names range left, everything else — marks, dates, amounts — centres,
-        // matching the on-screen table and the PDF.
-        alignment: opts?.first ? AlignmentType.LEFT : AlignmentType.CENTER,
-        children: [
-          new TextRun({
-            text,
-            bold: opts?.head,
-            color: opts?.head ? "334155" : opts?.low ? "B91C1C" : "1F2937",
-            size: 18, // half-points, so 9pt — a register has a lot of columns
-          }),
-        ],
-      }),
-    ],
-  });
-
 export const exportToWord = async (sheet: ExportSheet) => {
+  const docx = await import("docx");
+  const {
+    AlignmentType,
+    Document,
+    HeadingLevel,
+    PageOrientation,
+    Packer,
+    Paragraph,
+    Table,
+    TableRow,
+    TextRun,
+    WidthType,
+  } = docx;
+  const wordCell = makeWordCell(docx);
+
   // Landscape once a table is wider than a portrait page can carry without
   // squeezing every column to a couple of characters.
   const landscape = sheet.headers.length > 6;

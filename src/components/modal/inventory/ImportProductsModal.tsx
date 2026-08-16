@@ -2,7 +2,9 @@ import { Alert, Modal, Table, Upload } from "antd";
 import { Download, FileSpreadsheet, Upload as UploadIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import * as XLSX from "xlsx";
+// Loaded on the click that needs it. SheetJS is several hundred kilobytes and
+// this modal is reachable from the product list, so importing it at the top
+// put the whole parser in front of every page that links here.
 import Button from "../../ui/Button";
 import { useImportProductsMutation } from "../../../redux/features/inventory/productApi";
 
@@ -14,7 +16,7 @@ import { useImportProductsMutation } from "../../../redux/features/inventory/pro
  * "selling_price" still lands — a shop's existing file is whatever it is, and
  * asking them to rewrite the headers is asking them not to bother.
  */
-const FIELDS = [
+const FIELDS = [ 
   "name",
   "sku",
   "barcode",
@@ -79,6 +81,7 @@ const ImportProductsModal = ({
 
   const read = async (file: File) => {
     try {
+      const XLSX = await import("xlsx");
       const book = XLSX.read(await file.arrayBuffer());
       const sheet = book.Sheets[book.SheetNames[0]];
       const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, {
@@ -109,7 +112,8 @@ const ImportProductsModal = ({
     }
   };
 
-  const downloadTemplate = () => {
+  const downloadTemplate = async () => {
+    const XLSX = await import("xlsx");
     const sheet = XLSX.utils.json_to_sheet([
       {
         name: "Shampoo 200ml",

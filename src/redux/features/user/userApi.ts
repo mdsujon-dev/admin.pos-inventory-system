@@ -53,16 +53,10 @@ const authApi = baseApi.injectEndpoints({
       transformResponse: (response: { data: any }) => response.data,
       invalidatesTags: ["users"],
     }),
-    updateUserRole: builder.mutation({
-      query: (user) => {
-        return {
-          url: `user/update-role/${user.userId}`,
-          method: "PUT",
-          body: { role: user.role },
-        };
-      },
-      invalidatesTags: ["users"],
-    }),
+    // No `updateUserRole` here: there is no PUT /user/update-role/:id on the
+    // server, so the endpoint that used to sit at this spot could only ever
+    // 404. A role is changed through `updateUser` (PATCH /user/:id) like any
+    // other field on the account.
     toggleUserStatus: builder.mutation({
       query: (userId) => {
         return {
@@ -112,7 +106,6 @@ const authApi = baseApi.injectEndpoints({
 export const {
   useCreateUserMutation,
   useMyProfileQuery,
-  useUpdateUserRoleMutation,
   useGetAllUserQuery,
   // Fired on demand by the export button, which needs every matching row
   // rather than the page being shown.

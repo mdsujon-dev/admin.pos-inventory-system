@@ -1,4 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
+import type { SVGProps } from "react";
+
+/** Every icon here renders a single <svg>, so it accepts what an <svg> accepts. */
+type IconProps = SVGProps<SVGSVGElement>;
+
 export const TeamIcon = () => {
   return (
     <svg
@@ -187,7 +191,7 @@ export const RejectionIcon = () => {
     </svg>
   );
 };
-export const CopyIcon = ({ width, height, fillColor }) => {
+export const CopyIcon = () => {
   return (
     <svg
       className="w-[18px] h-[20px] align-middle fill-current overflow-hidden"
@@ -199,7 +203,7 @@ export const CopyIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const LocationIcon = ({ width, height, fillColor }) => {
+export const LocationIcon = () => {
   return (
     <svg
       stroke="currentColor"
@@ -214,7 +218,7 @@ export const LocationIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const DocumentIcon = ({ width, height, fillColor }) => {
+export const DocumentIcon = () => {
   return (
     <svg
       stroke="currentColor"
@@ -229,7 +233,7 @@ export const DocumentIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const LangIcon = ({ width, height, fillColor }) => {
+export const LangIcon = () => {
   return (
     <svg
       stroke="currentColor"
@@ -244,7 +248,7 @@ export const LangIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const EducationIcon = ({ width, height, fillColor }) => {
+export const EducationIcon = () => {
   return (
     <svg
       stroke="currentColor"
@@ -260,7 +264,7 @@ export const EducationIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const UserIcon = ({ width, height, fillColor }) => {
+export const UserIcon = () => {
   return (
     <svg
       stroke="currentColor"
@@ -275,7 +279,7 @@ export const UserIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const BookIcon = ({ width, height, fillColor }) => {
+export const BookIcon = () => {
   return (
     <svg
       stroke="currentColor"
@@ -291,7 +295,7 @@ export const BookIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const PurposeIcon = ({ width, height, fillColor }) => {
+export const PurposeIcon = () => {
   return (
     <svg
       stroke="currentColor"
@@ -306,7 +310,7 @@ export const PurposeIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const RemarksIcon = ({ width, height, fillColor }) => {
+export const RemarksIcon = () => {
   return (
     <svg
       stroke="currentColor"
@@ -321,7 +325,7 @@ export const RemarksIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const PassportIcon = ({ width, height, fillColor }) => {
+export const PassportIcon = () => {
   return (
     <svg
       stroke="currentColor"
@@ -337,7 +341,7 @@ export const PassportIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const LeadIcon2 = ({ width, height, fillColor }) => {
+export const LeadIcon2 = () => {
   return (
     <svg
       stroke="currentColor"
@@ -353,7 +357,7 @@ export const LeadIcon2 = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const MeetingIcon = ({ width, height, fillColor }) => {
+export const MeetingIcon = () => {
   return (
     <svg
       stroke="currentColor"
@@ -388,7 +392,7 @@ export const MeetingIcon = ({ width, height, fillColor }) => {
     </svg>
   );
 };
-export const EditIcon = ({ className, ...props }) => {
+export const EditIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="20"
@@ -418,7 +422,7 @@ export const EditIcon = ({ className, ...props }) => {
     </svg>
   );
 };
-export const DeleteIcon = ({ className, ...props }) => {
+export const DeleteIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="20"
@@ -462,7 +466,7 @@ export const DeleteIcon = ({ className, ...props }) => {
     </svg>
   );
 };
-export const SalesIcon = ({ className, ...props }) => {
+export const SalesIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1em"
@@ -481,7 +485,7 @@ export const SalesIcon = ({ className, ...props }) => {
     </svg>
   );
 };
-export const ServicePageIcon = ({ className, ...props }: any) => {
+export const ServicePageIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.5em"
@@ -502,7 +506,7 @@ export const ServicePageIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const MediaIcon = ({ className, ...props }: any) => {
+export const MediaIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.5em"
@@ -521,7 +525,7 @@ export const MediaIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const DashboardIcon = ({ className, ...props }: any) => {
+export const DashboardIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.5em"
@@ -537,7 +541,7 @@ export const DashboardIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const ProjectIcon = ({ className, ...props }: any) => {
+export const ProjectIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.4em"
@@ -555,7 +559,7 @@ export const ProjectIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const BlogIcon = ({ className, ...props }: any) => {
+export const BlogIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.5em"
@@ -578,7 +582,7 @@ export const BlogIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const SettingsIcon = ({ className, ...props }: any) => {
+export const SettingsIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.3em"
@@ -597,7 +601,7 @@ export const SettingsIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const InquiriesIcon = ({ className, ...props }: any) => {
+export const InquiriesIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.5em"
@@ -614,7 +618,7 @@ export const InquiriesIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const PortfolioIcon = ({ className, ...props }: any) => {
+export const PortfolioIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.5em"
@@ -633,7 +637,7 @@ export const PortfolioIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const CareerIcon = ({ className, ...props }: any) => {
+export const CareerIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.5em"
@@ -656,7 +660,7 @@ export const CareerIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const UserManagementIcon = ({ className, ...props }: any) => {
+export const UserManagementIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.6em"
@@ -676,7 +680,7 @@ export const UserManagementIcon = ({ className, ...props }: any) => {
     </svg>
   );
 };
-export const ActionLogsIcon = ({ className, ...props }: any) => {
+export const ActionLogsIcon = ({ className, ...props }: IconProps) => {
   return (
     <svg
       width="1.6em"

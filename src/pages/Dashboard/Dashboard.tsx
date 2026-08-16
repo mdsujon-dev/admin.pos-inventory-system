@@ -10,7 +10,7 @@ import {
   Wallet,
   Receipt,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { Suspense, lazy, useState } from "react";
 import PageMeta from "../../components/Common/PageMeta";
 import CustomDatePicker from "../../components/shared/CustomDatePicker";
 import { Money } from "../../components/shared/Money";
@@ -22,9 +22,27 @@ import {
 } from "../../redux/features/transaction/transactionApi";
 import { Metric } from "./components/DashboardKit";
 import { riseIn } from "./components/dashboardMotion";
-import IncomeExpenseChart from "./components/IncomeExpenseChart";
 import WelcomeDashboard from "./components/WelcomeDashboard";
-import { StaticChartsSection } from "./components/DashboardCharts";
+
+/*
+  Recharts is ~880 kB and nothing above the fold needs it, so the tiles and the
+  figures paint while it downloads instead of behind it. Both live in the same
+  chunk, so opening this page fetches it once for the pair.
+*/
+const IncomeExpenseChart = lazy(() => import("./components/IncomeExpenseChart"));
+const StaticChartsSection = lazy(() =>
+  import("./components/DashboardCharts").then((m) => ({
+    default: m.StaticChartsSection,
+  }))
+);
+
+/** Holds the space a chart is about to fill, so the page does not jump. */
+const ChartFallback = ({ height = 320 }: { height?: number }) => (
+  <div
+    style={{ height }}
+    className="animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800"
+  />
+);
 
 /**
  * The dashboard.
@@ -232,15 +250,19 @@ const Dashboard: React.FC = () => {
 
       {/* 6 Unique Static Chart Cards */}
       <motion.div variants={riseIn}>
-        <StaticChartsSection />
+        <Suspense fallback={<ChartFallback height={640} />}>
+          <StaticChartsSection />
+        </Suspense>
       </motion.div>
 
       {canIncomeExpense && (
         <motion.div variants={riseIn}>
-          <IncomeExpenseChart
-            data={financeSeries}
-            loading={financeChartLoading}
-          />
+          <Suspense fallback={<ChartFallback />}>
+            <IncomeExpenseChart
+              data={financeSeries}
+              loading={financeChartLoading}
+            />
+          </Suspense>
         </motion.div>
       )}
     </motion.div>

@@ -10,7 +10,7 @@ import {
   TrendingUp,
   Wallet,
 } from "lucide-react";
-import { useState } from "react";
+import { Suspense, lazy, useState } from "react";
 import { Link } from "react-router-dom";
 import PageHeader from "../../components/Common/PageHeader";
 import PageMeta from "../../components/Common/PageMeta";
@@ -23,7 +23,10 @@ import {
 } from "../../redux/features/accounts/reportApi";
 import { SectionCard } from "../Inventory/Products/ProductFormUI";
 import { MetricCard } from "../../components/Common/MetricCard";
-import AccountsCharts from "./components/AccountsCharts";
+
+// The figures above are the point of this screen and they are plain numbers;
+// Recharts only draws the second look at them, so it loads after the page does.
+const AccountsCharts = lazy(() => import("./components/AccountsCharts"));
 
 const { RangePicker } = DatePicker;
 
@@ -199,7 +202,13 @@ const AccountsOverview = () => {
       {/* The same figures as the cards above, drawn. Numbers first, because
           they are what gets written down; the shapes are for the second look. */}
       <div className="mt-4">
-        <AccountsCharts pnl={pnl} cash={cash} stock={stock} />
+        <Suspense
+          fallback={
+            <div className="h-80 animate-pulse rounded-xl bg-gray-100 dark:bg-gray-800" />
+          }
+        >
+          <AccountsCharts pnl={pnl} cash={cash} stock={stock} />
+        </Suspense>
       </div>
 
       {/* Owed both ways */}

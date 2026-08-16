@@ -66,10 +66,12 @@ export const PERMISSION_MODULES: PermissionModule[] = [
    */
   { module: "Accounts", permissions: CRUD, group: "Accounts" },
 
-  // Media Library
+  // Media Library. "Update" is what renaming or moving a folder is gated on
+  // (PUT /folders/:id), so without it here that button was unreachable for
+  // everyone but a SUPER_ADMIN — the tick box to grant it did not exist.
   {
     module: "Media Library",
-    permissions: ["View", "Create", "Delete"],
+    permissions: ["View", "Create", "Update", "Delete"],
     group: "Media Library",
   },
 
