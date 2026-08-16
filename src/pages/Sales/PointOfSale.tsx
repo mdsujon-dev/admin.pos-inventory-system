@@ -92,7 +92,18 @@ const PointOfSale = () => {
   const [scanCode, { isLoading: scanning }] = useScanCodeMutation();
   const [createSale, { isLoading: saving }] = useCreateSaleMutation();
 
-  const focusScanner = () => scanRef.current?.focus();
+  /**
+   * The caret belongs in the scan box — unless something is on top of it.
+   *
+   * The picker adds item after item without closing, and each add ends here.
+   * Pulling focus down to a box behind the modal on every one of those would
+   * take the caret out of the field the cashier is typing into.
+   */
+  const pickingRef = useRef(false);
+  const focusScanner = () => {
+    if (pickingRef.current) return;
+    scanRef.current?.focus();
+  };
   useEffect(focusScanner, []);
 
   useEffect(() => {
@@ -817,6 +828,8 @@ const PointOfSale = () => {
       <ProductPicker
         open={picking}
         setOpen={(value) => {
+          // Set before the focus call below, so closing hands the caret back.
+          pickingRef.current = value;
           setPicking(value);
           if (!value) focusScanner();
         }}
