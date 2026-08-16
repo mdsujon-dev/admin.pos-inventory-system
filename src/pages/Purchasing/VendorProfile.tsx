@@ -10,6 +10,7 @@ import {
   Receipt,
   Scale,
   TrendingUp,
+  Undo2,
   Wallet,
 } from "lucide-react";
 import React, { useState } from "react";
@@ -104,6 +105,15 @@ const VendorProfile = () => {
   const refunds: IPurchaseReturn[] = ledger.refunds ?? [];
   const owed = totals.due ?? 0;
   const refundDue = totals.refundDue ?? 0;
+
+  // What went back, against what came in. Shown as a share because 50,000
+  // returned means one thing on a 60,000 account and another on a 6,00,000 one.
+  const returned = totals.returned ?? 0;
+  const returnCount = totals.returnCount ?? 0;
+  const returnedShare =
+    totals.purchased > 0 && returned > 0
+      ? `${((returned / totals.purchased) * 100).toFixed(1)}%`
+      : "";
 
   const supplies = [
     ...(vendor.categories ?? []).map((row: unknown) => ({
@@ -227,7 +237,7 @@ const VendorProfile = () => {
         refundCount={refunds.length}
       />
 
-      <div className="mb-5 grid gap-3 sm:grid-cols-3">
+      <div className="mb-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           icon={Receipt}
           label="Bills"
@@ -248,6 +258,22 @@ const VendorProfile = () => {
           accent="#10b981"
           hint="Total amount settled"
           value={<Money value={totals.paid} />}
+        />
+        {/* Not the same question as "do they owe us a refund" above: this is
+            how much of what they sent was worth keeping. A supplier who
+            refunds every time still costs a morning per return. */}
+        <MetricCard
+          icon={Undo2}
+          label="Returned"
+          accent={returned > 0 ? "#f59e0b" : "#94a3b8"}
+          hint={
+            returnCount === 0
+              ? "Nothing sent back"
+              : `${returnCount} return${
+                  returnCount === 1 ? "" : "s"
+                }${returnedShare ? ` · ${returnedShare} of purchases` : ""}`
+          }
+          value={<Money value={returned} />}
         />
       </div>
 
